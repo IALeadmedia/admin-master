@@ -3,8 +3,8 @@ import { ConfigProvider, Switch, Tooltip } from "antd";
 import type { EntityType } from "../config-page.const";
 import { appSetting } from "@/constants/app-setting/config.const";
 
-export function getColumns(): TableColumnsType<EntityType> {
-    return [
+export function getColumns(canSeeOnlineSwitch: boolean): TableColumnsType<EntityType> {
+    const columns: TableColumnsType<EntityType> = [
         {
             title: "Nome do Pacote",
             dataIndex: "name",
@@ -25,8 +25,10 @@ export function getColumns(): TableColumnsType<EntityType> {
             key: "monthly_fee",
             width: 180,
         },
+    ];
 
-        {
+    if (canSeeOnlineSwitch) {
+        columns.push({
             title: "",
             dataIndex: "online",
             width: 50,
@@ -58,7 +60,8 @@ export function getColumns(): TableColumnsType<EntityType> {
                     </Tooltip>
                 </ConfigProvider>
             ),
-        },
+        });
+    }
 
-    ];
+    return columns;
 }
