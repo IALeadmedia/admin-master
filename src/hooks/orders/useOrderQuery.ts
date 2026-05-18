@@ -2,11 +2,14 @@
 import type { IOrderTelecomFilters } from "@/types/IOrder.type";
 import { useQuery } from "@tanstack/react-query";
 import { useResolvedOrderScope } from "./useResolvedOrderScope";
+import type { OrderModule } from "@/services/orders.service";
 
 export function useOrderQuery({
+  model,
   filters,
   enabled = true,
 }: {
+  model?: OrderModule;
   filters?: Omit<IOrderTelecomFilters, "company_id" | "partner_id">;
   enabled?: boolean;
 } = {}) {
@@ -16,7 +19,7 @@ export function useOrderQuery({
     resolvedOperator,
     resolvedCompanyId,
     resolvedPartnerId,
-  } = useResolvedOrderScope();
+  } = useResolvedOrderScope(model);
 
   const resolvedFilters: IOrderTelecomFilters = {
     ...filters,

@@ -66,11 +66,11 @@ export const menuOptionsTim: MenuItem[] = [
     items: [
       {
         label: "Banda Larga",
-        to: "/app/order/banda-larga",
+        to: "/app/order/telecom/banda-larga",
       },
       {
         label: "Telefonia Móvel",
-        to: "/app/order/telefonia-movel",
+        to: "/app/order/telecom/telefonia-movel",
       },
     ],
   },

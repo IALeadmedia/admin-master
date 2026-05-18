@@ -7,6 +7,7 @@ import type {
   IOrderAddressComplement,
   IOrderTelecom,
 } from "@/types/IOrder.type";
+import type { OrderModule } from "@/services/orders.service";
 
 export const entityPage = dictionaryQueryClient.orders;
 export const useUpdateEntity = useUpdateOrderMutation;
@@ -14,14 +15,37 @@ export const useDeleteEntity = useDeleteOrderMutation;
 export const useListEntity = useOrderQuery;
 export type EntityType = IOrderTelecom;
 
+export type OrderModel = OrderModule;
+
 export type TelecomOrderCategory = "banda-larga" | "telefonia-movel";
+export type FinanceOrderCategory = "maquininha" | "emprestimo";
+export type BenefitsOrderCategory = "beneficios";
+export type OrderCategory =
+  | TelecomOrderCategory
+  | FinanceOrderCategory
+  | BenefitsOrderCategory;
+
+export const defaultOrderModel: OrderModel = "telecom";
+
+export const defaultCategoryByModel: Record<OrderModel, OrderCategory> = {
+  telecom: "banda-larga",
+  finances: "maquininha",
+  benefits: "beneficios",
+};
+
+const categoriesByModel: Record<OrderModel, OrderCategory[]> = {
+  telecom: ["banda-larga", "telefonia-movel"],
+  finances: ["maquininha", "emprestimo"],
+  benefits: ["beneficios"],
+};
 
 const telecomOrderCategories: TelecomOrderCategory[] = [
   "banda-larga",
   "telefonia-movel",
 ];
 
-export const defaultOrderCategory: TelecomOrderCategory = "banda-larga";
+export const defaultOrderCategory: TelecomOrderCategory =
+  defaultCategoryByModel.telecom as TelecomOrderCategory;
 
 const telecomOrderCategoryLabelMap: Record<TelecomOrderCategory, string> = {
   "banda-larga": "Banda Larga",
@@ -39,14 +63,29 @@ export function isTelecomOrderCategory(
 
 export function resolveOrderCategory(
   rawCategory?: string,
-): TelecomOrderCategory {
-  return isTelecomOrderCategory(rawCategory)
-    ? rawCategory
-    : defaultOrderCategory;
+  model: OrderModel = defaultOrderModel,
+): OrderCategory {
+  const categories = categoriesByModel[model];
+  if (!rawCategory) return defaultCategoryByModel[model];
+
+  return categories.includes(rawCategory as OrderCategory)
+    ? (rawCategory as OrderCategory)
+    : defaultCategoryByModel[model];
 }
 
-export function getOrderCategoryLabel(category: TelecomOrderCategory): string {
-  return telecomOrderCategoryLabelMap[category];
+export function isKnownOrderModel(model: string): model is OrderModel {
+  return model in categoriesByModel;
+}
+
+export function resolveOrderModel(rawModel?: string): OrderModel {
+  const normalized = (rawModel ?? "").toLowerCase();
+  return isKnownOrderModel(normalized) ? normalized : defaultOrderModel;
+}
+
+export function getOrderCategoryLabel(category: string): string {
+  return (
+    telecomOrderCategoryLabelMap[category as TelecomOrderCategory] ?? category
+  );
 }
 
 export type FormValues = {

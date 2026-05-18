@@ -32,7 +32,9 @@ export interface ResolvedOrderScope {
  *     company_id = user.company_id
  *     partner_id = user.partner_id
  */
-export function useResolvedOrderScope(): ResolvedOrderScope {
+export function useResolvedOrderScope(
+  explicitModule?: OrderModule,
+): ResolvedOrderScope {
   const { user, isGlobalAdmin } = useAuth();
   const { selectedSegmentId, selectedCompanyId, selectedPartnerId } =
     useAdminScope();
@@ -55,7 +57,10 @@ export function useResolvedOrderScope(): ResolvedOrderScope {
       ?.toLowerCase()
       .trim();
 
-    const resolvedModule = resolveOrderModule(selectedSegmentId);
+    const resolvedModule = resolveOrderModule(
+      selectedSegmentId,
+      explicitModule,
+    );
     const resolvedOperator = resolveOrderOperator(operatorFromCompany, true);
 
     return {
@@ -82,7 +87,7 @@ export function useResolvedOrderScope(): ResolvedOrderScope {
   const resolvedOperator = resolveOrderOperator(operatorFromUserCompany, false);
   const resolvedModule = resolveOrderModule(
     undefined,
-    undefined,
+    explicitModule,
     resolvedOperator,
   );
 

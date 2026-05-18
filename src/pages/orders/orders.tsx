@@ -4,18 +4,31 @@ import { Typography } from "antd";
 import {
   entityPage,
   getOrderCategoryLabel,
+  resolveOrderModel,
   resolveOrderCategory,
   useListEntity,
 } from "./config-page.const";
 import { TableMain } from "./components/table";
+import { useParams } from "@tanstack/react-router";
 
 interface OrdersPageProps {
+  model?: string;
   category?: string;
 }
 
-export function OrdersPage({ category }: OrdersPageProps) {
-  const resolvedCategory = resolveOrderCategory(category);
+export function OrdersPage({ model, category }: OrdersPageProps) {
+  const routeParams = useParams({
+    from: "/app/order/$model/$category",
+    shouldThrow: false,
+  });
+
+  const rawModel = model ?? routeParams?.model;
+  const rawCategory = category ?? routeParams?.category;
+
+  const resolvedModel = resolveOrderModel(rawModel);
+  const resolvedCategory = resolveOrderCategory(rawCategory, resolvedModel);
   const { data, isLoading } = useListEntity({
+    model: resolvedModel,
     filters: { category: resolvedCategory },
   });
 

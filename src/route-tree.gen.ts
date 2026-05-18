@@ -22,10 +22,12 @@ import { Route as authLoginRouteImport } from './routes/(auth)/login'
 import { Route as AppProductsIndexRouteImport } from './routes/app/products/index'
 import { Route as AppVivoExampleRouteImport } from './routes/app/vivo/example'
 import { Route as AppTimExampleRouteImport } from './routes/app/tim/example'
+import { Route as AppOrderModelRouteImport } from './routes/app/order.$model'
 import { Route as AppOrderCategoryRouteImport } from './routes/app/order.$category'
 import { Route as AppClaroExampleRouteImport } from './routes/app/claro/example'
 import { Route as AppProductsModelIndexRouteImport } from './routes/app/products/$model/index'
 import { Route as AppProductsModelCategoryRouteImport } from './routes/app/products/$model.$category'
+import { Route as AppOrderModelCategoryRouteImport } from './routes/app/order.$model.$category'
 
 const AppRouteRoute = AppRouteRouteImport.update({
   id: '/app',
@@ -92,6 +94,11 @@ const AppTimExampleRoute = AppTimExampleRouteImport.update({
   path: '/tim/example',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppOrderModelRoute = AppOrderModelRouteImport.update({
+  id: '/$model',
+  path: '/$model',
+  getParentRoute: () => AppOrderRoute,
+} as any)
 const AppOrderCategoryRoute = AppOrderCategoryRouteImport.update({
   id: '/$category',
   path: '/$category',
@@ -113,6 +120,11 @@ const AppProductsModelCategoryRoute =
     path: '/$model/$category',
     getParentRoute: () => AppProductsRoute,
   } as any)
+const AppOrderModelCategoryRoute = AppOrderModelCategoryRouteImport.update({
+  id: '/$category',
+  path: '/$category',
+  getParentRoute: () => AppOrderModelRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -127,9 +139,11 @@ export interface FileRoutesByFullPath {
   '/app/': typeof AppIndexRoute
   '/app/claro/example': typeof AppClaroExampleRoute
   '/app/order/$category': typeof AppOrderCategoryRoute
+  '/app/order/$model': typeof AppOrderModelRouteWithChildren
   '/app/tim/example': typeof AppTimExampleRoute
   '/app/vivo/example': typeof AppVivoExampleRoute
   '/app/products/': typeof AppProductsIndexRoute
+  '/app/order/$model/$category': typeof AppOrderModelCategoryRoute
   '/app/products/$model/$category': typeof AppProductsModelCategoryRoute
   '/app/products/$model/': typeof AppProductsModelIndexRoute
 }
@@ -144,9 +158,11 @@ export interface FileRoutesByTo {
   '/app': typeof AppIndexRoute
   '/app/claro/example': typeof AppClaroExampleRoute
   '/app/order/$category': typeof AppOrderCategoryRoute
+  '/app/order/$model': typeof AppOrderModelRouteWithChildren
   '/app/tim/example': typeof AppTimExampleRoute
   '/app/vivo/example': typeof AppVivoExampleRoute
   '/app/products': typeof AppProductsIndexRoute
+  '/app/order/$model/$category': typeof AppOrderModelCategoryRoute
   '/app/products/$model/$category': typeof AppProductsModelCategoryRoute
   '/app/products/$model': typeof AppProductsModelIndexRoute
 }
@@ -164,9 +180,11 @@ export interface FileRoutesById {
   '/app/': typeof AppIndexRoute
   '/app/claro/example': typeof AppClaroExampleRoute
   '/app/order/$category': typeof AppOrderCategoryRoute
+  '/app/order/$model': typeof AppOrderModelRouteWithChildren
   '/app/tim/example': typeof AppTimExampleRoute
   '/app/vivo/example': typeof AppVivoExampleRoute
   '/app/products/': typeof AppProductsIndexRoute
+  '/app/order/$model/$category': typeof AppOrderModelCategoryRoute
   '/app/products/$model/$category': typeof AppProductsModelCategoryRoute
   '/app/products/$model/': typeof AppProductsModelIndexRoute
 }
@@ -185,9 +203,11 @@ export interface FileRouteTypes {
     | '/app/'
     | '/app/claro/example'
     | '/app/order/$category'
+    | '/app/order/$model'
     | '/app/tim/example'
     | '/app/vivo/example'
     | '/app/products/'
+    | '/app/order/$model/$category'
     | '/app/products/$model/$category'
     | '/app/products/$model/'
   fileRoutesByTo: FileRoutesByTo
@@ -202,9 +222,11 @@ export interface FileRouteTypes {
     | '/app'
     | '/app/claro/example'
     | '/app/order/$category'
+    | '/app/order/$model'
     | '/app/tim/example'
     | '/app/vivo/example'
     | '/app/products'
+    | '/app/order/$model/$category'
     | '/app/products/$model/$category'
     | '/app/products/$model'
   id:
@@ -221,9 +243,11 @@ export interface FileRouteTypes {
     | '/app/'
     | '/app/claro/example'
     | '/app/order/$category'
+    | '/app/order/$model'
     | '/app/tim/example'
     | '/app/vivo/example'
     | '/app/products/'
+    | '/app/order/$model/$category'
     | '/app/products/$model/$category'
     | '/app/products/$model/'
   fileRoutesById: FileRoutesById
@@ -327,6 +351,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppTimExampleRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/app/order/$model': {
+      id: '/app/order/$model'
+      path: '/$model'
+      fullPath: '/app/order/$model'
+      preLoaderRoute: typeof AppOrderModelRouteImport
+      parentRoute: typeof AppOrderRoute
+    }
     '/app/order/$category': {
       id: '/app/order/$category'
       path: '/$category'
@@ -355,15 +386,36 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppProductsModelCategoryRouteImport
       parentRoute: typeof AppProductsRoute
     }
+    '/app/order/$model/$category': {
+      id: '/app/order/$model/$category'
+      path: '/$category'
+      fullPath: '/app/order/$model/$category'
+      preLoaderRoute: typeof AppOrderModelCategoryRouteImport
+      parentRoute: typeof AppOrderModelRoute
+    }
   }
 }
 
+interface AppOrderModelRouteChildren {
+  AppOrderModelCategoryRoute: typeof AppOrderModelCategoryRoute
+}
+
+const AppOrderModelRouteChildren: AppOrderModelRouteChildren = {
+  AppOrderModelCategoryRoute: AppOrderModelCategoryRoute,
+}
+
+const AppOrderModelRouteWithChildren = AppOrderModelRoute._addFileChildren(
+  AppOrderModelRouteChildren,
+)
+
 interface AppOrderRouteChildren {
   AppOrderCategoryRoute: typeof AppOrderCategoryRoute
+  AppOrderModelRoute: typeof AppOrderModelRouteWithChildren
 }
 
 const AppOrderRouteChildren: AppOrderRouteChildren = {
   AppOrderCategoryRoute: AppOrderCategoryRoute,
+  AppOrderModelRoute: AppOrderModelRouteWithChildren,
 }
 
 const AppOrderRouteWithChildren = AppOrderRoute._addFileChildren(
