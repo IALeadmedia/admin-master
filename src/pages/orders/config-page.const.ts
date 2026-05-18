@@ -14,6 +14,41 @@ export const useDeleteEntity = useDeleteOrderMutation;
 export const useListEntity = useOrderQuery;
 export type EntityType = IOrderTelecom;
 
+export type TelecomOrderCategory = "banda-larga" | "telefonia-movel";
+
+const telecomOrderCategories: TelecomOrderCategory[] = [
+  "banda-larga",
+  "telefonia-movel",
+];
+
+export const defaultOrderCategory: TelecomOrderCategory = "banda-larga";
+
+const telecomOrderCategoryLabelMap: Record<TelecomOrderCategory, string> = {
+  "banda-larga": "Banda Larga",
+  "telefonia-movel": "Telefonia Móvel",
+};
+
+export function isTelecomOrderCategory(
+  category?: string,
+): category is TelecomOrderCategory {
+  return (
+    !!category &&
+    telecomOrderCategories.includes(category as TelecomOrderCategory)
+  );
+}
+
+export function resolveOrderCategory(
+  rawCategory?: string,
+): TelecomOrderCategory {
+  return isTelecomOrderCategory(rawCategory)
+    ? rawCategory
+    : defaultOrderCategory;
+}
+
+export function getOrderCategoryLabel(category: TelecomOrderCategory): string {
+  return telecomOrderCategoryLabelMap[category];
+}
+
 export type FormValues = {
   plan_id?: number | string;
   selected_extras?: Array<number | string>;

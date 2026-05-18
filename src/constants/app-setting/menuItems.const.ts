@@ -37,7 +37,16 @@ export const menuOptionsAdmin: MenuItem[] = [
   },
   {
     label: "Pedidos",
-    to: "/app/order",
+    items: [
+      {
+        label: "Banda Larga",
+        to: "/app/order/banda-larga",
+      },
+      {
+        label: "Telefonia Móvel",
+        to: "/app/order/telefonia-movel",
+      },
+    ],
   },
 ];
 
@@ -66,7 +75,11 @@ export const menuOptionsTim: MenuItem[] = [
     items: [
       {
         label: "Banda Larga",
-        to: "/app/order",
+        to: "/app/order/banda-larga",
+      },
+      {
+        label: "Telefonia Móvel",
+        to: "/app/order/telefonia-movel",
       },
     ],
   },

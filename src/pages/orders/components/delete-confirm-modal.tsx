@@ -19,7 +19,6 @@ export function DeleteConfirmModal({
     function handleConfirm() {
         const ids = entitiesToDelete.map((u) => u.id);
         deleteMutation.mutate({ ids }, { onSuccess: onClose });
-        console.log("handleConfirm disparou", entitiesToDelete);
     }
 
     const isSingle = entitiesToDelete.length === 1;

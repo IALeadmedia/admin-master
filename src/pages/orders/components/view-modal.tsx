@@ -240,6 +240,7 @@ interface ViewModalProps {
     onClose: () => void;
     onEdit?: (entity: EntityType) => void;
     onDelete?: (entity: EntityType) => void;
+    canDelete?: boolean;
 }
 
 export function ViewModal({
@@ -248,6 +249,7 @@ export function ViewModal({
     onClose,
     onEdit,
     onDelete,
+    canDelete = false,
 }: ViewModalProps) {
     const [observationForm] = Form.useForm();
     const updateMutation = useUpdateEntity();
@@ -507,6 +509,7 @@ export function ViewModal({
                     </Button>
                     <Button
                         danger
+                        style={{ display: canDelete ? "inline-flex" : "none" }}
                         onClick={() => viewingEntity && onDelete?.(viewingEntity)}
                     >
                         Deletar

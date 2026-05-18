@@ -17,6 +17,7 @@ type RestrictedRoute =
   | "/app/users"
   | "/app/priorities"
   | "/app/products"
+  | "/app/order"
   | "/app/orders";
 
 const allCrudActions: PermissionAction[] = ["view", "create", "edit", "delete"];
@@ -38,7 +39,7 @@ const permissionsByRole: Record<
     products: allCrudActions,
     orders: allCrudActions,
   },
-  DIRETOR: { products: allCrudActions, orders: ["view", "edit"] },
+  DIRETOR: { products: allCrudActions, orders: ["view", "edit", "delete"] },
   GERENTE: { products: allCrudActions, orders: ["view", "edit"] },
   LIDER: { products: ["view"], orders: ["view", "edit"] },
   CONSULTOR: { products: ["view"], orders: ["view", "edit"] },
@@ -50,8 +51,24 @@ const routeResourceMap: Record<RestrictedRoute, PermissionResource> = {
   "/app/users": "users",
   "/app/priorities": "priorities",
   "/app/products": "products",
+  "/app/order": "orders",
   "/app/orders": "orders",
 };
+
+function resolveRestrictedRoute(path: string): RestrictedRoute | null {
+  if ((path as RestrictedRoute) in routeResourceMap) {
+    return path as RestrictedRoute;
+  }
+
+  if (path.startsWith("/app/order")) return "/app/order";
+  if (path.startsWith("/app/products")) return "/app/products";
+  if (path.startsWith("/app/users")) return "/app/users";
+  if (path.startsWith("/app/partners")) return "/app/partners";
+  if (path.startsWith("/app/companies")) return "/app/companies";
+  if (path.startsWith("/app/priorities")) return "/app/priorities";
+
+  return null;
+}
 
 export function getStoredUserRole(): UserRole | null {
   try {
@@ -82,7 +99,10 @@ export function canAccessRoute(
 ): boolean {
   if (!path) return true;
 
-  const resource = routeResourceMap[path as RestrictedRoute];
+  const restrictedRoute = resolveRestrictedRoute(path);
+  if (!restrictedRoute) return true;
+
+  const resource = routeResourceMap[restrictedRoute];
   if (!resource) return true;
 
   return can(role, resource, "view");
@@ -103,7 +123,7 @@ export function isGlobalAdminUser(
 // Pedidos
 // view: todos (com filtro por hierarquia).
 // edit: todos.
-// delete: Gerente ou acima.
+// delete: Admin, Gestor e Diretor.
 // Produtos
 // view: todos.
 // create/edit/delete: Gerente ou acima.

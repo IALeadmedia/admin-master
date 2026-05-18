@@ -7,6 +7,7 @@ interface TableToolbarProps {
     onSearchChange: (value: string) => void;
     selectedCount: number;
     onBulkDelete: () => void;
+    canDelete: boolean;
 
 }
 
@@ -15,6 +16,7 @@ export function TableToolbar({
     onSearchChange,
     selectedCount,
     onBulkDelete,
+    canDelete,
 
 }: TableToolbarProps) {
     return (
@@ -36,7 +38,7 @@ export function TableToolbar({
                     allowClear
                     style={{ width: 300 }}
                 />
-                {selectedCount > 0 && (
+                {canDelete && selectedCount > 0 && (
                     <Button danger icon={<DeleteOutlined />} onClick={onBulkDelete}>
                         Deletar {selectedCount} {entityPage.plural.toLowerCase()}
                     </Button>

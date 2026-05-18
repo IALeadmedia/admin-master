@@ -10,6 +10,8 @@ import { entityPage } from "../config-page.const";
 import { useStyle } from "@/style/tableStyle";
 import { ViewModal } from "./view-modal";
 import type { IOrderTelecom } from "@/types/IOrder.type";
+import { useAuth } from "@/context/auth-provider";
+import { can } from "@/helpers/access-control.helper";
 
 interface CompaniesTableProps {
     data: IOrderTelecom[];
@@ -26,6 +28,8 @@ export function TableMain({ data, isLoading, columns }: CompaniesTableProps) {
     const [isFormModalOpen, setIsFormModalOpen] = useState(false);
     const [entitiesToDelete, setEntitiesToDelete] = useState<IOrderTelecom[]>([]);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const { user } = useAuth();
+    const canDeleteOrders = can(user?.user?.role, "orders", "delete");
     const { styles } = useStyle();
     const filteredData = useMemo(() => {
         if (!searchText) return data;
@@ -82,6 +86,7 @@ export function TableMain({ data, isLoading, columns }: CompaniesTableProps) {
                 onSearchChange={setSearchText}
                 selectedCount={selectedRowKeys.length}
                 onBulkDelete={handleBulkDelete}
+                canDelete={canDeleteOrders}
 
             />
             <div className="flex overflow-y-auto">
@@ -91,10 +96,14 @@ export function TableMain({ data, isLoading, columns }: CompaniesTableProps) {
                     dataSource={filteredData}
                     className={styles.customTable}
                     loading={isLoading}
-                    rowSelection={{
-                        selectedRowKeys,
-                        onChange: setSelectedRowKeys,
-                    }}
+                    rowSelection={
+                        canDeleteOrders
+                            ? {
+                                selectedRowKeys,
+                                onChange: setSelectedRowKeys,
+                            }
+                            : undefined
+                    }
                     pagination={{
                         pageSize: 10,
                         showTotal: (total) =>
@@ -123,6 +132,7 @@ export function TableMain({ data, isLoading, columns }: CompaniesTableProps) {
                 onDelete={(entity: IOrderTelecom) => {
                     handleDelete(entity);
                 }}
+                canDelete={canDeleteOrders}
             />
             <DeleteConfirmModal
                 open={isDeleteModalOpen}
