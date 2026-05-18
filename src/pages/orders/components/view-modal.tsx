@@ -519,191 +519,195 @@ export function ViewModal({
         >
             <div className="max-h-100 overflow-y-auto scrollbar-thin">
 
-                <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 2 }}>
 
                     {/* Detalhes dos Planos */}
-                    <div className="mt-4 text-neutral-700">
-                        {/* Header da tabela */}
-                        <div className="flex items-center font-semibold text-[#666666] text-[14px]">
-                            <p className="w-72 text-center">Plano</p>
 
-                            <p className="w-50 text-center">Data de Instalação 1</p>
-                            {/* <p className="w-32 text-center">Período 1</p> */}
+                    <Divider style={{ fontSize: 13, color: '#666' }}>Detalhes do Plano</Divider>
+                    <div className=" bg-neutral-100  rounded-sm p-3 w-full">
+                        <div className="mt-4 text-neutral-700">
+                            {/* Header da tabela */}
+                            <div className="flex items-center font-semibold text-[#666666] text-[14px]">
+                                <p className="w-72 text-center">Plano</p>
 
-                            <p className="w-50 text-center">Data de Instalação 2</p>
-                            {/* <p className="w-32 text-center">Período 2</p> */}
+                                <p className="w-50 text-center">Data de Instalação 1</p>
+                                {/* <p className="w-32 text-center">Período 1</p> */}
 
-                            <p className="w-32 text-center">Vencimento</p>
-                            <p className="w-46 text-center">Total</p>
-                            <p className="w-12 text-center">Extras</p>
-                        </div>
+                                <p className="w-50 text-center">Data de Instalação 2</p>
+                                {/* <p className="w-32 text-center">Período 2</p> */}
 
-                        <hr className="border-t border-neutral-300 mx-2" />
+                                <p className="w-32 text-center">Vencimento</p>
+                                <p className="w-46 text-center">Total</p>
+                                <p className="w-12 text-center">Extras</p>
+                            </div>
 
-                        {viewingEntity && (
-                            <React.Fragment key={viewingEntity.id}>
-                                <div className="flex items-center py-4 text-[14px] text-neutral-700 hover:bg-neutral-50 transition">
-                                    <p className="text-[14px] font-semibold w-72 text-center">
-                                        {viewingEntity.plan?.name
-                                            ? `${viewingEntity.plan.name} - ${viewingEntity.price_summary?.plan_price != null
-                                                ? formatBRL(viewingEntity.price_summary.plan_price)
-                                                : "-"
-                                            }`
-                                            : "-"}
-                                    </p>
+                            <hr className="border-t border-neutral-300 mx-2" />
 
-                                    <p className="text-[14px] w-50 text-center">
-                                        {viewingEntity.installation_preferred_date_one
-                                            ? `${viewingEntity.installation_preferred_date_one} - ${viewingEntity.installation_preferred_period_one || "-"
-                                            }`
-                                            : "-"}
-                                    </p>
+                            {viewingEntity && (
+                                <React.Fragment key={viewingEntity.id}>
+                                    <div className="flex items-center py-4 text-[14px] text-neutral-700 hover:bg-neutral-50 transition">
+                                        <p className="text-[14px] font-semibold w-72 text-center">
+                                            {viewingEntity.plan?.name
+                                                ? `${viewingEntity.plan.name} - ${viewingEntity.price_summary?.plan_price != null
+                                                    ? formatBRL(viewingEntity.price_summary.plan_price)
+                                                    : "-"
+                                                }`
+                                                : "-"}
+                                        </p>
 
-                                    <p className="text-[14px] w-50 text-center">
-                                        {viewingEntity.installation_preferred_date_two
-                                            ? `${viewingEntity.installation_preferred_date_two} - ${viewingEntity.installation_preferred_period_two || "-"
-                                            }`
-                                            : "-"}
-                                    </p>
+                                        <p className="text-[14px] w-50 text-center">
+                                            {viewingEntity.installation_preferred_date_one
+                                                ? `${viewingEntity.installation_preferred_date_one} - ${viewingEntity.installation_preferred_period_one || "-"
+                                                }`
+                                                : "-"}
+                                        </p>
 
-                                    <p className="text-[14px] font-semibold w-32 text-center">
-                                        {viewingEntity.due_day?.toString() || "-"}
-                                    </p>
+                                        <p className="text-[14px] w-50 text-center">
+                                            {viewingEntity.installation_preferred_date_two
+                                                ? `${viewingEntity.installation_preferred_date_two} - ${viewingEntity.installation_preferred_period_two || "-"
+                                                }`
+                                                : "-"}
+                                        </p>
 
-                                    <p className="text-[14px] font-bold w-46 text-center text-[#0026d9]">
-                                        {viewingEntity.price_summary?.total_monthly
-                                            ? formatBRL(viewingEntity.price_summary.total_monthly)
-                                            : "-"}
-                                    </p>
+                                        <p className="text-[14px] font-semibold w-32 text-center">
+                                            {viewingEntity.due_day?.toString() || "-"}
+                                        </p>
 
-                                    {viewingEntity.selected_extras &&
-                                        viewingEntity.selected_extras.length > 0 ? (
-                                        <Tooltip
-                                            title="Ver extras adicionados ao plano"
-                                            placement="top"
-                                        >
+                                        <p className="text-[14px] font-bold w-46 text-center text-[#0026d9]">
+                                            {viewingEntity.price_summary?.total_monthly
+                                                ? formatBRL(viewingEntity.price_summary.total_monthly)
+                                                : "-"}
+                                        </p>
+
+                                        {viewingEntity.selected_extras &&
+                                            viewingEntity.selected_extras.length > 0 ? (
+                                            <Tooltip
+                                                title="Ver extras adicionados ao plano"
+                                                placement="top"
+                                            >
+                                                <button
+                                                    className="w-12 text-center text-[#0026d9] font-bold focus:outline-none"
+                                                    onClick={() => toggleExpand(viewingEntity.id)}
+                                                    aria-label="Expandir extras"
+                                                    type="button"
+                                                >
+                                                    {expanded[viewingEntity.id] ? "−" : "+"}
+                                                </button>
+                                            </Tooltip>
+                                        ) : (
                                             <button
                                                 className="w-12 text-center text-[#0026d9] font-bold focus:outline-none"
-                                                onClick={() => toggleExpand(viewingEntity.id)}
-                                                aria-label="Expandir extras"
                                                 type="button"
-                                            >
-                                                {expanded[viewingEntity.id] ? "−" : "+"}
-                                            </button>
-                                        </Tooltip>
-                                    ) : (
-                                        <button
-                                            className="w-12 text-center text-[#0026d9] font-bold focus:outline-none"
-                                            type="button"
-                                            disabled
-                                            aria-label="Sem extras"
-                                        />
-                                    )}
-                                </div>
+                                                disabled
+                                                aria-label="Sem extras"
+                                            />
+                                        )}
+                                    </div>
 
-                                {/* Linha expansível dos extras */}
-                                {expanded[viewingEntity.id] &&
-                                    viewingEntity.selected_extras &&
-                                    viewingEntity.selected_extras.length > 0 && (
-                                        <div className="bg-neutral-50 px-8 py-2">
-                                            <div className="font-semibold text-[#666666] text-[14px] mb-1">
-                                                Extras adicionados
+                                    {/* Linha expansível dos extras */}
+                                    {expanded[viewingEntity.id] &&
+                                        viewingEntity.selected_extras &&
+                                        viewingEntity.selected_extras.length > 0 && (
+                                            <div className="bg-neutral-50 px-8 py-2">
+                                                <div className="font-semibold text-[#666666] text-[14px] mb-1">
+                                                    Extras adicionados
+                                                </div>
+
+                                                <ul className="divide-y divide-neutral-100">
+                                                    {viewingEntity.selected_extras.map((extra: any) => {
+                                                        const opt =
+                                                            extra.options && extra.options[0]
+                                                                ? extra.options[0]
+                                                                : undefined;
+
+                                                        return (
+                                                            <li
+                                                                key={extra.id}
+                                                                className="flex justify-between items-center py-2"
+                                                            >
+                                                                <div>
+                                                                    <div className="font-medium text-sm">
+                                                                        {extra.label}
+                                                                    </div>
+
+                                                                    <div className="text-xs text-neutral-600">
+                                                                        {opt?.description ||
+                                                                            extra.description ||
+                                                                            ""}
+                                                                    </div>
+
+                                                                    {/* Exibe bônus */}
+                                                                    {((opt?.bonus &&
+                                                                        (opt.bonus.type ||
+                                                                            opt.bonus.speed ||
+                                                                            opt.bonus.description)) ||
+                                                                        (extra.bonus &&
+                                                                            (extra.bonus.type ||
+                                                                                extra.bonus.speed ||
+                                                                                extra.bonus.description))) && (
+                                                                            <div className="text-xs text-green-700">
+                                                                                {opt?.bonus?.type ||
+                                                                                    extra.bonus?.type
+                                                                                    ? `Com ${extra.label}`
+                                                                                    : ""}
+
+                                                                                {opt?.bonus?.speed ||
+                                                                                    extra.bonus?.speed
+                                                                                    ? ` + ganhe ${opt?.bonus
+                                                                                        ?.speed ||
+                                                                                    extra.bonus
+                                                                                        ?.speed
+                                                                                    }`
+                                                                                    : ""}
+
+                                                                                {opt?.bonus?.description ||
+                                                                                    extra.bonus?.description
+                                                                                    ? ` ${opt?.bonus
+                                                                                        ?.description ||
+                                                                                    extra.bonus
+                                                                                        ?.description
+                                                                                    }`
+                                                                                    : ""}
+                                                                            </div>
+                                                                        )}
+                                                                </div>
+
+                                                                <div className="font-semibold text-sm">
+                                                                    {typeof opt?.price === "number"
+                                                                        ? formatBRL(opt.price)
+                                                                        : typeof extra.price ===
+                                                                            "number"
+                                                                            ? formatBRL(extra.price)
+                                                                            : "-"}
+                                                                </div>
+                                                            </li>
+                                                        );
+                                                    })}
+                                                </ul>
                                             </div>
+                                        )}
 
-                                            <ul className="divide-y divide-neutral-100">
-                                                {viewingEntity.selected_extras.map((extra: any) => {
-                                                    const opt =
-                                                        extra.options && extra.options[0]
-                                                            ? extra.options[0]
-                                                            : undefined;
-
-                                                    return (
-                                                        <li
-                                                            key={extra.id}
-                                                            className="flex justify-between items-center py-2"
-                                                        >
-                                                            <div>
-                                                                <div className="font-medium text-sm">
-                                                                    {extra.label}
-                                                                </div>
-
-                                                                <div className="text-xs text-neutral-600">
-                                                                    {opt?.description ||
-                                                                        extra.description ||
-                                                                        ""}
-                                                                </div>
-
-                                                                {/* Exibe bônus */}
-                                                                {((opt?.bonus &&
-                                                                    (opt.bonus.type ||
-                                                                        opt.bonus.speed ||
-                                                                        opt.bonus.description)) ||
-                                                                    (extra.bonus &&
-                                                                        (extra.bonus.type ||
-                                                                            extra.bonus.speed ||
-                                                                            extra.bonus.description))) && (
-                                                                        <div className="text-xs text-green-700">
-                                                                            {opt?.bonus?.type ||
-                                                                                extra.bonus?.type
-                                                                                ? `Com ${extra.label}`
-                                                                                : ""}
-
-                                                                            {opt?.bonus?.speed ||
-                                                                                extra.bonus?.speed
-                                                                                ? ` + ganhe ${opt?.bonus
-                                                                                    ?.speed ||
-                                                                                extra.bonus
-                                                                                    ?.speed
-                                                                                }`
-                                                                                : ""}
-
-                                                                            {opt?.bonus?.description ||
-                                                                                extra.bonus?.description
-                                                                                ? ` ${opt?.bonus
-                                                                                    ?.description ||
-                                                                                extra.bonus
-                                                                                    ?.description
-                                                                                }`
-                                                                                : ""}
-                                                                        </div>
-                                                                    )}
-                                                            </div>
-
-                                                            <div className="font-semibold text-sm">
-                                                                {typeof opt?.price === "number"
-                                                                    ? formatBRL(opt.price)
-                                                                    : typeof extra.price ===
-                                                                        "number"
-                                                                        ? formatBRL(extra.price)
-                                                                        : "-"}
-                                                            </div>
-                                                        </li>
-                                                    );
-                                                })}
-                                            </ul>
-                                        </div>
-                                    )}
-
-                                <hr className="border-t border-neutral-300 mx-2" />
-                            </React.Fragment>
-                        )}
-                    </div>
+                                    <hr className="border-t border-neutral-300 mx-2" />
+                                </React.Fragment>
+                            )}
+                        </div></div>
                     {/* Disponibilidade e PAP */}
                     <Divider style={{ fontSize: 13, color: '#666' }}>Disponibilidade</Divider>
-                    <Row gutter={[16, 16]}>
-                        <Col span={12}>
-                            <div style={{ background: '#fff', borderRadius: 6, padding: 16, textAlign: 'center', border: '1px solid #f0f0f0' }}>
-                                <p style={{ fontSize: 14, fontWeight: 500, color: '#555', marginBottom: 8 }}>Disponibilidade</p>
-                                <AvailabilityStatus localData={viewingEntity} />
-                            </div>
-                        </Col>
-                        <Col span={12}>
-                            <div style={{ background: '#fff', borderRadius: 6, padding: 16, textAlign: 'center', border: '1px solid #f0f0f0' }}>
-                                <p style={{ fontSize: 14, fontWeight: 500, color: '#555', marginBottom: 8 }}>PAP</p>
-                                <PAPStatus localData={viewingEntity} />
-                            </div>
-                        </Col>
-                    </Row>
+                    <div className=" bg-neutral-100  rounded-sm p-3 w-full">
+                        <Row gutter={[16, 16]}>
+                            <Col span={12}>
+                                <div style={{ background: '#fff', borderRadius: 6, padding: 16, textAlign: 'center', border: '1px solid #f0f0f0' }}>
+                                    <p style={{ fontSize: 14, fontWeight: 500, color: '#555', marginBottom: 8 }}>Disponibilidade</p>
+                                    <AvailabilityStatus localData={viewingEntity} />
+                                </div>
+                            </Col>
+                            <Col span={12}>
+                                <div style={{ background: '#fff', borderRadius: 6, padding: 16, textAlign: 'center', border: '1px solid #f0f0f0' }}>
+                                    <p style={{ fontSize: 14, fontWeight: 500, color: '#555', marginBottom: 8 }}>PAP</p>
+                                    <PAPStatus localData={viewingEntity} />
+                                </div>
+                            </Col>
+                        </Row></div>
 
                     {/* Informações de Pagamento */}
                     <Divider style={{ fontSize: 13, color: '#666' }}>Informações de Pagamento</Divider>
