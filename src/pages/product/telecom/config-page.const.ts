@@ -11,8 +11,8 @@ export const productModel = "telecom" as const;
 export const TELECOM_DEFAULT_CATEGORY = "banda-larga" as const;
 
 const telecomCategoryLabelMap: Record<string, string> = {
-  "banda-larga": "banda-larga",
-  "telefonia-movel": "telefonia-movel",
+  "banda-larga": "Banda Larga",
+  "telefonia-movel": "Telefonia Móvel",
 };
 
 export function getTelecomCategoryLabel(category: string) {

@@ -61,6 +61,15 @@ export const menuOptionsTim: MenuItem[] = [
       },
     ],
   },
+  {
+    label: "Pedidos",
+    items: [
+      {
+        label: "Banda Larga",
+        to: "/app/order",
+      },
+    ],
+  },
 ];
 
 export const menuOptionsClaro: MenuItem[] = [...menuOptionsCommon];
