@@ -17,9 +17,14 @@ interface CompaniesTableProps {
     data: IOrderTelecom[];
     isLoading: boolean;
     columns?: TableColumnsType<IOrderTelecom>;
+    categorySelect?: {
+        options: Array<{ label: string; value: string }>;
+        value?: string;
+        onChange: (value: string) => void;
+    };
 }
 
-export function TableMain({ data, isLoading, columns }: CompaniesTableProps) {
+export function TableMain({ data, isLoading, columns, categorySelect }: CompaniesTableProps) {
     const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
     const [searchText, setSearchText] = useState("");
     const [viewingEntity, setViewingEntity] = useState<IOrderTelecom | null>(null);
@@ -87,6 +92,7 @@ export function TableMain({ data, isLoading, columns }: CompaniesTableProps) {
                 selectedCount={selectedRowKeys.length}
                 onBulkDelete={handleBulkDelete}
                 canDelete={canDeleteOrders}
+                categorySelect={categorySelect}
 
             />
             <div className="flex overflow-y-auto">
