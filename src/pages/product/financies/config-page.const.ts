@@ -10,7 +10,7 @@ export const productModel = "finances" as const;
 export const FINANCIES_DEFAULT_CATEGORY = "maquininha" as const;
 
 const financiesCategoryLabelMap: Record<string, string> = {
-  "credito-pessoal": "Maquininha",
+  maquininha: "Maquininha",
   emprestimo: "Empréstimo",
 };
 

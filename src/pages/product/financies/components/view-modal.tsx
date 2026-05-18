@@ -3,6 +3,8 @@ import { entityPage, type EntityType } from "../config-page.const";
 
 import { appSetting } from "@/constants/app-setting/config.const";
 import { WifiOutlined } from "@ant-design/icons";
+import { useAuth } from "@/context/auth-provider";
+import { can } from "@/helpers/access-control.helper";
 
 interface ViewModalProps {
     open: boolean;
@@ -20,20 +22,29 @@ export function ViewModal({
     onDelete,
 }: ViewModalProps) {
     if (!viewingEntity) return null;
+    const { user } = useAuth();
+    const canEdit = can(user?.user?.role, "products", "edit");
+    const canDelete = can(user?.user?.role, "products", "delete");
     const color = appSetting?.primaryColor
     return (
         <Modal
             open={open}
             title={`Visualizar ${entityPage.name}`}
             footer={
-                <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
-                    <Button type="primary" onClick={() => viewingEntity && onEdit?.(viewingEntity)}>
-                        Editar
-                    </Button>
-                    <Button danger onClick={() => viewingEntity && onDelete?.(viewingEntity)}>
-                        Deletar
-                    </Button>
-                </div>
+                canEdit || canDelete ? (
+                    <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
+                        {canEdit && (
+                            <Button type="primary" onClick={() => viewingEntity && onEdit?.(viewingEntity)}>
+                                Editar
+                            </Button>
+                        )}
+                        {canDelete && (
+                            <Button danger onClick={() => viewingEntity && onDelete?.(viewingEntity)}>
+                                Deletar
+                            </Button>
+                        )}
+                    </div>
+                ) : null
             }
             onCancel={onClose}
             destroyOnHidden

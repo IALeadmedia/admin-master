@@ -1,5 +1,7 @@
 import { Button, Input, Select, Space } from "antd";
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import { useAuth } from "@/context/auth-provider";
+import { can } from "@/helpers/access-control.helper";
 
 interface CategorySelectProps {
     options: Array<{ label: string; value: string }>;
@@ -28,6 +30,10 @@ export function ProductTableToolbar({
     onCreate,
     categorySelect,
 }: ProductTableToolbarProps) {
+    const { user } = useAuth();
+    const canCreate = can(user?.user?.role, "products", "create");
+    const canDelete = can(user?.user?.role, "products", "delete");
+
     return (
         <div
             style={{
@@ -55,16 +61,18 @@ export function ProductTableToolbar({
                         style={{ minWidth: 200 }}
                     />
                 )}
-                {selectedCount > 0 && (
+                {canDelete && selectedCount > 0 && (
                     <Button danger icon={<DeleteOutlined />} onClick={onBulkDelete}>
                         Deletar {selectedCount} {entityPlural.toLowerCase()}
                     </Button>
                 )}
             </Space>
 
-            <Button type="primary" icon={<PlusOutlined />} onClick={onCreate}>
-                Novo(a) {entityName.toLowerCase()}
-            </Button>
+            {canCreate && (
+                <Button type="primary" icon={<PlusOutlined />} onClick={onCreate}>
+                    Novo(a) {entityName.toLowerCase()}
+                </Button>
+            )}
         </div>
     );
 }

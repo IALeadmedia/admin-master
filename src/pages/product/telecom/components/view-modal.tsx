@@ -5,6 +5,8 @@ import { appSetting } from "@/constants/app-setting/config.const";
 import { formatBRL } from "@/utils/number.utils";
 import { ExtraSection } from "./view-extras-info";
 import { resolveImageUrl } from "@/utils/products.utils";
+import { useAuth } from "@/context/auth-provider";
+import { can } from "@/helpers/access-control.helper";
 
 type ProductOfferConditionFile = { url: string; type: string };
 type ProductDetail = EntityType["details"][number];
@@ -24,6 +26,9 @@ export function ViewModal({
     onEdit,
     onDelete,
 }: ViewModalProps) {
+    const { user } = useAuth();
+    const canEdit = can(user?.user?.role, "products", "edit");
+    const canDelete = can(user?.user?.role, "products", "delete");
     const color = appSetting?.primaryColor
 
     const clientExtras = viewingEntity?.extras?.client ?? [];
@@ -35,20 +40,26 @@ export function ViewModal({
             open={open}
             title={`Visualizar ${entityPage.name}`}
             footer={
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
-                    <Button
-                        type="primary"
-                        onClick={() => viewingEntity && onEdit?.(viewingEntity)}
-                    >
-                        Editar
-                    </Button>
-                    <Button
-                        danger
-                        onClick={() => viewingEntity && onDelete?.(viewingEntity)}
-                    >
-                        Deletar
-                    </Button>
-                </div>
+                canEdit || canDelete ? (
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+                        {canEdit && (
+                            <Button
+                                type="primary"
+                                onClick={() => viewingEntity && onEdit?.(viewingEntity)}
+                            >
+                                Editar
+                            </Button>
+                        )}
+                        {canDelete && (
+                            <Button
+                                danger
+                                onClick={() => viewingEntity && onDelete?.(viewingEntity)}
+                            >
+                                Deletar
+                            </Button>
+                        )}
+                    </div>
+                ) : null
             }
             onCancel={onClose}
             destroyOnHidden
