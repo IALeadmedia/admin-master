@@ -6,9 +6,11 @@ import { appSetting } from "@/constants/app-setting/config.const";
 
 type UpdateMutation = ReturnType<typeof useUpdateProductMutation>;
 
-export function getColumns(updateMutation: UpdateMutation): TableColumnsType<EntityType> {
-
-  return [
+export function getColumns(
+  updateMutation: UpdateMutation,
+  canSeeOnlineSwitch: boolean,
+): TableColumnsType<EntityType> {
+  const columns: TableColumnsType<EntityType> = [
     {
       title: "Plano",
       dataIndex: "name",
@@ -32,8 +34,10 @@ export function getColumns(updateMutation: UpdateMutation): TableColumnsType<Ent
       },
     },
     { title: " Tipo", dataIndex: "client_type", width: 100 },
+  ];
 
-    {
+  if (canSeeOnlineSwitch) {
+    columns.push({
       title: "",
       dataIndex: "online",
       width: 50,
@@ -65,6 +69,8 @@ export function getColumns(updateMutation: UpdateMutation): TableColumnsType<Ent
           </Tooltip>
         </ConfigProvider>
       ),
-    },
-  ];
+    });
+  }
+
+  return columns;
 }

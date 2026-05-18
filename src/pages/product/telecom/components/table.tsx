@@ -8,6 +8,10 @@ import type { IProduct } from "@/types/IProduct.type";
 import { useProductTable } from "../../common/useProductTable";
 import { ProductTableToolbar } from "../../common/ProductTableToolbar";
 import { ProductDeleteModal } from "../../common/ProductDeleteModal";
+import { useAuth } from "@/context/auth-provider";
+import type { UserRole } from "@/types/IUser.type";
+
+const canSeeSwitchRoles: UserRole[] = ["ADMIN", "GESTOR", "DIRETOR", "GERENTE"];
 
 interface ProductsTableProps {
   data: IProduct[];
@@ -24,7 +28,9 @@ export function TableMain({ data, isLoading, category, categorySelect }: Product
   const { styles } = useStyle();
   const updateMutation = useUpdateEntity();
   const deleteMutation = useDeleteEntity();
-  const columns = getColumns(updateMutation);
+  const { user } = useAuth();
+  const canSeeOnlineSwitch = canSeeSwitchRoles.includes(user?.user?.role as UserRole);
+  const columns = getColumns(updateMutation, canSeeOnlineSwitch);
 
   const {
     selectedRowKeys,
