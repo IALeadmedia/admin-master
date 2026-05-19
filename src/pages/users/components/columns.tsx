@@ -2,6 +2,7 @@ import { Tag } from "antd";
 import type { TableColumnsType } from "antd";
 import { type EntityType, roleLabelMap } from "../config-page.const";
 import { formatCNPJ, formatCPF } from "@/utils/document.util";
+import { formatPhoneNumber } from "@/utils/number.utils";
 
 export function getColumns(): TableColumnsType<EntityType> {
   return [
@@ -24,7 +25,7 @@ export function getColumns(): TableColumnsType<EntityType> {
       dataIndex: "telephone",
       key: "telephone",
       width: 120,
-      render: (telephone: string) => telephone || "-"
+      render: (telephone: string) => formatPhoneNumber(telephone) || "-"
     },
     {
       title: "CPF",
@@ -60,7 +61,7 @@ export function getColumns(): TableColumnsType<EntityType> {
       dataIndex: "user_type",
       key: "user_type",
       width: 140,
-      render: (user_type: string) => user_type || "-"
+      render: (user_type: string) => user_type === "EQUIPE" ? "Equipe" : user_type === "SUBCREDENCIADO" ? "Subcredenciado" : "-"
     },
     {
       title: "Responsável",

@@ -81,7 +81,7 @@ export function ViewModal({ open, viewingEntity, onClose, onEdit, onDelete }: Vi
                         <ReadonlyField label="CNPJ" value={formatCNPJ(viewingEntity?.cnpj ?? "")} />
                     </Col>
                     <Col span={8}>
-                        <ReadonlyField label="Email" value={viewingEntity?.email} />
+                        <ReadonlyField label="Email" value={viewingEntity?.email} copyable />
                     </Col>
                     <Col span={8}>
                         <ReadonlyField label="Telefone" value={formatPhoneNumber(viewingEntity?.telephone ?? "")} />

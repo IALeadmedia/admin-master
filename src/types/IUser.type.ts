@@ -45,6 +45,9 @@ export interface IUser {
   person_responsible: {
     person_responsible_id: number;
     person_responsible_name: string;
+    role: string;
+    user_id: number;
+    user_name: string;
   };
 }
 

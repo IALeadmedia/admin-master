@@ -326,28 +326,42 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
           )}
           <Col span={8}>
             <Typography>Permissões de Notificação</Typography>
-            <div className="flex gap-2 " >
-              <Form.Item name="allow_email_notifications">
 
+            <div className="flex gap-2">
+              <Form.Item
+                name="allow_email_notifications"
+                valuePropName="checked"
+              >
                 <Row>
                   <Col span={12}>
-                    <Checkbox value="email">Email</Checkbox>
+                    <Checkbox>Email</Checkbox>
                   </Col>
                 </Row>
-
               </Form.Item>
-              <Form.Item name="allow_sms_notifications">
 
+              <Form.Item
+                name="allow_sms_notifications"
+                valuePropName="checked"
+              >
                 <Row>
                   <Col span={12}>
-                    <Checkbox value="sms">SMS</Checkbox>
+                    <Checkbox>SMS</Checkbox>
                   </Col>
                 </Row>
-
               </Form.Item>
             </div>
-
           </Col>
+          {userType === "EQUIPE" && (
+            <Col span={8}>
+              <Form.Item
+                name="team"
+                label="Equipe"
+                rules={[{ required: true, message: "Informe a equipe" }]}
+              >
+                <Input placeholder="Nome da equipe" />
+              </Form.Item>
+            </Col>
+          )}
           {userType === "SUBCREDENCIADO" && (
             <Col span={8}>
               <Form.Item

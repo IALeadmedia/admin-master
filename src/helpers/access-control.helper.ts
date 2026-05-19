@@ -39,7 +39,7 @@ const permissionsByRole: Record<
     products: allCrudActions,
     orders: allCrudActions,
   },
-  DIRETOR: { products: allCrudActions, orders: ["view", "edit", "delete"] },
+  DIRETOR: { products: allCrudActions, orders: allCrudActions },
   GERENTE: { products: allCrudActions, orders: ["view", "edit"] },
   LIDER: { products: ["view"], orders: ["view", "edit"] },
   CONSULTOR: { products: ["view"], orders: ["view", "edit"] },
