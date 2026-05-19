@@ -11,7 +11,7 @@ export function getColumns(): TableColumnsType<EntityType> {
             , render: (segment: string) => segment === "telecom" ? "Telecom" : segment === "finances" ? "Financeiro" : segment === "benefits" ? "Benefícios" : "-"
         },
         {
-            title: "Nome da empresa",
+            title: "Nome",
             dataIndex: "company_name",
             key: "company_name",
             width: 200,

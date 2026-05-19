@@ -98,7 +98,7 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
           <Col span={8}>
             <Form.Item
               name="company_name"
-              label="Nome da empresa"
+              label="Nome"
               rules={[
                 { required: true, message: "Informe o nome da empresa" },
               ]}

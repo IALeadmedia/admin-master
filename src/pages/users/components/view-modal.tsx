@@ -109,8 +109,8 @@ export function ViewModal({
                             <ul style={{ margin: '8px 0 0 16px', padding: 0 }}>
                                 {viewingEntity?.allow_email_notifications && <li><CheckCircleOutlined /> Email</li>}
                                 {viewingEntity?.allow_sms_notifications && <li><CheckCircleOutlined /> SMS</li>}
-
-                                {(!viewingEntity?.allow_email_notifications && !viewingEntity?.allow_sms_notifications) && <li><CloseCircleOutlined /> Nenhum canal habilitado</li>}
+                                {viewingEntity?.allow_wpp_notifications && <li><CheckCircleOutlined /> WhatsApp</li>}
+                                {(!viewingEntity?.allow_email_notifications && !viewingEntity?.allow_sms_notifications && !viewingEntity?.allow_wpp_notifications) && <li><CloseCircleOutlined /> Nenhum canal habilitado</li>}
                             </ul>
                         </div>
                     </Col>

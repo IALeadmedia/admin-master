@@ -22,8 +22,6 @@ export interface IProduct {
   id: number;
   company: string;
   company_id: number;
-  business_partner: string;
-  partner_id: number;
   category: string;
   client_type: "PF" | "PJ";
   landing_page: string;
@@ -54,6 +52,7 @@ export interface IProduct {
   uf: string[];
   created_at: string;
   updated_at: string;
+  city?: string[];
 }
 
 export interface IProductsResponse {
@@ -69,7 +68,6 @@ export interface IProductFilters {
   page?: number;
   perPage?: number;
   company_id?: number;
-  partner_id?: number;
   company?: string;
   category?: string;
 }
@@ -90,6 +88,8 @@ export interface ICreateProductPayload {
   extrasImages?: { extraId: string; files: File[] }[];
   company?: string;
   category?: string;
+  city?: string[];
+  uf?: string[];
 }
 export interface UploadedProductDetailImageResponse {
   success?: boolean;

@@ -31,11 +31,10 @@ export type EntityType = IProduct;
 export type FormValues = {
   name: string;
   company: string;
-  business_partner: string;
   badge?: string;
   category?: string;
   company_id?: number | null;
-  partner_id?: number | null;
+  uf?: string[];
   online: boolean;
   monthly_fee: number;
   tax_rate: number;

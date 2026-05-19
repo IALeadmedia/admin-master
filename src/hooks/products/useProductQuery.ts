@@ -12,31 +12,27 @@ export function useProductQuery({
   enabled = true,
 }: {
   model?: ProductModel;
-  filters?: Omit<IProductFilters, "company_id" | "partner_id">;
+  filters?: Omit<IProductFilters, "company_id">;
   enabled?: boolean;
 } = {}) {
   const entity = dictionaryQueryClient["products"];
   const { user } = useAuth();
-  const { selectedSegmentId, selectedCompanyId, selectedPartnerId } =
-    useAdminScope();
+  const { selectedSegmentId, selectedCompanyId } = useAdminScope();
 
   const resolvedModel =
     model ??
     (isProductModel(selectedSegmentId) ? selectedSegmentId : "telecom");
 
   const companyId = user?.user.company_id;
-  const partnerId = user?.user.partner_id;
 
   const queryFilters: IProductFilters = isAdminDomain
     ? {
         ...filters,
         ...(selectedCompanyId != null ? { company_id: selectedCompanyId } : {}),
-        ...(selectedPartnerId != null ? { partner_id: selectedPartnerId } : {}),
       }
     : {
         ...filters,
         ...(companyId != null ? { company_id: companyId } : {}),
-        ...(partnerId != null ? { partner_id: partnerId } : {}),
       };
 
   return useQuery({
@@ -44,7 +40,6 @@ export function useProductQuery({
       entity.key,
       resolvedModel,
       queryFilters.company_id ?? null,
-      queryFilters.partner_id ?? null,
       queryFilters.category ?? null,
       queryFilters.page ?? null,
       queryFilters.perPage ?? null,

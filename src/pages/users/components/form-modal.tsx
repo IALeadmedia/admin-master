@@ -206,16 +206,19 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
               />
             </Form.Item>
           </Col>
+
           <Col span={8}>
             <Form.Item
-              name="user_name"
-              label="Nome"
-              rules={[{ required: true, message: "Informe o nome" }]}
+              name="email"
+              label="Email (login)"
+              rules={[
+                { required: true, message: "Informe o email" },
+                { type: "email", message: "Email inválido" },
+              ]}
             >
-              <Input placeholder="Nome completo" />
+              <Input placeholder="exemplo@email.com" />
             </Form.Item>
           </Col>
-
           <Col span={8}>
             <Form.Item
               name="password"
@@ -235,9 +238,18 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
         <Row gutter={16}>
           <Col span={8}>
             <Form.Item
+              name="user_name"
+              label="Nome"
+              rules={[{ required: true, message: "Informe o nome" }]}
+            >
+              <Input placeholder="Nome completo" />
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Form.Item
               name="telephone"
               label="Telefone"
-              rules={[{ required: true, message: "Informe o telefone" }]}
+
             >
               <Input placeholder="(00) 00000-0000" />
             </Form.Item>
@@ -246,24 +258,13 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
             <Form.Item
               name="cpf"
               label="CPF"
-              rules={[{ required: true, message: "Informe o CPF" }]}
+
             >
               <Input placeholder="000.000.000-00" />
             </Form.Item>
           </Col>
 
-          <Col span={8}>
-            <Form.Item
-              name="email"
-              label="Email"
-              rules={[
-                { required: true, message: "Informe o email" },
-                { type: "email", message: "Email inválido" },
-              ]}
-            >
-              <Input placeholder="exemplo@email.com" />
-            </Form.Item>
-          </Col>
+
 
 
 
@@ -272,7 +273,7 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
         <Row gutter={16}>
           {isGlobalAdmin && (
             <Col span={8}>
-              <Form.Item name="company_id" label="Empresa">
+              <Form.Item name="company_id" label="Empresa" rules={[{ required: true, message: "Selecione a empresa" }]}>
                 <Select
                   placeholder="Selecione..."
                   options={companyOptions}
@@ -346,6 +347,16 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
                 <Row>
                   <Col span={12}>
                     <Checkbox>SMS</Checkbox>
+                  </Col>
+                </Row>
+              </Form.Item>
+              <Form.Item
+                name="allow_wpp_notifications"
+                valuePropName="checked"
+              >
+                <Row>
+                  <Col span={12}>
+                    <Checkbox>WhatsApp</Checkbox>
                   </Col>
                 </Row>
               </Form.Item>

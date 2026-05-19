@@ -26,6 +26,7 @@ export interface IUser {
   telephone: string;
   allow_email_notifications: boolean;
   allow_sms_notifications: boolean;
+  allow_wpp_notifications: boolean;
   person_responsible_id: number | null;
   consultant_hash: string;
   user_type: string;

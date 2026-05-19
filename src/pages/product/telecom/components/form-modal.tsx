@@ -9,16 +9,19 @@ import {
   Upload,
   Tooltip,
   Checkbox,
+  Dropdown,
   ConfigProvider,
   Typography,
   Segmented,
 } from "antd";
+import type { CheckboxChangeEvent } from "antd/es/checkbox";
 import ptBR from "antd/locale/pt_BR";
 import {
   FilePdfOutlined,
   FileZipOutlined,
   UploadOutlined,
   ExclamationCircleOutlined,
+  DownOutlined,
 } from "@ant-design/icons";
 import {
   entityPage,
@@ -27,6 +30,7 @@ import {
 import { ExtrasGroupList } from "./form-extras";
 import { useFormModal } from "@/hooks/products/userFormModal";
 import { appSetting } from "@/constants/app-setting/config.const";
+import { UF_OPTIONS } from "@/utils/ufOptions";
 
 interface FormModalProps {
   open: boolean;
@@ -45,11 +49,8 @@ export function FormModal({ open, editingEntity, category, onClose }: FormModalP
     isPending,
     isGlobalAdmin,
     companyOptions,
-    partnerOptions,
     selectedCompanyId,
     setSelectedCompanyId,
-    selectedPartnerId,
-    setSelectedPartnerId,
     reusableExtraTemplates,
     isLoadingReusableProducts,
     bonusVisible,
@@ -60,6 +61,25 @@ export function FormModal({ open, editingEntity, category, onClose }: FormModalP
     handleSubmit,
     handleClose,
   } = useFormModal({ open, editingEntity, category, onClose });
+  const selectedUFs = (Form.useWatch("uf", form) ?? []) as string[];
+  const isAllSelected = selectedUFs.length === UF_OPTIONS.length && UF_OPTIONS.length > 0;
+
+  function handleUFChange(checkedValues: Array<string | number>) {
+    form.setFieldValue("uf", checkedValues as string[]);
+  }
+
+  function handleSelectAll(event: CheckboxChangeEvent) {
+    if (event.target.checked) {
+      form.setFieldValue(
+        "uf",
+        UF_OPTIONS.map((option) => String(option.value)),
+      );
+      return;
+    }
+
+    form.setFieldValue("uf", []);
+  }
+
   return (
     <Modal
       open={open}
@@ -83,7 +103,7 @@ export function FormModal({ open, editingEntity, category, onClose }: FormModalP
         <div className="max-h-115 overflow-y-auto scrollbar-thin">
           {isGlobalAdmin && (
             <Row gutter={16}>
-              <Col span={12}>
+              <Col span={24}>
                 <Form.Item
                   label="Empresa"
                   required
@@ -99,21 +119,9 @@ export function FormModal({ open, editingEntity, category, onClose }: FormModalP
                   />
                 </Form.Item>
               </Col>
-
-              <Col span={12}>
-                <Form.Item label="Parceiro">
-                  <Select
-                    placeholder="Selecione o parceiro"
-                    options={partnerOptions}
-                    value={selectedPartnerId}
-                    onChange={setSelectedPartnerId}
-                    allowClear
-                    disabled={selectedCompanyId == null}
-                  />
-                </Form.Item>
-              </Col>
             </Row>
           )}
+
 
           {/* Nome e Badge */}
           <Row gutter={16}>
@@ -163,6 +171,60 @@ export function FormModal({ open, editingEntity, category, onClose }: FormModalP
                   <Select.Option value="PF">Pessoa Física (PF)</Select.Option>
                   <Select.Option value="PJ">Pessoa Jurídica (PJ)</Select.Option>
                 </Select>
+              </Form.Item>
+            </Col>
+
+            <Col span={8}>
+              <Form.Item
+                label="UF"
+                name="uf"
+                rules={[{ required: true, message: "Selecione ao menos uma UF" }]}
+              >
+                <Dropdown
+                  popupRender={() => (
+                    <div
+                      style={{
+                        width: 280,
+                        background: "#fff",
+                        border: "1px solid #e5e7eb",
+                        borderRadius: 8,
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                        padding: 12,
+                        maxHeight: 200,
+                        overflowY: "auto",
+                        scrollbarWidth: "none",
+                        msOverflowStyle: "none",
+                      }}
+                    >
+                      <div className="hide-scrollbar-uf">
+                        <div style={{ marginBottom: 12, paddingBottom: 12, borderBottom: "1px solid #e5e7eb" }}>
+                          <Checkbox
+                            checked={isAllSelected}
+                            onChange={handleSelectAll}
+                            style={{ fontWeight: 500 }}
+                          >
+                            Selecionar Todos
+                          </Checkbox>
+                        </div>
+                        <Checkbox.Group
+                          options={UF_OPTIONS}
+                          value={selectedUFs}
+                          onChange={handleUFChange}
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 8,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                  trigger={["click"]}
+                >
+                  <Button style={{ width: "100%" }}>
+                    {selectedUFs.length ? `${selectedUFs.length} UF(s) selecionada(s)` : "Selecionar UF"} <DownOutlined />
+                  </Button>
+                </Dropdown>
               </Form.Item>
             </Col>
 

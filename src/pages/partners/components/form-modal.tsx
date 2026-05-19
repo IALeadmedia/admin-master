@@ -178,7 +178,7 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
             <Form.Item
               name="telephone"
               label="Telefone"
-              rules={[{ required: true, message: "Informe o telefone" }, { min: 10, message: 'Telefone inválido' },
+              rules={[{ min: 10, message: 'Telefone inválido' },
               { max: 11, message: 'Telefone inválido' },]}
             >
               <Input placeholder="(00) 00000-0000" />

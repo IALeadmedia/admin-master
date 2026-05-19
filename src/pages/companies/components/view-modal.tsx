@@ -49,7 +49,7 @@ export function ViewModal({
                         <ReadonlyField label="Segmento" value={viewingEntity?.segment === "telecom" ? "Telecom" : viewingEntity?.segment === "finances" ? "Financeiro" : viewingEntity?.segment === "benefits" ? "Benefícios" : "-"} />
                     </Col>
                     <Col span={8}>
-                        <ReadonlyField label="Nome da empresa" value={viewingEntity?.company_name} />
+                        <ReadonlyField label="Nome" value={viewingEntity?.company_name} />
                     </Col>
                     <Col span={8}>
                         <ReadonlyField label="CNPJ" value={formatCNPJ(viewingEntity?.cnpj ?? "")} />
