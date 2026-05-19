@@ -6,16 +6,23 @@ import { getColumns } from "./columns";
 import { TableToolbar } from "./table-toolbar";
 import { FormModal } from "./form-modal";
 import { DeleteConfirmModal } from "./delete-confirm-modal";
-import { entityPage } from "../config-page.const";
 import { useStyle } from "@/style/tableStyle";
 import { ViewModal } from "./view-modal";
 
 interface CompaniesTableProps {
     data: ICompany[];
-    isLoading: boolean;
+    isLoading: boolean; currentPage: number;
+    pageSize: number;
+    total: number;
+    onPageChange: (page: number) => void;
+    onPageSizeChange: (size: number) => void;
 }
 
-export function TableMain({ data, isLoading }: CompaniesTableProps) {
+export function TableMain({ data, isLoading, currentPage,
+    pageSize,
+    total,
+    onPageChange,
+    onPageSizeChange, }: CompaniesTableProps) {
     const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
     const [searchText, setSearchText] = useState("");
     const [viewingEntity, setViewingEntity] = useState<ICompany | null>(null);
@@ -98,9 +105,18 @@ export function TableMain({ data, isLoading }: CompaniesTableProps) {
                         onChange: setSelectedRowKeys,
                     }}
                     pagination={{
-                        pageSize: 10,
-                        showTotal: (total) =>
-                            `Total: ${total} ${entityPage.plural.toLowerCase()}`,
+                        current: currentPage,
+                        pageSize: pageSize,
+                        total: total,
+                        pageSizeOptions: [5, 10, 20, 50, 100],
+                        showSizeChanger: true,
+
+                        showTotal: (total) => `Total: ${total}`,
+                        onChange: (page) => onPageChange(page),
+                        onShowSizeChange: (_, size) => {
+                            onPageSizeChange(size);
+                            onPageChange(1);
+                        },
                     }}
                     scroll={{ y: 800 }}
                     onRow={(record) => ({

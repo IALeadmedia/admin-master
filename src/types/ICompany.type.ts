@@ -45,4 +45,6 @@ export interface IUpdateCompany {
 
 export interface ICompanyFilters {
   segment?: string;
+  page?: number;
+  per_page?: number;
 }

@@ -16,24 +16,6 @@ export class CompaniesService {
       },
     );
     return data;
-
-    // await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // const data = [] as ICompany[];
-
-    // for (let i = 1; i <= 50; i++) {
-    //   data.push({
-    //     id: String(i),
-    //     company_name: `Empresa ${i}`,
-    //     cnpj: `123456789${i.toString().padStart(2, "0")}`,
-    //     email: `empresa${i}@example.com`,
-    //     telephone: `1198765432${i.toString().padStart(2, "0")}`,
-    //     manager_name: `Nome ${i}`,
-    //     segment: `Segmento ${i}`,
-    //   });
-    // }
-
-    // return data;
   }
 
   static async create(entity: ICreateCompany): Promise<ICompany> {
