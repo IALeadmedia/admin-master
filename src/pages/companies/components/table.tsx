@@ -8,6 +8,7 @@ import { FormModal } from "./form-modal";
 import { DeleteConfirmModal } from "./delete-confirm-modal";
 import { useStyle } from "@/style/tableStyle";
 import { ViewModal } from "./view-modal";
+import { entityPage } from "../config-page.const";
 
 interface CompaniesTableProps {
     data: ICompany[];
@@ -108,10 +109,10 @@ export function TableMain({ data, isLoading, currentPage,
                         current: currentPage,
                         pageSize: pageSize,
                         total: total,
+                        locale: { items_per_page: "" },
                         pageSizeOptions: [5, 10, 20, 50, 100],
                         showSizeChanger: true,
-
-                        showTotal: (total) => `Total: ${total}`,
+                        showTotal: (total) => `Total de ${total} ${entityPage.plural.toLowerCase()}`,
                         onChange: (page) => onPageChange(page),
                         onShowSizeChange: (_, size) => {
                             onPageSizeChange(size);
