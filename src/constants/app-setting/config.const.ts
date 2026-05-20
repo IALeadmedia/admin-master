@@ -30,12 +30,12 @@ admin.megalead.digital → domínio geral do ADMIN
 esses domínios, colocar no lugar dos numeros de portas dos options 
 */
 
-// const [subdomain] = window.location.hostname.split('.'); // - PRODUÇÃO // usar esse
-const subdomain = window.location.port; // - DEV // remover essse quando ja tiver os domínios configurados
+const [subdomain] = window.location.hostname.split("."); // - PRODUÇÃO // usar esse
+// const subdomain = window.location.port; // - DEV // remover essse quando ja tiver os domínios configurados
 const url = window.location.origin;
 
 export const options = {
-  "9000": {
+  admin: {
     name: "Admin",
     logo: "/megalead.png",
     primaryColor: "#333333",
@@ -44,7 +44,7 @@ export const options = {
     optionsMenu: menuOptionsAdmin,
     isAdminDomain: true,
   },
-  "9001": {
+  tim: {
     name: "Tim",
     logo: timLogo,
     primaryColor: "#0026d9",
@@ -53,7 +53,7 @@ export const options = {
     optionsMenu: menuOptionsTim,
     isAdminDomain: false,
   },
-  "9002": {
+  claro: {
     name: "Claro",
     logo: claroLogo,
     primaryColor: "#da291c",
@@ -62,7 +62,7 @@ export const options = {
     optionsMenu: menuOptionsClaro,
     isAdminDomain: false,
   },
-  "9003": {
+  vivo: {
     name: "Vivo",
     logo: vivoLogo,
     primaryColor: "#660099",
@@ -71,7 +71,7 @@ export const options = {
     optionsMenu: menuOptionsVivo,
     isAdminDomain: false,
   },
-  "9004": {
+  vr: {
     name: "VR",
     logo: vrLogo,
     primaryColor: "#008a1e",
@@ -80,7 +80,7 @@ export const options = {
     optionsMenu: menuOptionsVR,
     isAdminDomain: false,
   },
-  "9005": {
+  c6: {
     name: "C6",
     logo: c6Logo,
     primaryColor: "#656565",
@@ -89,7 +89,7 @@ export const options = {
     optionsMenu: menuOptionsC6,
     isAdminDomain: false,
   },
-  "9006": {
+  brisanet: {
     name: "Brisanet",
     logo: brisanetLogo,
     primaryColor: "#ff4800",
@@ -98,7 +98,7 @@ export const options = {
     optionsMenu: menuOptionsBrisanet,
     isAdminDomain: false,
   },
-  "9007": {
+  algar: {
     name: "Algar",
     logo: algarLogo,
     primaryColor: "#23917e",
@@ -110,6 +110,6 @@ export const options = {
 };
 
 export const appSetting =
-  options[subdomain as keyof typeof options] || options["9001"];
+  options[subdomain as keyof typeof options] || options["admin"];
 
 export const isAdminDomain = appSetting.isAdminDomain;
