@@ -13,6 +13,7 @@ import {
 } from "./config-page.const";
 import { PriorityTable, type PriorityRow } from "./components/table";
 import type { IPartnerPriorityClientType } from "@/types/IPartnerPriority.type";
+import { formatCategoryLabel } from "@/utils/text.util";
 
 type AppliedFilters = {
     companyId: number;
@@ -192,7 +193,10 @@ export function PrioritiesPage() {
             });
         });
     }
-
+    const formattedCategoryOptions = categoryOptions.map((option) => ({
+        value: option.value,
+        label: formatCategoryLabel(option.value),
+    }));
     function handleChangeCompany(value: number | undefined) {
         setCompanyId(value);
         setCategory(undefined);
@@ -227,7 +231,7 @@ export function PrioritiesPage() {
                             allowClear
                             placeholder="Selecione a categoria"
                             style={{ width: "100%", marginTop: 8 }}
-                            options={categoryOptions}
+                            options={formattedCategoryOptions}
                             value={category}
                             onChange={setCategory}
                             disabled={!companyId || categoryOptions.length === 0}

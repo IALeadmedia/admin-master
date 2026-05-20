@@ -11,6 +11,7 @@ import {
 import { DownOutlined, UploadOutlined } from "@ant-design/icons";
 import { useCompanyQuery } from "@/hooks/companies/useCompanyQuery";
 import { UF_OPTIONS } from "@/utils/ufOptions";
+import { formatCategoryLabel } from "@/utils/text.util";
 
 interface FormModalProps {
   open: boolean;
@@ -53,7 +54,10 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
     form.setFieldValue("uf", checkedValues as string[]);
   }
 
-
+  const formattedCategoryOptions = categoryOptions.map((option) => ({
+    value: option.value,
+    label: formatCategoryLabel(option.value),
+  }));
   function handleSelectAll(event: CheckboxChangeEvent) {
     if (event.target.checked) {
       form.setFieldValue(
@@ -324,8 +328,7 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
                     ? "Selecione a categoria"
                     : "Selecione uma empresa primeiro"
                 }
-                options={categoryOptions}
-                disabled={!selectedCompanyId || categoryOptions.length === 0}
+                options={formattedCategoryOptions} disabled={!selectedCompanyId || categoryOptions.length === 0}
                 notFoundContent="Nenhuma categoria cadastrada para a empresa selecionada"
               />
             </Form.Item>
