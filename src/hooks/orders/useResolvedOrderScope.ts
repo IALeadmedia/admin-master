@@ -47,9 +47,12 @@ export function useResolvedOrderScope(
   });
 
   if (isAdmin) {
+    const fallbackCompany = companiesData?.companies.find(
+      (c) => c.segment === selectedSegmentId,
+    ) ?? companiesData?.companies[0];
     const selectedCompany = companiesData?.companies.find(
       (c) => c.company_id === selectedCompanyId,
-    );
+    ) ?? fallbackCompany;
 
     // operator vem da primeira palavra do company_name (ex: "C6 Bank" → "c6")
     const operatorFromCompany = selectedCompany?.company_name
@@ -66,7 +69,7 @@ export function useResolvedOrderScope(
     return {
       resolvedModule,
       resolvedOperator,
-      resolvedCompanyId: selectedCompanyId,
+      resolvedCompanyId: selectedCompany?.company_id ?? selectedCompanyId,
       resolvedPartnerId: selectedPartnerId,
     };
   }

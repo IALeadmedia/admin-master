@@ -2,12 +2,15 @@ import { dictionaryQueryClient } from "@/constants/dictionaryQueryClient.const";
 import { useDeleteOrderMutation } from "@/hooks/orders/useDeleteOrderMutation";
 import { useOrderQuery } from "@/hooks/orders/useOrderQuery";
 import { useUpdateOrderMutation } from "@/hooks/orders/useUpdateOrderMutation";
+import type { TableColumnsType } from "antd";
 import type { Dayjs } from "dayjs";
 import type {
   IOrderAddressComplement,
   IOrderTelecom,
 } from "@/types/IOrder.type";
 import type { OrderModule } from "@/services/orders.service";
+import { getFinanceColumns } from "./finances/config-page.const";
+import { getColumns as getTelecomColumns } from "./telecom/components/columns";
 
 export const entityPage = dictionaryQueryClient.orders;
 export const useUpdateEntity = useUpdateOrderMutation;
@@ -39,17 +42,27 @@ const categoriesByModel: Record<OrderModel, OrderCategory[]> = {
   benefits: ["beneficios"],
 };
 
-const telecomOrderCategories: TelecomOrderCategory[] = [
-  "banda-larga",
-  "telefonia-movel",
-];
-
-export const defaultOrderCategory: TelecomOrderCategory =
-  defaultCategoryByModel.telecom as TelecomOrderCategory;
-
 const telecomOrderCategoryLabelMap: Record<TelecomOrderCategory, string> = {
   "banda-larga": "Banda Larga",
   "telefonia-movel": "Telefonia Móvel",
+};
+
+const financeOrderCategoryLabelMap: Record<FinanceOrderCategory, string> = {
+  maquininha: "Maquininha",
+  emprestimo: "Empréstimo",
+};
+
+const benefitsOrderCategoryLabelMap: Record<BenefitsOrderCategory, string> = {
+  beneficios: "Benefícios",
+};
+
+const orderCategoryLabelMapByModel: Record<
+  OrderModel,
+  Record<string, string>
+> = {
+  telecom: telecomOrderCategoryLabelMap,
+  finances: financeOrderCategoryLabelMap,
+  benefits: benefitsOrderCategoryLabelMap,
 };
 
 export function isTelecomOrderCategory(
@@ -57,7 +70,7 @@ export function isTelecomOrderCategory(
 ): category is TelecomOrderCategory {
   return (
     !!category &&
-    telecomOrderCategories.includes(category as TelecomOrderCategory)
+    categoriesByModel.telecom.includes(category as TelecomOrderCategory)
   );
 }
 
@@ -82,10 +95,66 @@ export function resolveOrderModel(rawModel?: string): OrderModel {
   return isKnownOrderModel(normalized) ? normalized : defaultOrderModel;
 }
 
-export function getOrderCategoryLabel(category: string): string {
-  return (
-    telecomOrderCategoryLabelMap[category as TelecomOrderCategory] ?? category
-  );
+export function getOrderCategoryLabelByModel(
+  category: string,
+  model: OrderModel = defaultOrderModel,
+): string {
+  return orderCategoryLabelMapByModel[model]?.[category] ?? category;
+}
+
+export function getOrderCategoryOptionsByModel(
+  model: OrderModel = defaultOrderModel,
+): Array<{ label: string; value: OrderCategory }> {
+  return (categoriesByModel[model] ?? []).map((category) => ({
+    value: category,
+    label: getOrderCategoryLabelByModel(category, model),
+  }));
+}
+
+export function getPartnerCategoryOptions(
+  categories: string[] = [],
+  model: OrderModel = defaultOrderModel,
+): Array<{ label: string; value: string }> {
+  const allowedCategories = categoriesByModel[model];
+  const uniqueCategories = Array.from(new Set(categories)).filter(Boolean);
+  const source = uniqueCategories.length ? uniqueCategories : allowedCategories;
+
+  return source
+    .filter((category) => allowedCategories.includes(category as OrderCategory))
+    .map((category) => ({
+      value: category,
+      label: getOrderCategoryLabelByModel(category, model),
+    }));
+}
+
+export function resolvePartnerCategory(
+  category: string | undefined,
+  partnerCategories: string[] = [],
+  model: OrderModel = defaultOrderModel,
+): OrderCategory {
+  const modelCategory = resolveOrderCategory(category, model);
+
+  if (!partnerCategories.length) {
+    return modelCategory;
+  }
+
+  return partnerCategories.includes(modelCategory)
+    ? modelCategory
+    : (partnerCategories[0] as OrderCategory);
+}
+
+export function getOrderColumnsByModel(
+  model: OrderModel = defaultOrderModel,
+): TableColumnsType<EntityType> | undefined {
+  if (model === "telecom") {
+    return getTelecomColumns() as TableColumnsType<EntityType>;
+  }
+
+  if (model === "finances") {
+    return getFinanceColumns() as TableColumnsType<EntityType>;
+  }
+
+  return undefined;
 }
 
 export type FormValues = {
