@@ -21,4 +21,5 @@ export type FormValues = {
   logo_url: File;
   company_id: number;
   segment: string;
+  category?: string[];
 };

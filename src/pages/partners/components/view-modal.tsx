@@ -12,7 +12,7 @@ interface ViewModalProps {
     onDelete?: (entity: EntityType) => void;
 }
 
-function ArrayField({ label, values }: { label: string; values?: string[] }) {
+export function ArrayField({ label, values }: { label: string; values?: string[] }) {
     return (
         <Space orientation="vertical" size={4} style={{ display: "flex" }}>
             <Typography.Text type="secondary">{label}</Typography.Text>

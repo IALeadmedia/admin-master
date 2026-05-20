@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Form, Input, Modal, Row, Col, Upload, Button, Select, message, Dropdown, Checkbox } from "antd";
 import type { CheckboxChangeEvent } from "antd/es/checkbox";
 import {
@@ -24,14 +24,30 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
   const updateMutation = useUpdateEntity();
   const [logoFile, setLogoFile] = useState<File | undefined>(undefined);
   const selectedUFs = (Form.useWatch("uf", form) ?? []) as string[];
+  const selectedCompanyId = Form.useWatch("company_id", form);
+  const companiesQuery = useCompanyQuery();
 
   const isEditing = !!editingEntity;
   const isPending = createMutation.isPending || updateMutation.isPending;
 
-  const companies = useCompanyQuery().data?.companies.map((company) => ({
+  const companiesData = useMemo(
+    () => companiesQuery.data?.companies ?? [],
+    [companiesQuery.data],
+  );
+  const companies = companiesData.map((company) => ({
     label: company.company_name,
     value: company.company_id,
-  })) ?? [];
+  }));
+  const categoryOptions = useMemo(() => {
+    const selectedCompany = companiesData.find(
+      (company) => String(company.company_id) === String(selectedCompanyId),
+    );
+
+    return (selectedCompany?.category ?? []).map((category) => ({
+      label: category,
+      value: category,
+    }));
+  }, [companiesData, selectedCompanyId]);
   const isAllSelected = selectedUFs.length === UF_OPTIONS.length && UF_OPTIONS.length > 0;
   function handleUFChange(checkedValues: Array<string | number>) {
     form.setFieldValue("uf", checkedValues as string[]);
@@ -54,6 +70,27 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
     setLogoFile(undefined);
     onClose();
   }
+
+  useEffect(() => {
+    if (!selectedCompanyId) {
+      form.setFieldValue("category", []);
+      return;
+    }
+
+    const selectedCompany = companiesData.find(
+      (company) => String(company.company_id) === String(selectedCompanyId),
+    );
+
+    const availableCategories = selectedCompany?.category ?? [];
+    const currentCategories = (form.getFieldValue("category") ?? []) as string[];
+    const validCategories = currentCategories.filter((category) =>
+      availableCategories.includes(category),
+    );
+
+    if (validCategories.length !== currentCategories.length) {
+      form.setFieldValue("category", validCategories);
+    }
+  }, [companiesData, form, selectedCompanyId]);
 
   useEffect(() => {
     if (open && editingEntity) {
@@ -273,17 +310,27 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
             </Form.Item>
           </Col>
         </Row>
-        <Col span={8}>
-          <Form.Item
-            name="category"
-            label="Categoria"
-            rules={[{ required: true, message: "Informe a categoria" }]}
-
-          >
-
-            <Select mode="multiple" placeholder="Selecione a categoria" options={[{ value: "banda-larga", label: "Banda Larga" }, { value: "telefonia-movel", label: "Telefonia Móvel" }]} />
-          </Form.Item>
-        </Col>
+        <Row gutter={16}>
+          <Col span={8}>
+            <Form.Item
+              name="category"
+              label="Categoria"
+              rules={[{ required: true, message: "Informe a categoria" }]}
+            >
+              <Select
+                mode="multiple"
+                placeholder={
+                  selectedCompanyId
+                    ? "Selecione a categoria"
+                    : "Selecione uma empresa primeiro"
+                }
+                options={categoryOptions}
+                disabled={!selectedCompanyId || categoryOptions.length === 0}
+                notFoundContent="Nenhuma categoria cadastrada para a empresa selecionada"
+              />
+            </Form.Item>
+          </Col>
+        </Row>
       </Form>
     </Modal >
   );
