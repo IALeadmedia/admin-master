@@ -98,6 +98,9 @@ export function ViewModal({ open, viewingEntity, onClose, onEdit, onDelete }: Vi
                     <Col span={8}>
                         <ArrayField label="Estados de Cobertura" values={viewingEntity?.uf} />
                     </Col>
+                    <Col span={8}>
+                        <ArrayField label="Categoria" values={viewingEntity?.category} />
+                    </Col>
                 </Row>
             </div>
         </Modal>

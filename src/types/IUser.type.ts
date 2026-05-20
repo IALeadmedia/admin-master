@@ -63,6 +63,7 @@ export interface ICreateUser {
   telephone: string;
   allow_email_notifications: boolean;
   allow_sms_notifications: boolean;
+  allow_wpp_notifications: boolean;
   person_responsible_id: number | null;
   user_type: string;
   team: string;
@@ -81,6 +82,7 @@ export interface IUpdateUser {
   telephone: string;
   allow_email_notifications: boolean;
   allow_sms_notifications: boolean;
+  allow_wpp_notifications: boolean;
   person_responsible_id: number | null;
   user_type: string;
   team: string;
