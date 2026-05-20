@@ -10,7 +10,7 @@ import { ExclamationOutlined } from "@ant-design/icons";
 import React, { useEffect, useState } from "react";
 import { useUpdateOrderStatusMutation } from "@/hooks/orders/useUpdateOrderStatusMutation";
 import { EmpresasDisplay } from "../../common/components/companiesDisplay";
-import type { OrderOperatorsAvailability, OrderSelectedExtra } from "@/types/orders/base.type";
+import type { OrderOperatorsAvailability } from "@/types/orders/base.type";
 
 export const AvailabilityStatus = ({ localData }: { localData: { operators_availability?: OrderOperatorsAvailability | null } }) => {
     const timAvailability = localData.operators_availability?.tim;
@@ -309,7 +309,7 @@ export function ViewModal({
                                         <div className="bg-neutral-50 px-8 py-2">
                                             <div className="font-semibold text-[#666666] text-[14px] mb-1">Extras adicionados</div>
                                             <ul className="divide-y divide-neutral-100">
-                                                {viewingEntity.selected_extras.map((extra: OrderSelectedExtra) => {
+                                                {viewingEntity.selected_extras.map((extra: any) => {
                                                     const opt = extra.options && extra.options[0] ? extra.options[0] : undefined;
                                                     return (
                                                         <li key={extra.id} className="flex justify-between items-center py-2">
