@@ -3,6 +3,7 @@ import { Tooltip, type TableColumnsType } from "antd";
 import type { EntityType } from "../config-page.const";
 import { formatPhoneNumber } from "@/utils/number.utils";
 import { formatCNPJ } from "@/utils/document.util";
+import { formatCategoryLabel } from "@/utils/text.util";
 
 export function getColumns(): TableColumnsType<EntityType> {
   return [
@@ -83,6 +84,25 @@ export function getColumns(): TableColumnsType<EntityType> {
             title={joined}
             overlayStyle={{ fontSize: "12px" }}
           >
+            {joined}
+          </Tooltip>
+        );
+      },
+    }, {
+      title: "Categorias",
+      dataIndex: "category",
+      key: "category",
+      width: 200,
+      ellipsis: {
+        showTitle: false,
+      },
+      render: (category: string[]) => {
+        if (!category?.length) return null;
+
+        const joined = category.map(formatCategoryLabel).join(", ");
+
+        return (
+          <Tooltip placement="topLeft" title={joined} overlayStyle={{ fontSize: "12px" }}>
             {joined}
           </Tooltip>
         );

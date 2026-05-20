@@ -3,6 +3,7 @@ import { entityPage, type EntityType } from "../config-page.const";
 import ReadonlyField, { ArrayField } from "@/layout/common-components/ReadOnlyField";
 import { formatPhoneNumber } from "@/utils/number.utils";
 import { formatCNPJ } from "@/utils/document.util";
+import { formatCategoryLabel } from "@/utils/text.util";
 
 interface ViewModalProps {
     open: boolean;
@@ -80,7 +81,10 @@ export function ViewModal({ open, viewingEntity, onClose, onEdit, onDelete }: Vi
                         <ArrayField label="Estados de Cobertura" values={viewingEntity?.uf} />
                     </Col>
                     <Col span={8}>
-                        <ArrayField label="Categoria" values={viewingEntity?.category} />
+                        <ArrayField
+                            label="Categoria"
+                            values={viewingEntity?.category?.map(formatCategoryLabel)}
+                        />
                     </Col>
                 </Row>
             </div>
