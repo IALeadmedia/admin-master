@@ -1,6 +1,6 @@
 import { Col, Modal, Row, Button, Typography, Space } from "antd";
 import { entityPage, type EntityType } from "../config-page.const";
-import ReadonlyField from "@/layout/common-components/ReadOnlyField";
+import ReadonlyField, { ArrayField } from "@/layout/common-components/ReadOnlyField";
 import { formatPhoneNumber } from "@/utils/number.utils";
 import { formatCNPJ } from "@/utils/document.util";
 
@@ -10,25 +10,6 @@ interface ViewModalProps {
     onClose: () => void;
     onEdit?: (entity: EntityType) => void;
     onDelete?: (entity: EntityType) => void;
-}
-
-export function ArrayField({ label, values }: { label: string; values?: string[] }) {
-    return (
-        <Space orientation="vertical" size={4} style={{ display: "flex" }}>
-            <Typography.Text type="secondary">{label}</Typography.Text>
-            <div
-                style={{
-                    minHeight: 30,
-                    padding: "4px 10px",
-                    border: "1px solid #d9d9d9",
-                    borderRadius: 8,
-                    backgroundColor: "rgba(0, 0, 0, 0.015)",
-                }}
-            >
-                {values?.length ? values.join(", ") : "-"}
-            </div>
-        </Space>
-    );
 }
 
 export function ViewModal({ open, viewingEntity, onClose, onEdit, onDelete }: ViewModalProps) {

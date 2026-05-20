@@ -1,9 +1,9 @@
 import { Col, Modal, Row, Button } from "antd";
 import { entityPage, type EntityType } from "../config-page.const";
-import ReadonlyField from "@/layout/common-components/ReadOnlyField";
+import ReadonlyField, { ArrayField } from "@/layout/common-components/ReadOnlyField";
 import { formatCNPJ } from "@/utils/document.util";
 import { formatPhoneNumber } from "@/utils/number.utils";
-import { ArrayField } from "@/pages/partners/components/view-modal";
+import { formatCategoryLabel } from "@/utils/text.util";
 
 interface ViewModalProps {
     open: boolean;
@@ -69,7 +69,10 @@ export function ViewModal({
                         />
                     </Col>
                     <Col span={8}>
-                        <ArrayField label="Categoria" values={viewingEntity?.category} />
+                        <ArrayField
+                            label="Categoria"
+                            values={viewingEntity?.category?.map(formatCategoryLabel)}
+                        />
                     </Col>
 
                 </Row>

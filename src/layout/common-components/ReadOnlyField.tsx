@@ -43,3 +43,23 @@ export default function ReadonlyField({ label, value, copyable }: ReadonlyFieldP
         </Space>
     );
 }
+
+
+export function ArrayField({ label, values }: { label: string; values?: string[] }) {
+    return (
+        <Space orientation="vertical" size={4} style={{ display: "flex" }}>
+            <Typography.Text type="secondary">{label}</Typography.Text>
+            <div
+                style={{
+                    minHeight: 30,
+                    padding: "4px 10px",
+                    border: "1px solid #d9d9d9",
+                    borderRadius: 8,
+                    backgroundColor: "rgba(0, 0, 0, 0.015)",
+                }}
+            >
+                {values?.length ? values.join(", ") : "-"}
+            </div>
+        </Space>
+    );
+}

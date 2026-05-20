@@ -68,7 +68,7 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
       onCancel={onClose}
       confirmLoading={isPending}
       destroyOnHidden
-      width={910}
+      width={920}
     >
       <Form
         form={form}
@@ -161,9 +161,7 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
             name="category"
             label="Categoria"
             rules={[{ required: true, message: "Informe a categoria" }]}
-
           >
-
             <Select mode="multiple" placeholder="Selecione a categoria" options={[{ value: "banda-larga", label: "Banda Larga" }, { value: "telefonia-movel", label: "Telefonia Móvel" }]} />
           </Form.Item>
         </Col>

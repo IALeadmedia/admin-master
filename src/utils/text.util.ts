@@ -18,3 +18,12 @@ export function summarizeName(fullName?: string | null): string {
   const lastLetter = validNames[validNames.length - 1][0].toUpperCase();
   return firstLetter + lastLetter;
 }
+const categoryLabelMap: Record<string, string> = {
+  "banda-larga": "Banda Larga",
+  "telefonia-movel": "Telefonia Móvel",
+  maquininha: "Maquininha",
+};
+
+export function formatCategoryLabel(category: string) {
+  return categoryLabelMap[category] ?? category;
+}
