@@ -5,7 +5,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useResolvedOrderScope } from "./useResolvedOrderScope";
 
 type DeleteOrderMutationVariables = {
-  id: number;
+  ids: number[];
 };
 
 export function useDeleteOrderMutation() {
@@ -14,9 +14,14 @@ export function useDeleteOrderMutation() {
   const { resolvedModule, resolvedOperator } = useResolvedOrderScope();
 
   return useMutation({
-    mutationFn: ({ id }: DeleteOrderMutationVariables) =>
-      entity.service.delete(id, resolvedModule, resolvedOperator),
-    onMutate: async ({ id }: DeleteOrderMutationVariables) => {
+    mutationFn: async ({ ids }: DeleteOrderMutationVariables) => {
+      await Promise.all(
+        ids.map((id) =>
+          entity.service.delete(id, resolvedModule, resolvedOperator),
+        ),
+      );
+    },
+    onMutate: async ({ ids }: DeleteOrderMutationVariables) => {
       await queryClient.cancelQueries({ queryKey: [entity.key] });
 
       const previousQueries = queryClient.getQueriesData<IOrderTelecomResponse>(
@@ -30,7 +35,10 @@ export function useDeleteOrderMutation() {
         (old) => {
           if (!old) return old;
 
-          const nextOrders = old.orders.filter((order) => order.id !== id);
+          const idsSet = new Set(ids);
+          const nextOrders = old.orders.filter(
+            (order) => !idsSet.has(order.id),
+          );
           const removedCount = old.orders.length - nextOrders.length;
 
           return {
@@ -41,7 +49,7 @@ export function useDeleteOrderMutation() {
         },
       );
 
-      return { previousQueries, toastId: fb.deleteLoading(entity, 1) };
+      return { previousQueries, toastId: fb.deleteLoading(entity, ids.length) };
     },
     onError: (_err, _variables, context) => {
       context?.previousQueries?.forEach(([queryKey, data]) => {
@@ -53,7 +61,8 @@ export function useDeleteOrderMutation() {
     onSuccess: (_data, _variables, context) => {
       queryClient.invalidateQueries({ queryKey: [entity.key] });
 
-      if (context?.toastId) fb.deleteSuccess(entity, 1, context.toastId);
+      if (context?.toastId)
+        fb.deleteSuccess(entity, _variables.ids.length, context.toastId);
     },
   });
 }

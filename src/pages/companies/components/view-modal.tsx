@@ -3,6 +3,7 @@ import { entityPage, type EntityType } from "../config-page.const";
 import ReadonlyField from "@/layout/common-components/ReadOnlyField";
 import { formatCNPJ } from "@/utils/document.util";
 import { formatPhoneNumber } from "@/utils/number.utils";
+import { ArrayField } from "@/pages/partners/components/view-modal";
 
 interface ViewModalProps {
     open: boolean;
@@ -49,7 +50,7 @@ export function ViewModal({
                         <ReadonlyField label="Segmento" value={viewingEntity?.segment === "telecom" ? "Telecom" : viewingEntity?.segment === "finances" ? "Financeiro" : viewingEntity?.segment === "benefits" ? "Benefícios" : "-"} />
                     </Col>
                     <Col span={8}>
-                        <ReadonlyField label="Nome da empresa" value={viewingEntity?.company_name} />
+                        <ReadonlyField label="Nome" value={viewingEntity?.company_name} />
                     </Col>
                     <Col span={8}>
                         <ReadonlyField label="CNPJ" value={formatCNPJ(viewingEntity?.cnpj ?? "")} />
@@ -67,7 +68,9 @@ export function ViewModal({
                             value={viewingEntity?.manager_name}
                         />
                     </Col>
-
+                    <Col span={8}>
+                        <ArrayField label="Categoria" values={viewingEntity?.category} />
+                    </Col>
 
                 </Row>
             </div>

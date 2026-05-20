@@ -12,7 +12,7 @@ interface ViewModalProps {
     onDelete?: (entity: EntityType) => void;
 }
 
-function ArrayField({ label, values }: { label: string; values?: string[] }) {
+export function ArrayField({ label, values }: { label: string; values?: string[] }) {
     return (
         <Space orientation="vertical" size={4} style={{ display: "flex" }}>
             <Typography.Text type="secondary">{label}</Typography.Text>
@@ -81,7 +81,7 @@ export function ViewModal({ open, viewingEntity, onClose, onEdit, onDelete }: Vi
                         <ReadonlyField label="CNPJ" value={formatCNPJ(viewingEntity?.cnpj ?? "")} />
                     </Col>
                     <Col span={8}>
-                        <ReadonlyField label="Email" value={viewingEntity?.email} />
+                        <ReadonlyField label="Email" value={viewingEntity?.email} copyable />
                     </Col>
                     <Col span={8}>
                         <ReadonlyField label="Telefone" value={formatPhoneNumber(viewingEntity?.telephone ?? "")} />
@@ -97,6 +97,9 @@ export function ViewModal({ open, viewingEntity, onClose, onEdit, onDelete }: Vi
                     </Col>
                     <Col span={8}>
                         <ArrayField label="Estados de Cobertura" values={viewingEntity?.uf} />
+                    </Col>
+                    <Col span={8}>
+                        <ArrayField label="Categoria" values={viewingEntity?.category} />
                     </Col>
                 </Row>
             </div>

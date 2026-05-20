@@ -5,10 +5,12 @@ export interface IPartnerPriority {
   company_id: number;
   partner_id: number;
   uf: string;
+  category: string;
   client_type: IPartnerPriorityClientType;
   created_at?: string;
   updated_at?: string;
   partner?: {
+    category: string[];
     partner_id: number;
     partner_name: string;
     partner_hash?: string;
@@ -26,12 +28,14 @@ export interface IPartnerPriorityFilters {
   company_id?: number;
   client_type?: IPartnerPriorityClientType;
   uf?: string;
+  category?: string;
 }
 
 export interface IUpdatePartnerPriorityPayload {
   company_id: number;
   partner_id: number;
   uf: string;
+  category: string;
   client_type: IPartnerPriorityClientType;
 }
 
@@ -49,4 +53,5 @@ export interface IPartnerPriorityResolveResponse {
   logo_url?: string;
   uf?: string;
   client_type?: IPartnerPriorityClientType;
+  category?: string;
 }

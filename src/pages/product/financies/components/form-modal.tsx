@@ -1,6 +1,9 @@
 import { useEffect } from "react";
-import { Form, Input, Modal, Row, Col, Select, InputNumber } from "antd";
+import { Form, Input, Modal, Row, Col, Select, InputNumber, Dropdown, Checkbox, Button } from "antd";
+import type { CheckboxChangeEvent } from "antd/es/checkbox";
 import { useCreateEntity, useUpdateEntity, entityPage, type EntityType } from "../config-page.const";
+import { UF_OPTIONS } from "@/utils/ufOptions";
+import { DownOutlined } from "@ant-design/icons";
 
 
 interface FormModalProps {
@@ -13,11 +16,10 @@ interface FormModalProps {
 export type FinanciesFormValues = {
     name: string;
     company: string;
-    business_partner: string;
     category?: string;
     client_type: "PF" | "PJ";
     company_id?: number | null;
-    partner_id?: number | null;
+    uf?: string[];
     interest_rate?: number;
     max_amount?: number;
     min_amount?: number;
@@ -28,16 +30,34 @@ export function FormModal({ open, editingEntity, category, onClose }: FormModalP
     const [form] = Form.useForm<FinanciesFormValues>();
     const createMutation = useCreateEntity();
     const updateMutation = useUpdateEntity();
+    const selectedUFs = (Form.useWatch("uf", form) ?? []) as string[];
 
     const isEditing = !!editingEntity;
     const isPending = createMutation.isPending || updateMutation.isPending;
+    const isAllSelected = selectedUFs.length === UF_OPTIONS.length && UF_OPTIONS.length > 0;
+
+    function handleUFChange(checkedValues: Array<string | number>) {
+        form.setFieldValue("uf", checkedValues as string[]);
+    }
+
+    function handleSelectAll(event: CheckboxChangeEvent) {
+        if (event.target.checked) {
+            form.setFieldValue(
+                "uf",
+                UF_OPTIONS.map((option) => String(option.value)),
+            );
+            return;
+        }
+
+        form.setFieldValue("uf", []);
+    }
 
     useEffect(() => {
         if (open && editingEntity) {
             form.setFieldsValue({
                 ...editingEntity,
                 company_id: editingEntity.company_id ?? undefined,
-                partner_id: editingEntity.partner_id ?? undefined,
+                uf: editingEntity.uf ?? [],
             });
         } else if (open) {
             form.resetFields();
@@ -58,7 +78,7 @@ export function FormModal({ open, editingEntity, category, onClose }: FormModalP
                     entity: {
                         ...entityPayload,
                         company_id: values.company_id ?? editingEntity.company_id ?? null,
-                        partner_id: values.partner_id ?? editingEntity.partner_id ?? null,
+                        uf: values.uf ?? editingEntity.uf ?? [],
                     },
                 },
                 { onSuccess: onClose }
@@ -71,7 +91,7 @@ export function FormModal({ open, editingEntity, category, onClose }: FormModalP
                         category,
                         company: "TIM",
                         company_id: values.company_id ?? null,
-                        partner_id: values.partner_id ?? null,
+                        uf: values.uf ?? [],
                     },
                 },
                 { onSuccess: onClose }
@@ -114,6 +134,62 @@ export function FormModal({ open, editingEntity, category, onClose }: FormModalP
                                     <Select.Option value="PF">Pessoa Física (PF)</Select.Option>
                                     <Select.Option value="PJ">Pessoa Jurídica (PJ)</Select.Option>
                                 </Select>
+                            </Form.Item>
+                        </Col>
+                    </Row>
+
+                    <Row gutter={16}>
+                        <Col span={24}>
+                            <Form.Item
+                                name="uf"
+                                label="UF"
+                                rules={[{ required: true, message: "Selecione ao menos uma UF" }]}
+                            >
+                                <Dropdown
+                                    popupRender={() => (
+                                        <div
+                                            style={{
+                                                width: 280,
+                                                background: "#fff",
+                                                border: "1px solid #e5e7eb",
+                                                borderRadius: 8,
+                                                boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                                                padding: 12,
+                                                maxHeight: 200,
+                                                overflowY: "auto",
+                                                scrollbarWidth: "none",
+                                                msOverflowStyle: "none",
+                                            }}
+                                        >
+                                            <div className="hide-scrollbar-uf">
+                                                <div style={{ marginBottom: 12, paddingBottom: 12, borderBottom: "1px solid #e5e7eb" }}>
+                                                    <Checkbox
+                                                        checked={isAllSelected}
+                                                        onChange={handleSelectAll}
+                                                        style={{ fontWeight: 500 }}
+                                                    >
+                                                        Selecionar Todos
+                                                    </Checkbox>
+                                                </div>
+                                                <Checkbox.Group
+                                                    options={UF_OPTIONS}
+                                                    value={selectedUFs}
+                                                    onChange={handleUFChange}
+                                                    style={{
+                                                        display: "flex",
+                                                        flexDirection: "column",
+                                                        gap: 8,
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
+                                    trigger={["click"]}
+                                >
+                                    <Button style={{ width: "100%" }}>
+                                        {selectedUFs.length ? `${selectedUFs.length} UF(s) selecionada(s)` : "Selecionar UF"} <DownOutlined />
+                                    </Button>
+                                </Dropdown>
                             </Form.Item>
                         </Col>
                     </Row>

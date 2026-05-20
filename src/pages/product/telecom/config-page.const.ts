@@ -32,14 +32,12 @@ export type EntityType = IProduct;
 export type FormValues = {
   name: string;
   company: string;
-  business_partner: string;
   badge?: string;
   offer_title?: string;
   offer_subtitle?: string;
   client_type: "PF" | "PJ";
   uf?: string[];
   company_id?: number | null;
-  partner_id?: number | null;
   category?: string;
   pricing?: {
     base_monthly?: { current_price?: number; original_price?: number };

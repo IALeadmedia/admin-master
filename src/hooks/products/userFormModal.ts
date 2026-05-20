@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Form, message } from "antd";
 import type { UploadFile } from "antd";
-import { usePartnerQuery } from "@/hooks/partners/usePartnerQuery";
 import { useCompanyQuery } from "@/hooks/companies/useCompanyQuery";
 import { useAuth } from "@/context/auth-provider";
 import { useAdminScope } from "@/context/admin-scope-provider";
@@ -29,23 +28,13 @@ export function useFormModal({ open, editingEntity, category, onClose }: any) {
   const createMutation = useCreateEntity();
   const updateMutation = useUpdateEntity();
   const { user, isGlobalAdmin } = useAuth();
-  const { selectedSegmentId, selectedCompanyId, selectedPartnerId } =
-    useAdminScope();
+  const { selectedCompanyId } = useAdminScope();
   const [modalCompanyId, setModalCompanyId] = useState<number | undefined>(
-    undefined,
-  );
-  const [modalPartnerId, setModalPartnerId] = useState<number | undefined>(
     undefined,
   );
   const { data: reusableProductsData, isLoading: isLoadingReusableProducts } =
     useListEntity(category);
   const { data: companiesData } = useCompanyQuery({ enabled: isGlobalAdmin });
-  const shouldFetchPartners = isGlobalAdmin ? modalCompanyId != null : true;
-  const { data: partnersData } = usePartnerQuery({
-    enabled: shouldFetchPartners,
-    companyId: modalCompanyId,
-    segmentId: selectedSegmentId,
-  });
   const [activeExtrasTab, setActiveExtrasTab] =
     useState<ExtrasTab>("non_client");
   const [bonusVisibleOverrides, setBonusVisibleOverrides] = useState<
@@ -90,15 +79,6 @@ export function useFormModal({ open, editingEntity, category, onClose }: any) {
     [companiesData],
   );
 
-  const partnerOptions = useMemo(
-    () =>
-      (partnersData?.partners ?? []).map((partner) => ({
-        label: partner.partner_name,
-        value: partner.partner_id,
-      })),
-    [partnersData],
-  );
-
   function handleTemplateApplied(
     fieldName: "extras_non_client" | "extras_client",
     groupIndex: number,
@@ -130,11 +110,6 @@ export function useFormModal({ open, editingEntity, category, onClose }: any) {
 
   function handleSelectCompany(companyId: number | undefined) {
     setModalCompanyId(companyId);
-    setModalPartnerId(undefined);
-  }
-
-  function handleSelectPartner(partnerId: number | undefined) {
-    setModalPartnerId(partnerId);
   }
 
   useEffect(() => {
@@ -142,19 +117,11 @@ export function useFormModal({ open, editingEntity, category, onClose }: any) {
 
     if (editingEntity) {
       setModalCompanyId(editingEntity.company_id ?? undefined);
-      setModalPartnerId(editingEntity.partner_id ?? undefined);
       return;
     }
 
     setModalCompanyId(selectedCompanyId ?? undefined);
-    setModalPartnerId(selectedPartnerId ?? undefined);
-  }, [
-    open,
-    isGlobalAdmin,
-    editingEntity,
-    selectedCompanyId,
-    selectedPartnerId,
-  ]);
+  }, [open, isGlobalAdmin, editingEntity, selectedCompanyId]);
 
   useEffect(() => {
     if (open && editingEntity) {
@@ -187,19 +154,11 @@ export function useFormModal({ open, editingEntity, category, onClose }: any) {
     const effectiveCompanyId = isGlobalAdmin
       ? (modalCompanyId ?? null)
       : (user?.user.company_id ?? null);
-    const effectivePartnerId = isGlobalAdmin
-      ? (modalPartnerId ?? null)
-      : (user?.user.partner_id ?? null);
 
     if (isGlobalAdmin && effectiveCompanyId == null) {
       message.error("Selecione uma empresa para associar o produto.");
       return;
     }
-
-    const partnerUf =
-      (partnersData?.partners ?? []).find(
-        (partner) => String(partner.partner_id) === String(effectivePartnerId),
-      )?.uf ?? [];
 
     const conditionFiles = (values.offer_conditions ?? [])
       .filter((f) => f.originFileObj)
@@ -295,8 +254,7 @@ export function useFormModal({ open, editingEntity, category, onClose }: any) {
             ...entityPayload,
             online: editingEntity.online,
             company_id: effectiveCompanyId,
-            partner_id: effectivePartnerId,
-            uf: partnerUf,
+            uf: values.uf ?? [],
           },
           conditionFiles,
           detailsImages,
@@ -312,8 +270,7 @@ export function useFormModal({ open, editingEntity, category, onClose }: any) {
             category,
             company: "TIM",
             company_id: effectiveCompanyId,
-            partner_id: effectivePartnerId,
-            uf: partnerUf,
+            uf: values.uf ?? [],
           },
           conditionFiles,
           detailsImages,
@@ -329,7 +286,6 @@ export function useFormModal({ open, editingEntity, category, onClose }: any) {
     isEditing,
     isGlobalAdmin,
     companyOptions,
-    partnerOptions,
     reusableExtraTemplates,
     isLoadingReusableProducts,
     activeExtrasTab,
@@ -339,8 +295,6 @@ export function useFormModal({ open, editingEntity, category, onClose }: any) {
     handleTemplateApplied,
     selectedCompanyId: modalCompanyId,
     setSelectedCompanyId: handleSelectCompany,
-    selectedPartnerId: modalPartnerId,
-    setSelectedPartnerId: handleSelectPartner,
     handleSubmit,
     handleClose,
   };

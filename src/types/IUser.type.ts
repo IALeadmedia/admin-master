@@ -26,6 +26,7 @@ export interface IUser {
   telephone: string;
   allow_email_notifications: boolean;
   allow_sms_notifications: boolean;
+  allow_wpp_notifications: boolean;
   person_responsible_id: number | null;
   consultant_hash: string;
   user_type: string;
@@ -45,6 +46,9 @@ export interface IUser {
   person_responsible: {
     person_responsible_id: number;
     person_responsible_name: string;
+    role: string;
+    user_id: number;
+    user_name: string;
   };
 }
 
@@ -59,6 +63,7 @@ export interface ICreateUser {
   telephone: string;
   allow_email_notifications: boolean;
   allow_sms_notifications: boolean;
+  allow_wpp_notifications: boolean;
   person_responsible_id: number | null;
   user_type: string;
   team: string;
@@ -77,6 +82,7 @@ export interface IUpdateUser {
   telephone: string;
   allow_email_notifications: boolean;
   allow_sms_notifications: boolean;
+  allow_wpp_notifications: boolean;
   person_responsible_id: number | null;
   user_type: string;
   team: string;

@@ -1,13 +1,20 @@
-import { Button, Input, Space } from "antd";
+import { Button, Input, Select, Space } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
-import { entityPage } from "../config-page.const";
+
+export interface CategorySelectProps {
+    options: Array<{ label: string; value: string }>;
+    value?: string;
+    onChange: (value: string) => void;
+}
 
 interface TableToolbarProps {
     searchText: string;
     onSearchChange: (value: string) => void;
     selectedCount: number;
     onBulkDelete: () => void;
-
+    canDelete: boolean;
+    deleteLabel: string;
+    categorySelect?: CategorySelectProps;
 }
 
 export function TableToolbar({
@@ -15,7 +22,9 @@ export function TableToolbar({
     onSearchChange,
     selectedCount,
     onBulkDelete,
-
+    canDelete,
+    deleteLabel,
+    categorySelect,
 }: TableToolbarProps) {
     return (
         <div
@@ -36,14 +45,20 @@ export function TableToolbar({
                     allowClear
                     style={{ width: 300 }}
                 />
-                {selectedCount > 0 && (
+                {categorySelect && (
+                    <Select
+                        options={categorySelect.options}
+                        value={categorySelect.value}
+                        onChange={categorySelect.onChange}
+                        style={{ minWidth: 220 }}
+                    />
+                )}
+                {canDelete && selectedCount > 0 && (
                     <Button danger icon={<DeleteOutlined />} onClick={onBulkDelete}>
-                        Deletar {selectedCount} {entityPage.plural.toLowerCase()}
+                        {deleteLabel} {selectedCount}
                     </Button>
                 )}
             </Space>
-
-
         </div>
     );
 }

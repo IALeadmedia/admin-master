@@ -72,19 +72,62 @@ export function ViewModal({
 
                     {/* Header do Plano */}
                     <div style={{ background: "#f5f5f5", padding: 24, borderRadius: 8, marginBottom: 24 }}>
-                        {viewingEntity?.badge && (
-                            <div style={{ marginBottom: 8 }}>
-                                <Typography.Text strong style={{ color: "#374151" }}>
-                                    {viewingEntity.badge}
-                                </Typography.Text>
-                            </div>
-                        )}
+
 
                         <div style={{ marginBottom: 16 }}>
-                            <Typography.Title level={4} style={{ marginBottom: 8 }}>
-                                {viewingEntity?.name} - {viewingEntity?.client_type}
-                            </Typography.Title>
 
+                            <Row justify="space-between" align="top">
+                                <Col>
+                                    {viewingEntity?.badge && (
+                                        <Typography.Text strong style={{ color: "#374151" }}>
+                                            {viewingEntity.badge}
+                                        </Typography.Text>
+                                    )}
+                                    <Typography.Title level={4} >
+                                        {viewingEntity?.name}
+                                    </Typography.Title>
+                                </Col>
+                                <Col style={{ textAlign: "right" }}>
+                                    <Typography.Title level={5} >
+                                        <span className="text-sm text-gray-500">Tipo de cliente: </span>  {viewingEntity?.client_type}
+                                    </Typography.Title>
+                                    <Typography.Title level={5}>
+                                        <span className="text-sm text-gray-500">Categoria: </span>{viewingEntity?.category}
+                                    </Typography.Title>
+                                </Col>
+                            </Row>
+
+
+                            <div className="flex flex-wrap items-center gap-2 mt-1">
+                                <span className="text-sm text-gray-500">Área de cobertura:</span>
+                                {Array.isArray(viewingEntity?.uf) && viewingEntity.uf.length > 0 ? (
+                                    viewingEntity.uf.map((uf) => (
+                                        <span
+                                            key={uf}
+                                            className={`text-xs font-medium text-${color} bg-gray-200  px-2 py-1 rounded`}
+                                        >
+                                            {uf}
+                                        </span>
+                                    ))
+                                ) : (
+                                    <span className={`text-xs font-medium text-${color} bg-gray-200   px-2 py-1 rounded`}>
+                                        Todas as UFs
+                                    </span>
+                                )}
+                            </div>
+                            {viewingEntity?.city && viewingEntity.city.length > 0 && (
+                                <div className="flex flex-wrap items-center gap-2 mt-1">
+                                    <span className="text-sm text-gray-500">Cidades:</span>
+                                    {viewingEntity.city.map((city) => (
+                                        <span
+                                            key={city}
+                                            className={`text-xs font-medium text-${color} bg-gray-200   px-2 py-1 rounded`}
+                                        >
+                                            {city}
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
                         </div>
 
                         {(viewingEntity?.offer_title || viewingEntity?.offer_subtitle) && (
@@ -297,6 +340,6 @@ export function ViewModal({
                 </div>
 
             </div>
-        </Modal>
+        </Modal >
     );
 }

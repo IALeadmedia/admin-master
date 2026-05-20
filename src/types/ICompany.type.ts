@@ -21,6 +21,7 @@ export interface ICompany {
     users: number;
     partners: number;
   };
+  category?: string[];
 }
 
 export interface ICreateCompany {
@@ -31,6 +32,7 @@ export interface ICreateCompany {
   telephone?: string;
   manager_name?: string;
   segment: string;
+  category?: string[];
 }
 
 export interface IUpdateCompany {
@@ -41,8 +43,11 @@ export interface IUpdateCompany {
   telephone?: string;
   manager_name?: string;
   segment: string;
+  category?: string[];
 }
 
 export interface ICompanyFilters {
   segment?: string;
+  page?: number;
+  per_page?: number;
 }

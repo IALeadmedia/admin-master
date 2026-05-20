@@ -18,9 +18,9 @@ export function useUpdateOrderStatusMutation() {
     mutationFn: ({ id, payload }: UpdateOrderStatusMutationVariables) =>
       entity.service.changeStatus(
         id,
-        payload,
         resolvedModule,
         resolvedOperator,
+        payload,
       ),
     onMutate: async ({ id, payload }: UpdateOrderStatusMutationVariables) => {
       await queryClient.cancelQueries({ queryKey: [entity.key] });

@@ -10,6 +10,7 @@ export interface IPartnerResponse {
 export interface IPartner {
   cnpj: string;
   email: string;
+  category: string[];
   partner_id: number;
   logo_url: string | null;
   manager_name: string;
@@ -45,6 +46,7 @@ export interface ICreatePartner {
   };
   uf: string[];
   client_type: string[];
+  category?: string[];
 }
 
 export interface ICreatePartnerPayload {
@@ -64,6 +66,7 @@ export interface IUpdatePartner {
   logo_url?: string | null;
   manager_name: string;
   partner_name: string;
+  category?: string[];
   telephone: string;
   company_id: number;
   company: {

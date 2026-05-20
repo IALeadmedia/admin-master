@@ -2,6 +2,8 @@ import { Col, Modal, Row, Button, Typography } from "antd";
 import { entityPage, type EntityType, roleLabelMap } from "../config-page.const";
 import ReadonlyField from "@/layout/common-components/ReadOnlyField";
 import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
+import { formatCNPJ, formatCPF } from "@/utils/document.util";
+import { formatPhoneNumber } from "@/utils/number.utils";
 
 interface ViewModalProps {
     open: boolean;
@@ -54,18 +56,18 @@ export function ViewModal({
                         <ReadonlyField label="Nome" value={viewingEntity?.user_name} />
                     </Col>
                     <Col span={8}>
-                        <ReadonlyField label="Email" value={viewingEntity?.email} />
+                        <ReadonlyField label="Email" value={viewingEntity?.email} copyable />
                     </Col>
 
                     <Col span={8}>
-                        <ReadonlyField label="Telefone" value={viewingEntity?.telephone} />
+                        <ReadonlyField label="Telefone" value={formatPhoneNumber(viewingEntity?.telephone || "")} />
                     </Col>
 
                     <Col span={8}>
-                        <ReadonlyField label="CPF" value={viewingEntity?.cpf} />
+                        <ReadonlyField label="CPF" value={formatCPF(viewingEntity?.cpf || "")} />
                     </Col>
                     <Col span={8}>
-                        <ReadonlyField label="CNPJ" value={viewingEntity?.cnpj} />
+                        <ReadonlyField label="CNPJ" value={formatCNPJ(viewingEntity?.cnpj || "")} />
                     </Col>
                     <Col span={8}>
                         <ReadonlyField
@@ -85,7 +87,7 @@ export function ViewModal({
                     <Col span={8}>
                         <ReadonlyField
                             label="Tipo"
-                            value={viewingEntity?.user_type}
+                            value={viewingEntity?.user_type === "EQUIPE" ? "Equipe" : viewingEntity?.user_type === "SUBCREDENCIADO" ? "Subcredenciado" : "-"}
                         />
                     </Col>
                     <Col span={8}>
@@ -97,7 +99,7 @@ export function ViewModal({
                     <Col span={8}>
                         <ReadonlyField
                             label="Responsável"
-                            value={viewingEntity?.person_responsible?.person_responsible_name}
+                            value={viewingEntity?.person_responsible?.user_name || "-" + " - " + (viewingEntity?.person_responsible?.role === "DIRETOR" ? "Diretor" : viewingEntity?.person_responsible?.role === "GERENTE" ? "Gerente" : viewingEntity?.person_responsible?.role === "LIDER" ? "Líder" : viewingEntity?.person_responsible?.role === "GESTOR" ? "Gestor" : "-")}
                         />
                     </Col>
 
@@ -107,8 +109,8 @@ export function ViewModal({
                             <ul style={{ margin: '8px 0 0 16px', padding: 0 }}>
                                 {viewingEntity?.allow_email_notifications && <li><CheckCircleOutlined /> Email</li>}
                                 {viewingEntity?.allow_sms_notifications && <li><CheckCircleOutlined /> SMS</li>}
-
-                                {(!viewingEntity?.allow_email_notifications && !viewingEntity?.allow_sms_notifications) && <li><CloseCircleOutlined /> Nenhum canal habilitado</li>}
+                                {viewingEntity?.allow_wpp_notifications && <li><CheckCircleOutlined /> WhatsApp</li>}
+                                {(!viewingEntity?.allow_email_notifications && !viewingEntity?.allow_sms_notifications && !viewingEntity?.allow_wpp_notifications) && <li><CloseCircleOutlined /> Nenhum canal habilitado</li>}
                             </ul>
                         </div>
                     </Col>

@@ -31,4 +31,5 @@ export type FormValues = {
   };
   uf: string[];
   client_type: string[];
+  category: string[];
 };

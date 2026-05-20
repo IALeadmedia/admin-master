@@ -98,7 +98,7 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
           <Col span={8}>
             <Form.Item
               name="company_name"
-              label="Nome da empresa"
+              label="Nome"
               rules={[
                 { required: true, message: "Informe o nome da empresa" },
               ]}
@@ -156,6 +156,17 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
           </Col>
 
         </Row>
+        <Col span={8}>
+          <Form.Item
+            name="category"
+            label="Categoria"
+            rules={[{ required: true, message: "Informe a categoria" }]}
+
+          >
+
+            <Select mode="multiple" placeholder="Selecione a categoria" options={[{ value: "banda-larga", label: "Banda Larga" }, { value: "telefonia-movel", label: "Telefonia Móvel" }]} />
+          </Form.Item>
+        </Col>
       </Form>
     </Modal >
   );
