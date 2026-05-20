@@ -98,3 +98,50 @@ export const formatResolution = (resolution: any) => {
   }
   return "-";
 };
+
+export const getAlertScenarios = (
+  availability?: boolean | number,
+  found_via_range?: boolean | null,
+  single_zip_code?: boolean | null,
+  status?: string,
+) => {
+  const scenarios: { color: string; content: React.ReactNode }[] = [];
+  const noAvailability =
+    availability === false || availability === null || availability === 0;
+  const isCoveredByRange = Boolean(found_via_range);
+  const hasUnicCep = Boolean(single_zip_code);
+
+  if (status === "FECHADO" || status === "fechado") {
+    if (noAvailability) {
+      scenarios.push({
+        color: "#ffeaea",
+        content: "Não foi identificada disponibilidade no endereço fornecido.",
+      });
+    } else if (isCoveredByRange) {
+      scenarios.push({
+        color: "#fff6c7",
+        content:
+          "O número fornecido esta dentro de um range com disponibilidade.",
+      });
+    } else if (hasUnicCep) {
+      scenarios.push({
+        color: "#fff6c7",
+        content: "CEP Único",
+      });
+    }
+  }
+
+  if (
+    (status === "FECHADO" || status === "fechado") &&
+    !hasUnicCep &&
+    !isCoveredByRange &&
+    !noAvailability
+  ) {
+    scenarios.push({
+      color: "#e6ffed",
+      content: "Esse pedido não possui travas",
+    });
+  }
+
+  return scenarios;
+};

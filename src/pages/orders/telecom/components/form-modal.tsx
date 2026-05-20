@@ -218,9 +218,9 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
             onCancel={onClose}
             confirmLoading={isPending}
             destroyOnHidden
-            width={910}
+            width={920}
         >
-            <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
+            <Form form={form} layout="vertical" style={{ marginTop: 16 }} className="max-h-110 overflow-y-auto scrollbar-thin">
                 <div className="flex flex-col bg-neutral-100 mb-3 rounded-sm p-3">
                     <div className="flex items-center">
                         <h2 className="text-[14px] text-[#666666]">Detalhes dos Planos</h2>

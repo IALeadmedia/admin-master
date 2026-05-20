@@ -1,17 +1,18 @@
-import { Col, Row, Button, Form, ConfigProvider, Input, Select, Tooltip, Typography, message } from "antd";
-import { CopyOutlined } from "@ant-design/icons";
+import { Col, Row, Button, Form, ConfigProvider, Input, Select, Tooltip, } from "antd";
 import { useUpdateEntity, type EntityType } from "../config-page.const";
 import { OrderModalShell } from "../../common/components/order-modal-shell";
 import { OrderModalSection } from "../../common/components/order-modal-section";
 import ReadonlyField from "@/layout/common-components/ReadOnlyField";
 import { formatBRL, formatPaymentMethod, formatPhoneNumber } from "@/utils/number.utils";
 import { formatCEP, formatCPF } from "@/utils/document.util";
-import { formatBrowserDisplay, formatDevice, formatOSDisplay, formatResolution } from "@/utils/orders.util";
+import { formatBrowserDisplay, formatDevice, formatOSDisplay, formatResolution, getAlertScenarios } from "@/utils/orders.util";
 import { ExclamationOutlined } from "@ant-design/icons";
 import React, { useEffect, useState } from "react";
 import { useUpdateOrderStatusMutation } from "@/hooks/orders/useUpdateOrderStatusMutation";
+import { EmpresasDisplay } from "../../common/components/companiesDisplay";
+import type { OrderOperatorsAvailability, OrderSelectedExtra } from "@/types/orders/base.type";
 
-export const AvailabilityStatus = ({ localData }: { localData: any }) => {
+export const AvailabilityStatus = ({ localData }: { localData: { operators_availability?: OrderOperatorsAvailability | null } }) => {
     const timAvailability = localData.operators_availability?.tim;
 
     if (
@@ -76,7 +77,7 @@ export const AvailabilityStatus = ({ localData }: { localData: any }) => {
     );
 };
 
-export const PAPStatus = ({ localData }: { localData: any }) => {
+export const PAPStatus = ({ localData }: { localData: { availability_pap?: boolean | number | null } }) => {
     if (
         localData.availability_pap === null ||
         localData.availability_pap === undefined
@@ -119,86 +120,6 @@ export const PAPStatus = ({ localData }: { localData: any }) => {
     );
 };
 
-interface EmpresasDisplayProps {
-    empresas?: any;
-}
-
-function EmpresasDisplay({ empresas }: EmpresasDisplayProps) {
-    const [tooltipTitle, setTooltipTitle] = useState("Copiar");
-
-    const empresasFormatadas =
-        empresas && empresas.length > 0
-            ? empresas
-                .map(
-                    (empresa: any) =>
-                        `${empresa.cnpj || "-"}, ${empresa.nome || "-"}, ${empresa.porte || "-"}`
-                )
-                .join("; \n")
-            : "-";
-
-    const handleCopy = async () => {
-        try {
-            await navigator.clipboard.writeText(empresasFormatadas);
-            setTooltipTitle("Copiado!");
-            message.success("Copiado!");
-            setTimeout(() => {
-                setTooltipTitle("Copiar");
-            }, 2000);
-        } catch {
-            message.error("Erro ao copiar");
-        }
-    };
-
-    const maxLength = 80;
-    const isLongText = empresasFormatadas.length > maxLength;
-    const previewText = isLongText
-        ? `${empresasFormatadas.substring(0, maxLength)}...`
-        : empresasFormatadas;
-
-    return (
-        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            <Typography.Text type="secondary">Empresas</Typography.Text>
-            <div
-                style={{
-                    minHeight: 30,
-                    padding: "4px 10px",
-                    border: "1px solid #d9d9d9",
-                    borderRadius: 8,
-                    backgroundColor: "rgba(0, 0, 0, 0.015)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    gap: 8,
-                }}
-            >
-                {isLongText ? (
-                    <Tooltip placement="topLeft" title={<div style={{ whiteSpace: "pre-line" }}>{empresasFormatadas}</div>}>
-                        <Typography.Text style={{ cursor: "pointer", flex: 1 }}>
-                            {previewText}
-                        </Typography.Text>
-                    </Tooltip>
-                ) : (
-                    <Typography.Text style={{ whiteSpace: "pre-line", flex: 1 }}>
-                        {previewText}
-                    </Typography.Text>
-                )}
-                {empresasFormatadas !== "-" && (
-                    <Tooltip title={tooltipTitle}>
-                        <CopyOutlined
-                            onClick={handleCopy}
-                            style={{
-                                color: "#8c8c8c",
-                                cursor: "pointer",
-                                flexShrink: 0,
-                            }}
-                        />
-                    </Tooltip>
-                )}
-            </div>
-        </div>
-    );
-}
-
 interface ViewModalProps {
     open: boolean;
     viewingEntity: EntityType | null;
@@ -234,46 +155,6 @@ export function ViewModal({
         }));
     };
 
-    const getAlertScenarios = (
-        availability?: boolean | number,
-        found_via_range?: boolean | null,
-        single_zip_code?: boolean | null,
-        status?: string,
-    ) => {
-        const scenarios: { color: string; content: React.ReactNode }[] = [];
-        const noAvailability = availability === false || availability === null || availability === 0;
-        const isCoveredByRange = Boolean(found_via_range);
-        const hasUnicCep = Boolean(single_zip_code);
-
-        if (status === "FECHADO" || status === "fechado") {
-            if (noAvailability) {
-                scenarios.push({
-                    color: "#ffeaea",
-                    content: "Não foi identificada disponibilidade no endereço fornecido.",
-                });
-            } else if (isCoveredByRange) {
-                scenarios.push({
-                    color: "#fff6c7",
-                    content: "O número fornecido esta dentro de um range com disponibilidade.",
-                });
-            } else if (hasUnicCep) {
-                scenarios.push({
-                    color: "#fff6c7",
-                    content: "CEP Único",
-                });
-            }
-        }
-
-        if ((status === "FECHADO" || status === "fechado") && !hasUnicCep && !isCoveredByRange && !noAvailability) {
-            scenarios.push({
-                color: "#e6ffed",
-                content: "Esse pedido não possui travas",
-            });
-        }
-
-        return scenarios;
-    };
-
     useEffect(() => {
         if (open && viewingEntity) {
             observationForm.setFieldsValue({
@@ -284,7 +165,11 @@ export function ViewModal({
                 consultant_observation: viewingEntity.consultant_observation || "",
             });
         }
-    }, [open, viewingEntity]);
+    }, [open, viewingEntity, observationForm]);
+
+    if (!viewingEntity) {
+        return null;
+    }
 
     const handleSaveObservacao = async () => {
         const values = await observationForm.validateFields();
@@ -424,7 +309,7 @@ export function ViewModal({
                                         <div className="bg-neutral-50 px-8 py-2">
                                             <div className="font-semibold text-[#666666] text-[14px] mb-1">Extras adicionados</div>
                                             <ul className="divide-y divide-neutral-100">
-                                                {viewingEntity.selected_extras.map((extra: any) => {
+                                                {viewingEntity.selected_extras.map((extra: OrderSelectedExtra) => {
                                                     const opt = extra.options && extra.options[0] ? extra.options[0] : undefined;
                                                     return (
                                                         <li key={extra.id} className="flex justify-between items-center py-2">
@@ -596,7 +481,7 @@ export function ViewModal({
                             <Col span={12}><ReadonlyField label="Dispositivo" value={formatDevice(viewingEntity?.fingerprint?.device || '-')} copyable /></Col>
                             <Col span={12}><ReadonlyField label="Browser" value={formatBrowserDisplay(viewingEntity?.fingerprint?.browser)} copyable /></Col>
                             <Col span={12}>
-                                <ReadonlyField label="TimeZone" value={`${viewingEntity?.fingerprint?.timezone} - ${viewingEntity?.fingerprint?.timezone_name}` || '-'} copyable />
+                                <ReadonlyField label="TimeZone" value={`${viewingEntity?.fingerprint?.timezone} - ${viewingEntity?.fingerprint?.timezone_name}`} copyable />
                             </Col>
                             <Col span={12}><ReadonlyField label="Resolução" value={formatResolution(viewingEntity?.fingerprint?.resolution || '-')} copyable /></Col>
                             <Col span={12}><ReadonlyField label="ID Fingerprint" value={viewingEntity?.fingerprint_id || '-'} copyable /></Col>
