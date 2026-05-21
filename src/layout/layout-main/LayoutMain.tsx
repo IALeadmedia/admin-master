@@ -68,11 +68,11 @@ export function LayoutMain() {
     <Layout>
       <header className="px-6 md:px-10 lg:px-14 py-4 dark:bg-neutral-800 bg-[#c5c5c5] flex items-center justify-between w-full">
         <div className="flex items-center justify-between gap-1 w-full">
-          <img className="h-6" src={appSetting.logo} alt="Logo" />
+          <img className="h-7" src={appSetting.logo} alt="Logo" />
 
           {(previewPartner?.logo_url || user?.user?.partner_url_logo) && (
             <img
-              className="h-6"
+              className="h-7"
               src={previewPartner?.logo_url ?? user?.user?.partner_url_logo}
               alt="Partner Logo"
             />
