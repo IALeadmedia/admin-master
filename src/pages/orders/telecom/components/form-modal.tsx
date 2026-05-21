@@ -10,6 +10,7 @@ import type { FormValues } from "../../config-page.const";
 import { OrderModalShell } from "../../common/components/order-modal-shell";
 import { useProductQuery } from "@/hooks/products/useProductQuery";
 import { useResolvedOrderScope } from "@/hooks/orders/useResolvedOrderScope";
+import type { OrderPriceSummary, OrderSelectedExtra } from "@/types/orders/base.type";
 import type { IProduct } from "@/types/IProduct.type";
 import { OrderModalSection } from "../../common/components/order-modal-section";
 
@@ -17,8 +18,15 @@ type PlanSelectedExtraOption = {
     id: string;
     label: string;
     options?: Array<{
+        id?: string;
         price?: number;
         description?: string;
+        bonus?: {
+            type?: string;
+            price?: number;
+            speed?: number;
+            description?: string;
+        };
     }>;
 };
 
@@ -27,6 +35,65 @@ type PlanOption = {
     value: number | string;
     plan: IProduct;
 };
+
+type EditablePlan = {
+    id: string;
+    name?: string;
+    speed?: string;
+    value?: number;
+    original_value?: number;
+};
+
+function toNumber(value?: number | string | null) {
+    if (value === null || value === undefined || value === "") return 0;
+    return Number(value);
+}
+
+function buildPlanSnapshot(plan?: IProduct | null): EditablePlan | null {
+    if (!plan) return null;
+
+    const speedMatch = plan.name?.match(/\d+\s*(?:Mega|MB|Mb|Mbps)/i);
+
+    return {
+        id: String(plan.id),
+        name: plan.name,
+        ...(speedMatch?.[0] ? { speed: speedMatch[0] } : {}),
+        value: toNumber(plan.pricing?.base_monthly?.current_price),
+        ...(plan.pricing?.base_monthly?.original_price != null
+            ? { original_value: toNumber(plan.pricing.base_monthly.original_price) }
+            : {}),
+    };
+}
+
+function buildSelectedExtraSnapshot(
+    extra: PlanSelectedExtraOption,
+    selectedId?: string | number,
+): OrderSelectedExtra | null {
+    const matchingOption = extra.options?.find(
+        (option) => String(option.id ?? extra.id) === String(selectedId),
+    ) ?? extra.options?.[0];
+
+    if (!matchingOption) {
+        return null;
+    }
+
+    return {
+        id: String(matchingOption.id ?? extra.id),
+        label: extra.label,
+        price: toNumber(matchingOption.price),
+        description: matchingOption.description,
+        ...(matchingOption.bonus
+            ? {
+                bonus: {
+                    type: matchingOption.bonus.type,
+                    price: toNumber(matchingOption.bonus.price),
+                    speed: toNumber(matchingOption.bonus.speed),
+                    description: matchingOption.bonus.description,
+                },
+            }
+            : {}),
+    };
+}
 
 interface FormModalProps {
     open: boolean;
@@ -54,6 +121,7 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
         form,
     ) || "house";
     const selectedPlanId = Form.useWatch("plan_id", form);
+    const selectedExtrasIds = Form.useWatch("selected_extras", form) as (string | number)[] | undefined;
 
     const planOptions = useMemo<PlanOption[]>(
         () => (productsData?.products ?? []).map((product) => ({
@@ -78,6 +146,45 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
             options: extra.options,
         }));
     }, [selectedPlan]);
+
+    const selectedPlanSnapshot = useMemo(() => buildPlanSnapshot(selectedPlan), [selectedPlan]);
+
+    const selectedExtrasSnapshot = useMemo<OrderSelectedExtra[]>(() => {
+        if (!selectedPlan?.online || !selectedExtrasIds?.length) return [];
+
+        return selectedExtrasIds
+            .map((selectedId) => {
+                const matchedExtra = selectedPlan.extras?.non_client?.find((extra) =>
+                    String(extra.id) === String(selectedId) ||
+                    extra.options?.some((option) => String(option.id ?? extra.id) === String(selectedId)),
+                );
+
+                if (!matchedExtra) return null;
+
+                return buildSelectedExtraSnapshot(
+                    {
+                        id: matchedExtra.id,
+                        label: matchedExtra.label,
+                        options: matchedExtra.options,
+                    },
+                    selectedId,
+                );
+            })
+            .filter((extra): extra is OrderSelectedExtra => extra !== null);
+    }, [selectedExtrasIds, selectedPlan]);
+
+    const computedPriceSummary = useMemo<OrderPriceSummary>(() => {
+        const planPrice = toNumber(selectedPlan?.pricing?.base_monthly?.current_price);
+        const originalPrice = selectedPlan?.pricing?.base_monthly?.original_price;
+        const extrasPrice = selectedExtrasSnapshot.reduce((total, extra) => total + toNumber(extra.price), 0);
+
+        return {
+            plan_price: planPrice,
+            extras_price: extrasPrice,
+            total_monthly: planPrice + extrasPrice,
+            ...(originalPrice != null ? { original_price: toNumber(originalPrice) } : {}),
+        };
+    }, [selectedExtrasSnapshot, selectedPlan]);
 
     function handlePlanChange(planId: number | string) {
         form.setFieldValue("plan_id", planId);
@@ -192,7 +299,9 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
                     id: editingEntity.id,
                     payload: {
                         ...values,
-                        selected_extras: values.selected_extras ?? [],
+                        plan: selectedPlanSnapshot,
+                        price_summary: computedPriceSummary,
+                        selected_extras: selectedExtrasSnapshot,
                         installation_preferred_date_one: installationPreferredDateOne,
                         installation_preferred_date_two: installationPreferredDateTwo,
                         cnpj: values.cnpj ?? null,
