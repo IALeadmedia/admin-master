@@ -186,7 +186,7 @@ export function PriorityTable({
 
     ];
 
-    return (
+    return (<div className="flex overflow-y-auto ">
         <Table
             rowKey="uf"
             scroll={{ y: 800 }}
@@ -196,6 +196,6 @@ export function PriorityTable({
             loading={isLoading}
             pagination={false}
             locale={{ emptyText: "Nenhum estado encontrado para os filtros" }}
-        />
+        /></div>
     );
 }

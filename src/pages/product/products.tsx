@@ -1,27 +1,50 @@
 import { Typography } from "antd";
 import { useParams } from "@tanstack/react-router";
-import { configByModel, isKnownProductModel, defaultProductModel } from "./config-page.const";
+import { useState } from "react";
+import { configByModel, resolveProductModel } from "./config-page.const";
+
+function ProductsTableSection({
+    model,
+    category,
+}: {
+    model: "telecom" | "finances";
+    category: string;
+}) {
+    const config = configByModel[model];
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(20);
+
+    const { data, isLoading } = config.useListEntity(category, currentPage, pageSize);
+    const TableComponent = config.TableComponent;
+
+    return (
+        <TableComponent
+            data={data?.products ?? []}
+            isLoading={isLoading}
+            category={category}
+            model={model}
+            currentPage={currentPage}
+            pageSize={pageSize}
+            total={data?.total ?? 0}
+            onPageChange={setCurrentPage}
+            onPageSizeChange={setPageSize}
+        />
+    );
+}
 
 export function ProductsPage() {
     const { model: rawModel, category } = useParams({ from: "/app/products/$model/$category" });
 
-    const model = isKnownProductModel(rawModel) ? rawModel : defaultProductModel;
+    const model = resolveProductModel(rawModel);
     const config = configByModel[model];
-    const { data, isLoading } = config.useListEntity(category);
     const categoryLabel = config.getCategoryLabel(category);
-    const TableComponent = config.TableComponent;
 
     return (
         <div className="py-6 min-h-[calc(100vh-160px)]">
             <Typography.Title level={3} style={{ marginBottom: 16 }}>
                 {config.entityPage.plural} - {categoryLabel}
             </Typography.Title>
-            <TableComponent
-                data={data?.products ?? []}
-                isLoading={isLoading}
-                category={category}
-                model={model}
-            />
+            <ProductsTableSection key={`${model}-${category}`} model={model} category={category} />
         </div>
     );
 }

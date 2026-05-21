@@ -1,4 +1,5 @@
 import type { ComponentType } from "react";
+import type { IProduct, IProductsResponse } from "@/types/IProduct.type";
 
 import * as telecomConfig from "./telecom/config-page.const";
 import * as financiesConfig from "./financies/config-page.const";
@@ -6,14 +7,35 @@ import * as financiesConfig from "./financies/config-page.const";
 import { TableMain as TelecomTable } from "./telecom/components/table";
 import { TableMain as FinanciesTable } from "./financies/components/table";
 
+export interface ProductsTableComponentProps {
+  data: IProduct[];
+  isLoading: boolean;
+  category: string;
+  model?: ProductModel;
+  currentPage: number;
+  pageSize: number;
+  total: number;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (size: number) => void;
+  categorySelect?: {
+    options: Array<{ label: string; value: string }>;
+    value: string;
+    onChange: (value: string) => void;
+  };
+}
+
 interface ModelConfig {
   entityPage: { plural: string; name: string };
-  useListEntity: (category: string) => {
-    data?: { products: any[] };
+  useListEntity: (
+    category: string,
+    page?: number,
+    per_page?: number,
+  ) => {
+    data?: Pick<IProductsResponse, "products" | "total">;
     isLoading: boolean;
   };
   getCategoryLabel: (category: string) => string;
-  TableComponent: ComponentType<any>;
+  TableComponent: ComponentType<ProductsTableComponentProps>;
 }
 
 export type ProductModel = "telecom" | "finances";

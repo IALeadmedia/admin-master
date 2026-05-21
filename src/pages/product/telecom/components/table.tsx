@@ -10,6 +10,7 @@ import { ProductTableToolbar } from "../../common/ProductTableToolbar";
 import { ProductDeleteModal } from "../../common/ProductDeleteModal";
 import { useAuth } from "@/context/auth-provider";
 import type { UserRole } from "@/types/IUser.type";
+import type { ProductModel } from "@/types/IProduct.type";
 
 const canSeeSwitchRoles: UserRole[] = ["ADMIN", "GESTOR", "DIRETOR", "GERENTE"];
 
@@ -17,6 +18,12 @@ interface ProductsTableProps {
   data: IProduct[];
   isLoading: boolean;
   category: string;
+  model?: ProductModel;
+  currentPage: number;
+  pageSize: number;
+  total: number;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (size: number) => void;
   categorySelect?: {
     options: Array<{ label: string; value: string }>;
     value: string;
@@ -24,7 +31,17 @@ interface ProductsTableProps {
   };
 }
 
-export function TableMain({ data, isLoading, category, categorySelect }: ProductsTableProps) {
+export function TableMain({
+  data,
+  isLoading,
+  category,
+  currentPage,
+  pageSize,
+  total,
+  onPageChange,
+  onPageSizeChange,
+  categorySelect,
+}: ProductsTableProps) {
   const { styles } = useStyle();
   const updateMutation = useUpdateEntity();
   const deleteMutation = useDeleteEntity();
@@ -78,9 +95,19 @@ export function TableMain({ data, isLoading, category, categorySelect }: Product
             onChange: setSelectedRowKeys,
           }}
           pagination={{
-            pageSize: 10,
-            showTotal: (total) =>
-              `Total: ${total} ${entityPage.plural.toLowerCase()}`,
+            current: currentPage,
+            pageSize,
+            total,
+            locale: { items_per_page: "" },
+            pageSizeOptions: [5, 10, 20, 50, 100],
+            showSizeChanger: true,
+            showTotal: (itemsTotal) =>
+              `Total de ${itemsTotal} ${entityPage.plural.toLowerCase()}`,
+            onChange: (page) => onPageChange(page),
+            onShowSizeChange: (_, size) => {
+              onPageSizeChange(size);
+              onPageChange(1);
+            },
           }}
           scroll={{ y: 800 }}
           onRow={(record) => ({

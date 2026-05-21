@@ -10,10 +10,14 @@ export function useProductQuery({
   model,
   filters,
   enabled = true,
+  page = 1,
+  per_page = 20,
 }: {
   model?: ProductModel;
   filters?: Omit<IProductFilters, "company_id">;
   enabled?: boolean;
+  page?: number;
+  per_page?: number;
 } = {}) {
   const entity = dictionaryQueryClient["products"];
   const { user } = useAuth();
@@ -29,10 +33,14 @@ export function useProductQuery({
     ? {
         ...filters,
         ...(selectedCompanyId != null ? { company_id: selectedCompanyId } : {}),
+        page,
+        per_page,
       }
     : {
         ...filters,
         ...(companyId != null ? { company_id: companyId } : {}),
+        page,
+        per_page,
       };
 
   return useQuery({
@@ -43,6 +51,8 @@ export function useProductQuery({
       queryFilters.category ?? null,
       queryFilters.page ?? null,
       queryFilters.perPage ?? null,
+      page,
+      per_page,
     ],
     queryFn: () => entity.service.getAll(queryFilters, resolvedModel),
     retry: 2,

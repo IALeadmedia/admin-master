@@ -66,6 +66,7 @@ export interface IProductsResponse {
 
 export interface IProductFilters {
   page?: number;
+  per_page?: number;
   perPage?: number;
   company_id?: number;
   company?: string;

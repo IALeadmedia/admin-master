@@ -21,10 +21,16 @@ export function getTelecomCategoryLabel(category: string) {
 
 export const useCreateEntity = () => useCreateProductMutation(productModel);
 export const useUpdateEntity = () => useUpdateProductMutation(productModel);
-export const useListEntity = (category: string = TELECOM_DEFAULT_CATEGORY) =>
+export const useListEntity = (
+  category: string = TELECOM_DEFAULT_CATEGORY,
+  page = 1,
+  per_page = 20,
+) =>
   useProductQuery({
     model: productModel,
     filters: { category },
+    page,
+    per_page,
   });
 export const useDeleteEntity = () => useDeleteProductMutation(productModel);
 export type EntityType = IProduct;

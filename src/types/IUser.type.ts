@@ -93,4 +93,6 @@ export interface IUserFilters {
   company_id?: number;
   partner_id?: number;
   segment?: string;
+  page?: number;
+  per_page?: number;
 }

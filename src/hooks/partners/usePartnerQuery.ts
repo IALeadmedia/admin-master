@@ -9,11 +9,15 @@ export function usePartnerQuery({
   companyId,
   segmentId,
   partnerId,
+  page = 1,
+  per_page = 20,
 }: {
   enabled?: boolean;
   companyId?: number;
   segmentId?: string;
   partnerId?: number;
+  page?: number;
+  per_page?: number;
 } = {}) {
   const entity = dictionaryQueryClient["partners"];
   const { user } = useAuth();
@@ -28,10 +32,14 @@ export function usePartnerQuery({
         ...(resolvedSegmentId ? { segment: resolvedSegmentId } : {}),
         ...(resolvedCompanyId != null ? { company_id: resolvedCompanyId } : {}),
         ...(resolvedPartnerId != null ? { partner_id: resolvedPartnerId } : {}),
+        page,
+        per_page,
       }
     : {
         company_id: user?.user.company_id ?? undefined,
         ...(resolvedPartnerId != null ? { partner_id: resolvedPartnerId } : {}),
+        page,
+        per_page,
       };
 
   return useQuery({
@@ -40,6 +48,8 @@ export function usePartnerQuery({
       filters.segment ?? null,
       filters.company_id ?? null,
       filters.partner_id ?? null,
+      page,
+      per_page,
     ],
     queryFn: () => entity.service.getAll(filters),
     retry: 2,

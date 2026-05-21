@@ -12,10 +12,18 @@ import { ViewModal } from "./view-modal";
 
 interface PartnersTableProps {
   data: IPartner[];
-  isLoading: boolean;
+  isLoading: boolean; currentPage: number;
+  pageSize: number;
+  total: number;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (size: number) => void;
 }
 
-export function TableMain({ data, isLoading }: PartnersTableProps) {
+export function TableMain({ data, isLoading, currentPage,
+  pageSize,
+  total,
+  onPageChange,
+  onPageSizeChange, }: PartnersTableProps) {
   const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
   const [searchText, setSearchText] = useState("");
   const [viewingEntity, setViewingEntity] = useState<IPartner | null>(null);
@@ -98,9 +106,18 @@ export function TableMain({ data, isLoading }: PartnersTableProps) {
             onChange: setSelectedRowKeys,
           }}
           pagination={{
-            pageSize: 10,
-            showTotal: (total) =>
-              `Total: ${total} ${entityPage.plural.toLowerCase()}`,
+            current: currentPage,
+            pageSize: pageSize,
+            total: total,
+            locale: { items_per_page: "" },
+            pageSizeOptions: [5, 10, 20, 50, 100],
+            showSizeChanger: true,
+            showTotal: (total) => `Total de ${total} ${entityPage.plural.toLowerCase()}`,
+            onChange: (page) => onPageChange(page),
+            onShowSizeChange: (_, size) => {
+              onPageSizeChange(size);
+              onPageChange(1);
+            },
           }}
           scroll={{ y: 800 }}
           onRow={(record) => ({
