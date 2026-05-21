@@ -1,3 +1,5 @@
+import type { OrderCommonRecord } from "@/pages/orders/common/components/columns";
+
 export type FingerprintNameVersion =
   | string
   | {
@@ -145,3 +147,34 @@ export const getAlertScenarios = (
 
   return scenarios;
 };
+
+export function normalizeNames(name1?: string | null, name2?: string | null) {
+  if (!name1 || !name2) return null;
+
+  const normalizeText = (text: string) =>
+    text
+      .toLowerCase()
+      .trim()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+
+  return normalizeText(name1) === normalizeText(name2);
+}
+
+export function normalizeCompanyPartners(
+  companyPartners?: OrderCommonRecord["company_partners"],
+) {
+  if (!companyPartners)
+    return [] as Array<{ cnpj: string; nome: string; porte: string }>;
+
+  if (Array.isArray(companyPartners)) {
+    return companyPartners;
+  }
+
+  try {
+    const parsed = JSON.parse(companyPartners);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}

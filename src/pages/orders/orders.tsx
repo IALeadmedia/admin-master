@@ -12,6 +12,7 @@ import {
 } from "./config-page.const";
 import { useParams } from "@tanstack/react-router";
 import { useResolvedOrderScope } from "@/hooks/orders/useResolvedOrderScope";
+import { useCompanyQuery } from "@/hooks/companies/useCompanyQuery";
 import { usePartnerQuery } from "@/hooks/partners/usePartnerQuery";
 import { TableMain as CommonTableMain } from "./common/components/table";
 import { FormModal as TelecomFormModal } from "./telecom/components/form-modal";
@@ -47,6 +48,7 @@ export function OrdersPage({ model, category }: OrdersPageProps) {
   const resolvedModel = resolveOrderModel(rawModel);
   const resolvedCategory = resolveOrderCategory(rawCategory, resolvedModel);
   const { resolvedPartnerId } = useResolvedOrderScope(resolvedModel);
+  const { data: companiesData } = useCompanyQuery();
   const { data: partnersData } = usePartnerQuery({
     partnerId: resolvedPartnerId,
     enabled: resolvedPartnerId != null,
@@ -58,7 +60,7 @@ export function OrdersPage({ model, category }: OrdersPageProps) {
     partnerCategories,
     resolvedModel,
   );
-  const columns = getOrderColumnsByModel(resolvedModel);
+  const columns = getOrderColumnsByModel(resolvedModel, companiesData?.companies ?? []);
   const { FormModal: FormModalComponent, ViewModal: ViewModalComponent } =
     orderSegmentComponents[resolvedModel === "finances" ? "finances" : "telecom"];
 

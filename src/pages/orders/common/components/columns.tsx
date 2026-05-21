@@ -17,6 +17,8 @@ import {
     formatBrowserDisplay,
     formatOSDisplay,
     formatResolution,
+    normalizeCompanyPartners,
+    normalizeNames,
 } from "@/utils/orders.util";
 import type {
     OrderBase,
@@ -28,7 +30,7 @@ import type {
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { Thermometer } from "@/layout/common-components/Thermomter";
 import anonymousAvatar from "@/assets/anonymous_avatar.png";
-type OrderCommonRecord = OrderBase & {
+export type OrderCommonRecord = OrderBase & {
     rfb_name?: string | null;
     rfb_birth_date?: string | null;
     rfb_mother_name?: string | null;
@@ -57,410 +59,383 @@ export type SharedOrderRecord = OrderCommonRecord & {
     credit?: boolean | number | string | null;
 };
 
-function normalizeNames(name1?: string | null, name2?: string | null) {
-    if (!name1 || !name2) return null;
-
-    const normalizeText = (text: string) =>
-        text
-            .toLowerCase()
-            .trim()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "");
-
-    return normalizeText(name1) === normalizeText(name2);
-}
-
-function normalizeCompanyPartners(companyPartners?: OrderCommonRecord["company_partners"]) {
-    if (!companyPartners) return [] as Array<{ cnpj: string; nome: string; porte: string }>;
-
-    if (Array.isArray(companyPartners)) {
-        return companyPartners;
-    }
-
-    try {
-        const parsed = JSON.parse(companyPartners);
-        return Array.isArray(parsed) ? parsed : [];
-    } catch {
-        return [];
-    }
-}
-
 
 export function getSharedOrderColumnsBefore<T extends OrderCommonRecord>(): TableColumnsType<T> {
-    return [{
-        title: "",
-        dataIndex: "consultant_observation",
-        width: 30,
-        render: (consultant_observation) => (
-            <Tooltip
-                placement="top"
-                title={consultant_observation || "Sem observações"}
-                overlayInnerStyle={{ fontSize: 12 }}
-            >
-                {consultant_observation && <ExclamationCircleOutlined />}
-            </Tooltip>
-        ),
-    },
-    {
-        title: "",
-        dataIndex: "whatsapp",
-        width: 80,
-        render: (whatsapp, record) => {
-            const avatarSrc = whatsapp?.avatar || anonymousAvatar;
-
-            if (record.pf_temperature === 10) {
-                return (
-                    <div className="flex bg-[#d63535] rounded-full w-9 h-9 items-center justify-center relative">
-
-
-                        <img
-                            src={avatarSrc}
-                            className="rounded-full w-9 h-9 object-cover"
-                        />
-                        <div className="text-sm absolute -top-1 -right-1 flex items-center justify-center">
-                            🔥
-                        </div>
-
-                    </div>
-                );
-            }
-            return (
-
-                <img
-                    src={avatarSrc}
-                    className="rounded-full w-9 h-9 object-cover"
-                />
-            );
-        },
-    },
-    {
-        title: "Temperatura",
-        dataIndex: "pf_temperature",
-        width: 140,
-        render: (pf_temperature) => (
-            <div className="flex w-[120px] h-2 items-center gap-1 mr-4">
-                {" "}
-                <Thermometer min={0} max={10} value={pf_temperature || 0} />
-            </div>
-        ),
-    },
-    {
-        title: "ID",
-        dataIndex: "order_number",
-        width: 110,
-        render: (order_number, record) =>
-            order_number ? order_number : record.id || "-",
-    },
-
-    {
-        title: "Abertura",
-        dataIndex: "created_at",
-        width: 110,
-
-    },
-    {
-        title: "Pedido",
-        dataIndex: "status",
-        render: (status: string) =>
-            status === "ABERTO"
-                ? "Aberto"
-                : status === "FECHADO"
-                    ? "Fechado"
-                    : status === "CANCELADO"
-                        ? "Cancelado"
-                        : "-",
-        width: 80,
-    }, {
-        title: "Tramitação",
-        ellipsis: {
-            showTitle: false,
-        },
-        dataIndex: "after_sales_status",
-        width: 155,
-
-        render: (after_sales_status) => (
-            <Tooltip
-                placement="topLeft"
-                title={after_sales_status}
-                overlayInnerStyle={{ fontSize: 12 }}
-            >
-                {after_sales_status || "-"}
-            </Tooltip>
-        ),
-    }, {
-        title: "Recadastro",
-        dataIndex: "number_attempts_second_call",
-        width: 110,
-        render: (number_attempts_second_call) => number_attempts_second_call || "-",
-    },
-    {
-        title: "CPF",
-        dataIndex: "cpf",
-        width: 120,
-        render: (cpf) => (cpf ? formatCPF(cpf) : "-"),
-        filters: [
-            { text: "Preenchido", value: "preenchido" },
-            { text: "Vazio", value: "vazio" },
-        ],
-        onFilter: (value, record) => {
-            if (value === "preenchido") {
-                return record.cpf !== null && record.cpf !== undefined && record.cpf !== "";
-            }
-
-            if (value === "vazio") {
-                return record.cpf === null || record.cpf === undefined || record.cpf === "";
-            }
-
-            return true;
-        },
-    },
-    {
-        title: "Nome",
-        dataIndex: "full_name",
-        ellipsis: { showTitle: false },
-        render: (full_name, record) => {
-            const isNamesMatch = normalizeNames(full_name, record.rfb_name);
-
-            return full_name ? (
-                <span className="flex items-center gap-1">
-                    {full_name}
-                    {isNamesMatch === true ? (
-                        <Tooltip title="Nome confere com RFB" placement="top" overlayInnerStyle={{ fontSize: 12 }}>
-                            <CheckCircle2 className="h-4 w-4 text-green-500" />
-                        </Tooltip>
-                    ) : isNamesMatch === false ? (
-                        <Tooltip title="Nome diferente da RFB" placement="top" overlayInnerStyle={{ fontSize: 12 }}>
-                            <XCircle className="h-4 w-4 text-red-500" />
-                        </Tooltip>
-                    ) : null}
-                </span>
-            ) : (
-                "-"
-            );
-        },
-        width: 240,
-    },
-    {
-        title: "Gênero",
-        dataIndex: "rfb_gender",
-        width: 80,
-        render: (rfb_gender) =>
-            rfb_gender === "M" ? (
-                <div className="flex items-center justify-center">
-                    <Mars color="blue" size={17} />
-                </div>
-            ) : rfb_gender === "F" ? (
-                <div className="flex items-center justify-center">
-                    <Venus color="magenta" size={18} />
-                </div>
-            ) : (
-                <div className="flex items-center justify-center">-</div>
-            ),
-    },
-    {
-        title: "Data de Nascimento",
-        dataIndex: "birth_date",
-        width: 150,
-        render: (birth_date, record) => {
-            const compareDates = (date1?: string | null, date2?: string | null) => {
-                if (!date1 || !date2) return null;
-                return date1.trim() === date2.trim();
-            };
-
-            const isDatesMatch =
-                birth_date && birth_date !== "00/00/0000"
-                    ? compareDates(birth_date, record.rfb_birth_date)
-                    : null;
-
-            return (
-                <span className="flex items-center gap-1">
-                    {birth_date && birth_date !== "00/00/0000" ? birth_date : "-"}
-                    {isDatesMatch === true ? (
-                        <Tooltip title="Data de nascimento confere com RFB" placement="top" overlayInnerStyle={{ fontSize: 12 }}>
-                            <CheckCircle2 className="h-4 w-4 text-green-500" />
-                        </Tooltip>
-                    ) : isDatesMatch === false ? (
-                        <Tooltip title="Data de nascimento diferente da RFB" placement="top" overlayInnerStyle={{ fontSize: 12 }}>
-                            <XCircle className="h-4 w-4 text-red-500" />
-                        </Tooltip>
-                    ) : null}
-                </span>
-            );
-        },
-    },
-    {
-        title: "Nome da Mãe",
-        dataIndex: "mother_full_name",
-        ellipsis: { showTitle: false },
-        render: (mother_full_name, record) => {
-            const isNamesMatch = normalizeNames(mother_full_name, record.rfb_mother_name);
-
-            return mother_full_name ? (
-                <span className="flex items-center gap-1">
-                    {mother_full_name}
-                    {isNamesMatch === true ? (
-                        <Tooltip title="Nome da mãe confere com RFB" placement="top" overlayInnerStyle={{ fontSize: 12 }}>
-                            <CheckCircle2 className="h-4 w-4 text-green-500" />
-                        </Tooltip>
-                    ) : isNamesMatch === false ? (
-                        <Tooltip title="Nome da mãe diferente da RFB" placement="top" overlayInnerStyle={{ fontSize: 12 }}>
-                            <XCircle className="h-4 w-4 text-red-500" />
-                        </Tooltip>
-                    ) : null}
-                </span>
-            ) : (
-                "-"
-            );
-        },
-        width: 220,
-    },
-    {
-        title: "MEI",
-        dataIndex: "is_mei",
-        width: 70,
-        render: (is_mei) => (is_mei ? "Sim" : is_mei === undefined || is_mei === null ? "-" : "Não"),
-    },
-    {
-        title: "Sócio",
-        dataIndex: "is_socio",
-        width: 70,
-        render: (is_socio) =>
-            is_socio ? "Sim" : is_socio === undefined || is_socio === null ? "-" : "Não",
-    },
-    {
-        title: "Empresas",
-        dataIndex: "company_partners",
-        width: 210,
-        ellipsis: { showTitle: false },
-        render: (company_partners) => {
-            const companies = normalizeCompanyPartners(company_partners);
-
-            if (!companies.length) return "-";
-
-            const empresasFormatadas = companies
-                .map((empresa) => `${empresa.cnpj}, ${empresa.nome}, ${empresa.porte}`)
-                .join("; \n");
-
-            return (
+    return [
+        {
+            title: "",
+            dataIndex: "consultant_observation",
+            width: 30,
+            render: (consultant_observation) => (
                 <Tooltip
-                    placement="topLeft"
-                    title={<div style={{ whiteSpace: "pre-line" }}>{empresasFormatadas}</div>}
+                    placement="top"
+                    title={consultant_observation || "Sem observações"}
                     overlayInnerStyle={{ fontSize: 12 }}
                 >
-                    {empresasFormatadas}
+                    {consultant_observation && <ExclamationCircleOutlined />}
                 </Tooltip>
-            );
+            ),
         },
-    },
-    {
-        title: "Telefone",
-        dataIndex: "phone",
-        width: 180,
-        render: (_, record) => {
-            if (!record.phone) return "-";
+        {
+            title: "",
+            dataIndex: "whatsapp",
+            width: 80,
+            render: (whatsapp, record) => {
+                const avatarSrc = whatsapp?.avatar || anonymousAvatar;
 
-            const isValid = Number(record.phone_valid);
+                if (record.pf_temperature === 10) {
+                    return (
+                        <div className="flex bg-[#d63535] rounded-full w-9 h-9 items-center justify-center relative">
 
-            return (
+
+                            <img
+                                src={avatarSrc}
+                                className="rounded-full w-9 h-9 object-cover"
+                            />
+                            <div className="text-sm absolute -top-1 -right-1 flex items-center justify-center">
+                                🔥
+                            </div>
+
+                        </div>
+                    );
+                }
+                return (
+
+                    <img
+                        src={avatarSrc}
+                        className="rounded-full w-9 h-9 object-cover"
+                    />
+                );
+            },
+        },
+        {
+            title: "Temperatura",
+            dataIndex: "pf_temperature",
+            width: 140,
+            render: (pf_temperature) => (
+                <div className="flex w-30 h-2 items-center gap-1 mr-4">
+                    {" "}
+                    <Thermometer min={0} max={10} value={pf_temperature || 0} />
+                </div>
+            ),
+        },
+        {
+            title: "ID",
+            dataIndex: "order_number",
+            width: 110,
+            render: (order_number, record) =>
+                order_number ? order_number : record.id || "-",
+        },
+
+        {
+            title: "Abertura",
+            dataIndex: "created_at",
+            width: 110,
+
+        },
+        {
+            title: "Pedido",
+            dataIndex: "status",
+            render: (status: string) =>
+                status === "ABERTO"
+                    ? "Aberto"
+                    : status === "FECHADO"
+                        ? "Fechado"
+                        : status === "CANCELADO"
+                            ? "Cancelado"
+                            : "-",
+            width: 80,
+        }, {
+            title: "Tramitação",
+            ellipsis: {
+                showTitle: false,
+            },
+            dataIndex: "after_sales_status",
+            width: 155,
+
+            render: (after_sales_status) => (
+                <Tooltip
+                    placement="topLeft"
+                    title={after_sales_status}
+                    overlayInnerStyle={{ fontSize: 12 }}
+                >
+                    {after_sales_status || "-"}
+                </Tooltip>
+            ),
+        }, {
+            title: "Recadastro",
+            dataIndex: "number_attempts_second_call",
+            width: 110,
+            render: (number_attempts_second_call) => number_attempts_second_call || "-",
+        },
+        {
+            title: "CPF",
+            dataIndex: "cpf",
+            width: 120,
+            render: (cpf) => (cpf ? formatCPF(cpf) : "-"),
+            filters: [
+                { text: "Preenchido", value: "preenchido" },
+                { text: "Vazio", value: "vazio" },
+            ],
+            onFilter: (value, record) => {
+                if (value === "preenchido") {
+                    return record.cpf !== null && record.cpf !== undefined && record.cpf !== "";
+                }
+
+                if (value === "vazio") {
+                    return record.cpf === null || record.cpf === undefined || record.cpf === "";
+                }
+
+                return true;
+            },
+        },
+        {
+            title: "Nome",
+            dataIndex: "full_name",
+            ellipsis: { showTitle: false },
+            render: (full_name, record) => {
+                const isNamesMatch = normalizeNames(full_name, record.rfb_name);
+
+                return full_name ? (
+                    <span className="flex items-center gap-1">
+                        {full_name}
+                        {isNamesMatch === true ? (
+                            <Tooltip title="Nome confere com RFB" placement="top" overlayInnerStyle={{ fontSize: 12 }}>
+                                <CheckCircle2 className="h-4 w-4 text-green-500" />
+                            </Tooltip>
+                        ) : isNamesMatch === false ? (
+                            <Tooltip title="Nome diferente da RFB" placement="top" overlayInnerStyle={{ fontSize: 12 }}>
+                                <XCircle className="h-4 w-4 text-red-500" />
+                            </Tooltip>
+                        ) : null}
+                    </span>
+                ) : (
+                    "-"
+                );
+            },
+            width: 240,
+        },
+        {
+            title: "Gênero",
+            dataIndex: "rfb_gender",
+            width: 80,
+            render: (rfb_gender) =>
+                rfb_gender === "M" ? (
+                    <div className="flex items-center justify-center">
+                        <Mars color="blue" size={17} />
+                    </div>
+                ) : rfb_gender === "F" ? (
+                    <div className="flex items-center justify-center">
+                        <Venus color="magenta" size={18} />
+                    </div>
+                ) : (
+                    <div className="flex items-center justify-center">-</div>
+                ),
+        },
+        {
+            title: "Data de Nascimento",
+            dataIndex: "birth_date",
+            width: 150,
+            render: (birth_date, record) => {
+                const compareDates = (date1?: string | null, date2?: string | null) => {
+                    if (!date1 || !date2) return null;
+                    return date1.trim() === date2.trim();
+                };
+
+                const isDatesMatch =
+                    birth_date && birth_date !== "00/00/0000"
+                        ? compareDates(birth_date, record.rfb_birth_date)
+                        : null;
+
+                return (
+                    <span className="flex items-center gap-1">
+                        {birth_date && birth_date !== "00/00/0000" ? birth_date : "-"}
+                        {isDatesMatch === true ? (
+                            <Tooltip title="Data de nascimento confere com RFB" placement="top" overlayInnerStyle={{ fontSize: 12 }}>
+                                <CheckCircle2 className="h-4 w-4 text-green-500" />
+                            </Tooltip>
+                        ) : isDatesMatch === false ? (
+                            <Tooltip title="Data de nascimento diferente da RFB" placement="top" overlayInnerStyle={{ fontSize: 12 }}>
+                                <XCircle className="h-4 w-4 text-red-500" />
+                            </Tooltip>
+                        ) : null}
+                    </span>
+                );
+            },
+        },
+        {
+            title: "Nome da Mãe",
+            dataIndex: "mother_full_name",
+            ellipsis: { showTitle: false },
+            render: (mother_full_name, record) => {
+                const isNamesMatch = normalizeNames(mother_full_name, record.rfb_mother_name);
+
+                return mother_full_name ? (
+                    <span className="flex items-center gap-1">
+                        {mother_full_name}
+                        {isNamesMatch === true ? (
+                            <Tooltip title="Nome da mãe confere com RFB" placement="top" overlayInnerStyle={{ fontSize: 12 }}>
+                                <CheckCircle2 className="h-4 w-4 text-green-500" />
+                            </Tooltip>
+                        ) : isNamesMatch === false ? (
+                            <Tooltip title="Nome da mãe diferente da RFB" placement="top" overlayInnerStyle={{ fontSize: 12 }}>
+                                <XCircle className="h-4 w-4 text-red-500" />
+                            </Tooltip>
+                        ) : null}
+                    </span>
+                ) : (
+                    "-"
+                );
+            },
+            width: 220,
+        },
+        {
+            title: "MEI",
+            dataIndex: "is_mei",
+            width: 70,
+            render: (is_mei) => (is_mei ? "Sim" : is_mei === undefined || is_mei === null ? "-" : "Não"),
+        },
+        {
+            title: "Sócio",
+            dataIndex: "is_socio",
+            width: 70,
+            render: (is_socio) =>
+                is_socio ? "Sim" : is_socio === undefined || is_socio === null ? "-" : "Não",
+        },
+        {
+            title: "Empresas",
+            dataIndex: "company_partners",
+            width: 210,
+            ellipsis: { showTitle: false },
+            render: (company_partners) => {
+                const companies = normalizeCompanyPartners(company_partners);
+
+                if (!companies.length) return "-";
+
+                const empresasFormatadas = companies
+                    .map((empresa) => `${empresa.cnpj}, ${empresa.nome}, ${empresa.porte}`)
+                    .join("; \n");
+
+                return (
+                    <Tooltip
+                        placement="topLeft"
+                        title={<div style={{ whiteSpace: "pre-line" }}>{empresasFormatadas}</div>}
+                        overlayInnerStyle={{ fontSize: 12 }}
+                    >
+                        {empresasFormatadas}
+                    </Tooltip>
+                );
+            },
+        },
+        {
+            title: "Telefone",
+            dataIndex: "phone",
+            width: 180,
+            render: (_, record) => {
+                if (!record.phone) return "-";
+
+                const isValid = Number(record.phone_valid);
+
+                return (
+                    <span className="flex items-center gap-1">
+                        {formatPhoneNumber(record.phone)}
+                        {isValid === 1 ? (
+                            <Tooltip title="Válido na ANATEL" placement="top" overlayInnerStyle={{ fontSize: 12 }}>
+                                <CheckCircle2 className="h-4 w-4 text-green-500" />
+                            </Tooltip>
+                        ) : isValid === 0 ? (
+                            <Tooltip title="Inválido na ANATEL" placement="top" overlayInnerStyle={{ fontSize: 12 }}>
+                                <XCircle className="h-4 w-4 text-red-500" />
+                            </Tooltip>
+                        ) : null}
+                    </span>
+                );
+            },
+            filters: [
+                { text: "Preenchido", value: "preenchido" },
+                { text: "Vazio", value: "vazio" },
+            ],
+            onFilter: (value, record) => {
+                if (value === "preenchido") {
+                    return record.phone !== null && record.phone !== undefined && record.phone !== "";
+                }
+
+                if (value === "vazio") {
+                    return record.phone === null || record.phone === undefined || record.phone === "";
+                }
+
+                return true;
+            },
+        },
+        {
+            title: "Portado",
+            dataIndex: "portability",
+            width: 90,
+            render: (portability) => portability || "-",
+        },
+        {
+            title: "Whatsapp",
+            dataIndex: ["whatsapp", "is_comercial"],
+            width: 90,
+            render: (is_comercial, record) => {
+                const whatsappData = record?.whatsapp;
+                const hasInvalidPhoneError =
+                    (whatsappData as { erro?: string } | null)?.erro === "Telefone inválido";
+
+                if (hasInvalidPhoneError || whatsappData?.sucesso === false) {
+                    return <div className="flex items-center justify-center">Não</div>;
+                }
+
+                if (whatsappData?.existe_no_whatsapp === false) {
+                    return <div className="flex items-center justify-center">Não</div>;
+                }
+
+                return (
+                    <div className="flex items-center justify-center">
+                        {is_comercial === true ? (
+                            <Tooltip title="Business" placement="top" overlayInnerStyle={{ fontSize: 12 }}>
+                                <img src="/assets/whatsapp-business.png" alt="Business" className="h-6 w-6" />
+                            </Tooltip>
+                        ) : is_comercial === false ? (
+                            <Tooltip title="Messenger" placement="top" overlayInnerStyle={{ fontSize: 12 }}>
+                                <img src="/assets/whatsapp-messenger.png" alt="Messenger" className="h-6 w-6" />
+                            </Tooltip>
+                        ) : (
+                            "-"
+                        )}
+                    </div>
+                );
+            },
+        },
+        {
+            title: "Email",
+            dataIndex: "email",
+            width: 240,
+            ellipsis: { showTitle: false },
+            render: (_, record) => (
                 <span className="flex items-center gap-1">
-                    {formatPhoneNumber(record.phone)}
-                    {isValid === 1 ? (
-                        <Tooltip title="Válido na ANATEL" placement="top" overlayInnerStyle={{ fontSize: 12 }}>
-                            <CheckCircle2 className="h-4 w-4 text-green-500" />
-                        </Tooltip>
-                    ) : isValid === 0 ? (
-                        <Tooltip title="Inválido na ANATEL" placement="top" overlayInnerStyle={{ fontSize: 12 }}>
-                            <XCircle className="h-4 w-4 text-red-500" />
-                        </Tooltip>
+                    <Tooltip placement="topLeft" title={record.email || "-"} overlayInnerStyle={{ fontSize: 12 }}>
+                        <span
+                            style={{
+                                maxWidth: 180,
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                                display: "inline-block",
+                                verticalAlign: "middle",
+                            }}
+                        >
+                            {record.email || "-"}
+                        </span>
+                    </Tooltip>
+                    {record.is_email_valid === true ? (
+                        <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    ) : record.is_email_valid === false ? (
+                        <XCircle className="h-4 w-4 text-red-500" />
                     ) : null}
                 </span>
-            );
-        },
-        filters: [
-            { text: "Preenchido", value: "preenchido" },
-            { text: "Vazio", value: "vazio" },
-        ],
-        onFilter: (value, record) => {
-            if (value === "preenchido") {
-                return record.phone !== null && record.phone !== undefined && record.phone !== "";
-            }
-
-            if (value === "vazio") {
-                return record.phone === null || record.phone === undefined || record.phone === "";
-            }
-
-            return true;
-        },
-    },
-    {
-        title: "Portado",
-        dataIndex: "portability",
-        width: 90,
-        render: (portability) => portability || "-",
-    },
-    {
-        title: "Whatsapp",
-        dataIndex: ["whatsapp", "is_comercial"],
-        width: 90,
-        render: (is_comercial, record) => {
-            const whatsappData = record?.whatsapp;
-            const hasInvalidPhoneError =
-                (whatsappData as { erro?: string } | null)?.erro === "Telefone inválido";
-
-            if (hasInvalidPhoneError || whatsappData?.sucesso === false) {
-                return <div className="flex items-center justify-center">Não</div>;
-            }
-
-            if (whatsappData?.existe_no_whatsapp === false) {
-                return <div className="flex items-center justify-center">Não</div>;
-            }
-
-            return (
-                <div className="flex items-center justify-center">
-                    {is_comercial === true ? (
-                        <Tooltip title="Business" placement="top" overlayInnerStyle={{ fontSize: 12 }}>
-                            <img src="/assets/whatsapp-business.png" alt="Business" className="h-6 w-6" />
-                        </Tooltip>
-                    ) : is_comercial === false ? (
-                        <Tooltip title="Messenger" placement="top" overlayInnerStyle={{ fontSize: 12 }}>
-                            <img src="/assets/whatsapp-messenger.png" alt="Messenger" className="h-6 w-6" />
-                        </Tooltip>
-                    ) : (
-                        "-"
-                    )}
-                </div>
-            );
-        },
-    },
-    {
-        title: "Email",
-        dataIndex: "email",
-        width: 240,
-        ellipsis: { showTitle: false },
-        render: (_, record) => (
-            <span className="flex items-center gap-1">
-                <Tooltip placement="topLeft" title={record.email || "-"} overlayInnerStyle={{ fontSize: 12 }}>
-                    <span
-                        style={{
-                            maxWidth: 180,
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            whiteSpace: "nowrap",
-                            display: "inline-block",
-                            verticalAlign: "middle",
-                        }}
-                    >
-                        {record.email || "-"}
-                    </span>
-                </Tooltip>
-                {record.is_email_valid === true ? (
-                    <CheckCircle2 className="h-4 w-4 text-green-500" />
-                ) : record.is_email_valid === false ? (
-                    <XCircle className="h-4 w-4 text-red-500" />
-                ) : null}
-            </span>
-        ),
-    },] as TableColumnsType<T>;
+            ),
+        },] as TableColumnsType<T>;
 }
 
 export function getSharedOrderColumnsAfter<T extends OrderCommonRecord>(): TableColumnsType<T> {

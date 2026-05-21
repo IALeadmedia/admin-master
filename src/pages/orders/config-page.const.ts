@@ -8,9 +8,10 @@ import type {
   IOrderAddressComplement,
   IOrderTelecom,
 } from "@/types/IOrder.type";
+import type { ICompany } from "@/types/ICompany.type";
 import type { OrderModule } from "@/services/orders.service";
 import { getFinanceColumns } from "./finances/config-page.const";
-import { getColumns as getTelecomColumns } from "./telecom/components/columns";
+import { getColumns as getTelecomColumns } from "./telecom/components/columns.tsx";
 
 export const entityPage = dictionaryQueryClient.orders;
 export const useUpdateEntity = useUpdateOrderMutation;
@@ -145,9 +146,10 @@ export function resolvePartnerCategory(
 
 export function getOrderColumnsByModel(
   model: OrderModel = defaultOrderModel,
+  companies: ICompany[] = [],
 ): TableColumnsType<EntityType> | undefined {
   if (model === "telecom") {
-    return getTelecomColumns() as TableColumnsType<EntityType>;
+    return getTelecomColumns(companies) as TableColumnsType<EntityType>;
   }
 
   if (model === "finances") {
@@ -164,7 +166,7 @@ export type FormValues = {
   installation_preferred_period_one?: string;
   installation_preferred_date_two?: string | Dayjs;
   installation_preferred_period_two?: string;
-  due_day?: number;
+  due_day?: string | number;
   availability_pap?: boolean;
   full_name?: string;
   cpf?: string;

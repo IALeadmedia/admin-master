@@ -13,12 +13,23 @@ import { EmpresasDisplay } from "../../common/components/companiesDisplay";
 import type { OrderOperatorsAvailability } from "@/types/orders/base.type";
 import { appSetting } from "@/constants/app-setting/config.const";
 import anonymousAvatar from "@/assets/anonymous_avatar.png";
-export const AvailabilityStatus = ({ localData }: { localData: { operators_availability?: OrderOperatorsAvailability | null } }) => {
-    const timAvailability = localData.operators_availability?.tim;
+function resolveOperatorKey(companyName?: string | null) {
+    return companyName?.split(" ")[0]?.toLowerCase().trim();
+}
+
+export const AvailabilityStatus = ({
+    localData,
+    companyName,
+}: {
+    localData: { operators_availability?: OrderOperatorsAvailability | null };
+    companyName?: string | null;
+}) => {
+    const operatorKey = resolveOperatorKey(companyName);
+    const operatorAvailability = operatorKey ? localData.operators_availability?.[operatorKey] : undefined;
 
     if (
-        timAvailability?.available === null ||
-        timAvailability?.available === undefined
+        operatorAvailability?.available === null ||
+        operatorAvailability?.available === undefined
     ) {
         return (
             <div className="flex flex-col items-center mt-2">
@@ -27,8 +38,8 @@ export const AvailabilityStatus = ({ localData }: { localData: { operators_avail
         );
     }
 
-    if (timAvailability.available) {
-        if (timAvailability.found_via_range) {
+    if (operatorAvailability.available) {
+        if (operatorAvailability.found_via_range) {
             return (
                 <div className="flex flex-col items-center mt-2">
                     <div className="flex items-center justify-center mb-2">
@@ -41,8 +52,8 @@ export const AvailabilityStatus = ({ localData }: { localData: { operators_avail
                         </Tooltip>
                     </div>
                     <div className="text-center text-[11px] text-neutral-600 bg-yellow-50 px-2 py-1 rounded">
-                        <strong>Range numérico:</strong> {timAvailability.range_min} - {" "}
-                        {timAvailability.range_max}
+                        <strong>Range numérico:</strong> {operatorAvailability.range_min} - {" "}
+                        {operatorAvailability.range_max}
                     </div>
                 </div>
             );
@@ -171,6 +182,8 @@ export function ViewModal({
     if (!viewingEntity) {
         return null;
     }
+
+    const resolvedCompanyName = viewingEntity.company ?? null;
 
     const handleSaveObservacao = async () => {
         const values = await observationForm.validateFields();
@@ -345,7 +358,7 @@ export function ViewModal({
                             <Col span={12}>
                                 <div style={{ background: '#fff', borderRadius: 6, padding: 16, textAlign: 'center', border: '1px solid #f0f0f0' }}>
                                     <p style={{ fontSize: 14, fontWeight: 500, color: '#555', marginBottom: 8 }}>Disponibilidade</p>
-                                    <AvailabilityStatus localData={viewingEntity} />
+                                    <AvailabilityStatus localData={viewingEntity} companyName={resolvedCompanyName} />
                                 </div>
                             </Col>
                             <Col span={12}>

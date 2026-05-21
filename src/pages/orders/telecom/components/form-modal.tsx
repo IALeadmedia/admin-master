@@ -150,8 +150,8 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
                 cnpj: editingEntity.cnpj || "",
                 due_day:
                     typeof editingEntity.due_day === "number"
-                        ? editingEntity.due_day
-                        : Number(editingEntity.due_day || 0) || undefined,
+                        ? String(editingEntity.due_day)
+                        : String(editingEntity.due_day || "") || undefined,
                 availability_pap:
                     editingEntity.availability_pap === null || editingEntity.availability_pap === undefined
                         ? undefined
@@ -317,7 +317,7 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
                                         showSearch
                                         options={Array.from({ length: 31 }, (_, index) => ({
                                             label: String(index + 1),
-                                            value: index + 1,
+                                            value: String(index + 1),
                                         }))}
                                     />
                                 </Form.Item>

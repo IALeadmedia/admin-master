@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Card, Typography } from "antd";
 import { useAdminScope } from "@/context/admin-scope-provider";
+import { useCompanyQuery } from "@/hooks/companies/useCompanyQuery";
 import { usePartnerQuery } from "@/hooks/partners/usePartnerQuery";
 import { TableMain as CommonTableMain } from "./common/components/table";
 import { FormModal as TelecomFormModal } from "./telecom/components/form-modal";
@@ -22,8 +23,9 @@ import {
 export function OrdersAdminPage() {
     const { selectedSegmentId, selectedPartnerId } = useAdminScope();
     const { data, isLoading } = useListEntity();
-    const orders = data?.orders ?? [];
+    const orders = useMemo(() => data?.orders ?? [], [data?.orders]);
     const model = resolveOrderModel(selectedSegmentId);
+    const { data: companiesData } = useCompanyQuery({ enabled: !!selectedSegmentId });
     const { data: partnersData } = usePartnerQuery({
         segmentId: selectedSegmentId,
         partnerId: selectedPartnerId,
@@ -88,7 +90,7 @@ export function OrdersAdminPage() {
             ),
         [model, partnerCategories, resolvedSelectedCategory],
     );
-    const columns = getOrderColumnsByModel(model);
+    const columns = getOrderColumnsByModel(model, companiesData?.companies ?? []);
     const FormModalComponent = model === "finances" ? FinanceFormModal : TelecomFormModal;
     const ViewModalComponent = model === "finances" ? FinanceViewModal : TelecomViewModal;
 
