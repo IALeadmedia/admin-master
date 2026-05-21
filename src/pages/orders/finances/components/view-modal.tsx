@@ -9,7 +9,7 @@ import { formatPhoneNumber } from "@/utils/number.utils";
 import { formatBrowserDisplay, formatDevice, formatOSDisplay, formatResolution } from "@/utils/orders.util";
 import { useUpdateEntity } from "../../config-page.const";
 import type { FinanceOrder } from "@/types/orders";
-
+import anonymousAvatar from "@/assets/anonymous_avatar.png";
 const financeProductLabelMap = {
     "conta-pj": "Conta PJ",
     "capital-giro-c6": "Capital de Giro",
@@ -34,9 +34,9 @@ function EmpresasDisplay({ empresas }: EmpresasDisplayProps) {
 
         const asArray = Array.isArray(empresas) ? empresas : [empresas];
         const formatted = asArray
-                .map((empresa: { cnpj?: string | null; nome?: string | null; porte?: string | null }) =>
-                    `${empresa.cnpj || "-"}, ${empresa.nome || "-"}, ${empresa.porte || "-"}`,
-                )
+            .map((empresa: { cnpj?: string | null; nome?: string | null; porte?: string | null }) =>
+                `${empresa.cnpj || "-"}, ${empresa.nome || "-"}, ${empresa.porte || "-"}`,
+            )
             .join("; \n");
 
         return formatted || "-";
@@ -239,7 +239,7 @@ export function ViewModal({
                             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
                                 <div style={{ position: "relative" }}>
                                     <img
-                                        src={financeData?.whatsapp?.avatar || "/assets/anonymous_avatar.png"}
+                                        src={financeData?.whatsapp?.avatar || anonymousAvatar}
                                         style={{
                                             width: 40,
                                             height: 40,
@@ -416,7 +416,7 @@ export function ViewModal({
 
                                     return accessTypeMap[String(financeData?.ip_access_type ?? "")] ?? "-";
                                 })()}
-                                                        />
+                            />
                         </Col>
                         <Col span={12}>
                             <ReadonlyField label="URL" value={financeData?.url} copyable />

@@ -35,10 +35,10 @@ export const menuOptionsAdmin: MenuItem[] = [
     label: "Produtos",
     to: "/app/products",
   },
-  // {
-  //   label: "Pedidos",
-  //   to: "/app/order",
-  // },
+  {
+    label: "Pedidos",
+    to: "/app/order",
+  },
 ];
 
 // telas do menu específicas para cada empresa

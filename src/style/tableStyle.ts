@@ -1,6 +1,6 @@
 import { useTheme } from "@/context/theme-provider";
 import { createStyles } from "antd-style";
-
+import { appSetting } from "@/constants/app-setting/config.const";
 const useTableStyles = createStyles(({ css }, isDarkMode: boolean) => {
   const headerBg = isDarkMode ? "#2b2b2b" : "#e9e9e9";
   const headerColor = isDarkMode ? "#fff" : "#000";
@@ -39,8 +39,8 @@ const useTableStyles = createStyles(({ css }, isDarkMode: boolean) => {
         display: flex;
         justify-content: center;
         margin-top: 16px; 
-        colorText: "#0026d9",
-        colorTextActive: "#0026d9", 
+        colorText: "${appSetting.primaryColor}",
+        colorTextActive: "${appSetting.primaryColor}", 
       }
     `,
   };

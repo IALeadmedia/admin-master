@@ -11,7 +11,8 @@ import React, { useEffect, useState } from "react";
 import { useUpdateOrderStatusMutation } from "@/hooks/orders/useUpdateOrderStatusMutation";
 import { EmpresasDisplay } from "../../common/components/companiesDisplay";
 import type { OrderOperatorsAvailability } from "@/types/orders/base.type";
-
+import { appSetting } from "@/constants/app-setting/config.const";
+import anonymousAvatar from "@/assets/anonymous_avatar.png";
 export const AvailabilityStatus = ({ localData }: { localData: { operators_availability?: OrderOperatorsAvailability | null } }) => {
     const timAvailability = localData.operators_availability?.tim;
 
@@ -180,7 +181,7 @@ export function ViewModal({
             });
         }
     };
-
+    const color = appSetting.primaryColor;
     return (
         <OrderModalShell
             open={open}
@@ -194,8 +195,8 @@ export function ViewModal({
                             <ConfigProvider
                                 theme={{
                                     components: {
-                                        Select: { hoverBorderColor: "#0026d9", activeBorderColor: "#0026d9", activeOutlineColor: "none" },
-                                        Input: { hoverBorderColor: "#0026d9", activeBorderColor: "#0026d9" },
+                                        Select: { hoverBorderColor: color, activeBorderColor: color, activeOutlineColor: "none" },
+                                        Input: { hoverBorderColor: color, activeBorderColor: color },
                                     },
                                 }}
                             >
@@ -292,17 +293,17 @@ export function ViewModal({
                                                 : "-"}
                                         </p>
                                         <p className="text-[14px] font-semibold w-32 text-center">{viewingEntity.due_day?.toString() || "-"}</p>
-                                        <p className="text-[14px] font-bold w-46 text-center text-[#0026d9]">
+                                        <p className={`text-[14px] font-bold w-46 text-center text-${color}`}>
                                             {viewingEntity.price_summary?.total_monthly ? formatBRL(viewingEntity.price_summary.total_monthly) : "-"}
                                         </p>
                                         {viewingEntity.selected_extras && viewingEntity.selected_extras.length > 0 ? (
                                             <Tooltip title="Ver extras adicionados ao plano" placement="top">
-                                                <button className="w-12 text-center text-[#0026d9] font-bold focus:outline-none" onClick={() => toggleExpand(String(viewingEntity.id))} aria-label="Expandir extras" type="button">
+                                                <button className={`w-12 text-center text-${color} font-bold focus:outline-none`} onClick={() => toggleExpand(String(viewingEntity.id))} aria-label="Expandir extras" type="button">
                                                     {expanded[viewingEntity.id] ? "−" : "+"}
                                                 </button>
                                             </Tooltip>
                                         ) : (
-                                            <button className="w-12 text-center text-[#0026d9] font-bold focus:outline-none" type="button" disabled aria-label="Sem extras" />
+                                            <button className={`w-12 text-center text-${color} font-bold focus:outline-none`} type="button" disabled aria-label="Sem extras" />
                                         )}
                                     </div>
                                     {expanded[viewingEntity.id] && viewingEntity.selected_extras && viewingEntity.selected_extras.length > 0 && (
@@ -372,7 +373,7 @@ export function ViewModal({
                             <Col span={24}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
                                     <div style={{ position: 'relative' }}>
-                                        <img src={viewingEntity?.whatsapp?.avatar || '/assets/anonymous_avatar.png'} style={{ width: 40, height: 40, borderRadius: '50%', outline: viewingEntity?.pf_temperature === 10 ? '2px solid #d63535' : 'none' }} />
+                                        <img src={viewingEntity?.whatsapp?.avatar || anonymousAvatar} style={{ width: 40, height: 40, borderRadius: '50%', outline: viewingEntity?.pf_temperature === 10 ? '2px solid #d63535' : 'none' }} />
                                         {viewingEntity?.pf_temperature === 10 && (
                                             <span style={{ position: 'absolute', top: -4, right: -4, fontSize: 12 }}>🔥</span>
                                         )}
@@ -453,12 +454,12 @@ export function ViewModal({
                             <Col span={8}><ReadonlyField label="Ponto de Referência" value={viewingEntity?.address_complement?.reference_point || '-'} copyable /></Col>
                             <Col span={12}><ReadonlyField label="Coordenadas" value={viewingEntity?.geolocation?.latitude && viewingEntity?.geolocation?.longitude ? `${viewingEntity?.geolocation.latitude}, ${viewingEntity?.geolocation.longitude}` : '-'} /></Col>
                             <Col span={6} style={{ display: 'flex', alignItems: 'flex-end' }}>
-                                <a href={viewingEntity?.geolocation?.maps_link} target="_blank" rel="noopener noreferrer" style={{ color: '#0026d9' }}>
+                                <a href={viewingEntity?.geolocation?.maps_link} target="_blank" rel="noopener noreferrer" style={{ color: color }}>
                                     Ver no Google Maps
                                 </a>
                             </Col>
                             <Col span={6} style={{ display: 'flex', alignItems: 'flex-end' }}>
-                                <a href={viewingEntity?.geolocation?.street_view_link} target="_blank" rel="noopener noreferrer" style={{ color: '#0026d9' }}>
+                                <a href={viewingEntity?.geolocation?.street_view_link} target="_blank" rel="noopener noreferrer" style={{ color: color }}>
                                     Ver no Street View
                                 </a>
                             </Col>
@@ -510,17 +511,17 @@ export function ViewModal({
                     theme={{
                         components: {
                             Input: {
-                                hoverBorderColor: "#0026d9",
-                                activeBorderColor: "#0026d9",
+                                hoverBorderColor: color,
+                                activeBorderColor: color,
                                 activeShadow: "none",
                                 colorBorder: "#bfbfbf",
                                 colorTextPlaceholder: "#666666",
                             },
                             Button: {
-                                colorBorder: "#0026d9",
-                                colorText: "#0026d9",
-                                colorPrimary: "#0026d9",
-                                colorPrimaryHover: "#0026d9",
+                                colorBorder: color,
+                                colorText: color,
+                                colorPrimary: color,
+                                colorPrimaryHover: color,
                             },
                         },
                     }}
