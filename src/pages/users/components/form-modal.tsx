@@ -14,12 +14,42 @@ import { useCompanyQuery } from "@/hooks/companies/useCompanyQuery";
 import { usePartnerQuery } from "@/hooks/partners/usePartnerQuery";
 import { useUserQuery } from "@/hooks/users/useUserQuery";
 import { useAuth } from "@/context/auth-provider";
+import { PatternFormat, type PatternFormatProps } from "react-number-format";
 
 interface FormModalProps {
   open: boolean;
   editingEntity: EntityType | null;
   onClose: () => void;
 }
+const CNPJInput = (props: PatternFormatProps) => (
+  <PatternFormat
+    {...props}
+    format="##.###.###/####-##"
+    customInput={Input}
+    placeholder="CNPJ"
+    size="middle"
+    className="h-8"
+  />
+);
+const PhoneInput = (props: PatternFormatProps) => (
+  <PatternFormat
+    {...props}
+    format="(##) ####-####"
+    customInput={Input}
+    placeholder="Telefone"
+    size="middle"
+    className="h-8"
+  />
+); const CPFInput = (props: PatternFormatProps) => (
+  <PatternFormat
+    {...props}
+    format="###.###.###-##"
+    customInput={Input}
+    placeholder="CPF"
+    size="middle"
+    className="h-8"
+  />
+);
 
 export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
   const [form] = Form.useForm<FormValues>();
@@ -148,6 +178,9 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
           allow_wpp_notifications: values.allow_wpp_notifications ?? false,
           company_id: values.company_id ?? null,
           partner_id: values.partner_id ?? null,
+          cnpj: values.cnpj?.replace(/\D/g, ""),
+          telephone: values.telephone?.replace(/\D/g, ""),
+          cpf: values.cpf?.replace(/\D/g, ""),
           ...(values.password ? { password: values.password } : {}),
         },
         { onSuccess: onClose },
@@ -165,7 +198,9 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
           password: values.password!,
           user_type: values.user_type ?? "",
           team: values.team ?? "",
-          cnpj: values.cnpj ?? "",
+          cnpj: values.cnpj?.replace(/\D/g, ""),
+          telephone: values.telephone?.replace(/\D/g, ""),
+          cpf: values.cpf?.replace(/\D/g, ""),
           user_name: values.user_name,
         },
         { onSuccess: onClose },
@@ -251,18 +286,16 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
             <Form.Item
               name="telephone"
               label="Telefone"
-
             >
-              <Input placeholder="(00) 00000-0000" />
+              <PhoneInput format="(##) #####-####" />
             </Form.Item>
           </Col>
           <Col span={8}>
             <Form.Item
               name="cpf"
               label="CPF"
-
             >
-              <Input placeholder="000.000.000-00" />
+              <CPFInput format="###.###.###-##" />
             </Form.Item>
           </Col>
 
@@ -331,37 +364,39 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
             <Typography>Permissões de Notificação</Typography>
 
             <div className="flex gap-2">
-              <Form.Item
-                name="allow_email_notifications"
-                valuePropName="checked"
-              >
-                <Row>
-                  <Col span={12}>
-                    <Checkbox>Email</Checkbox>
-                  </Col>
-                </Row>
-              </Form.Item>
 
-              <Form.Item
-                name="allow_sms_notifications"
-                valuePropName="checked"
-              >
-                <Row>
-                  <Col span={12}>
-                    <Checkbox>SMS</Checkbox>
-                  </Col>
-                </Row>
-              </Form.Item>
-              <Form.Item
-                name="allow_wpp_notifications"
-                valuePropName="checked"
-              >
-                <Row>
-                  <Col span={12}>
-                    <Checkbox>WhatsApp</Checkbox>
-                  </Col>
-                </Row>
-              </Form.Item>
+              <Row>
+                <Col span={12}>
+                  <Form.Item
+                    name="allow_email_notifications"
+                    valuePropName="checked"
+                  >
+                    <Checkbox >Email</Checkbox></Form.Item>
+                </Col>
+              </Row>
+
+
+
+              <Row>
+                <Col span={12}>
+                  <Form.Item
+                    name="allow_sms_notifications"
+                    valuePropName="checked"
+                  >
+                    <Checkbox>SMS</Checkbox></Form.Item>
+                </Col>
+              </Row>
+
+
+              <Row>
+                <Col span={12}>   <Form.Item
+                  name="allow_wpp_notifications"
+                  valuePropName="checked"
+                >
+                  <Checkbox>WhatsApp</Checkbox>
+                </Form.Item>
+                </Col>
+              </Row>
             </div>
           </Col>
           {userType === "EQUIPE" && (
@@ -383,7 +418,7 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
                 label="CNPJ"
                 rules={[{ required: true, message: "Informe o CNPJ" }]}
               >
-                <Input placeholder="00.000.000/0000-00" />
+                <CNPJInput format="##.###.###/####-##" />
               </Form.Item>
             </Col>
           )}

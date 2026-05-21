@@ -7,14 +7,33 @@ import {
   type EntityType,
   type FormValues,
 } from "../config-page.const";
-
+import { PatternFormat, type PatternFormatProps } from "react-number-format";
 
 interface FormModalProps {
   open: boolean;
   editingEntity: EntityType | null;
   onClose: () => void;
 }
-
+const CNPJInput = (props: PatternFormatProps) => (
+  <PatternFormat
+    {...props}
+    format="##.###.###/####-##"
+    customInput={Input}
+    placeholder="CNPJ"
+    size="middle"
+    className="h-8"
+  />
+);
+const PhoneInput = (props: PatternFormatProps) => (
+  <PatternFormat
+    {...props}
+    format="(##) ####-####"
+    customInput={Input}
+    placeholder="Telefone"
+    size="middle"
+    className="h-8"
+  />
+);
 export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
   const [form] = Form.useForm<FormValues>();
   const createMutation = useCreateEntity();
@@ -36,12 +55,16 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
 
   async function handleSubmit() {
     const values = await form.validateFields();
-
+    const cleanValues = {
+      ...values,
+      cnpj: values.cnpj?.replace(/\D/g, ""),
+      telephone: values.telephone?.replace(/\D/g, ""),
+    };
     if (isEditing && editingEntity)
       updateMutation.mutate(
         {
           ...editingEntity,
-          ...values,
+          ...cleanValues,
           company_id: editingEntity.company_id,
 
         },
@@ -50,7 +73,7 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
     else
       createMutation.mutate(
         {
-          ...values,
+          ...cleanValues,
           company_id: values.company_id ?? null,
         },
         { onSuccess: onClose },
@@ -74,7 +97,7 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
         form={form}
         layout="vertical"
         style={{ marginTop: 16 }}
-      // requiredMark="optional"
+
       >
         <Row gutter={16}>
           <Col span={8}>
@@ -110,12 +133,8 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
             <Form.Item
               name="cnpj"
               label="CNPJ"
-              rules={[
-                { min: 14, message: 'CNPJ deve ter 14 dígitos' },
-                { max: 14, message: 'CNPJ deve ter 14 dígitos' },
-              ]}
             >
-              <Input placeholder="00.000.000/0000-00" />
+              <CNPJInput format="##.###.###/####-##" />
             </Form.Item>
           </Col>
         </Row>
@@ -136,12 +155,8 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
             <Form.Item
               name="telephone"
               label="Telefone"
-              rules={[
-                { min: 10, message: 'Telefone inválido' },
-                { max: 11, message: 'Telefone inválido' },
-              ]}
             >
-              <Input placeholder="(00) 00000-0000" />
+              <PhoneInput format="(##) #####-####" />
             </Form.Item>
           </Col>
 

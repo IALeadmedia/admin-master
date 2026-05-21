@@ -12,13 +12,33 @@ import { DownOutlined, UploadOutlined } from "@ant-design/icons";
 import { useCompanyQuery } from "@/hooks/companies/useCompanyQuery";
 import { UF_OPTIONS } from "@/utils/ufOptions";
 import { formatCategoryLabel } from "@/utils/text.util";
+import { PatternFormat, type PatternFormatProps } from "react-number-format";
 
 interface FormModalProps {
   open: boolean;
   editingEntity: EntityType | null;
   onClose: () => void;
 }
-
+const CNPJInput = (props: PatternFormatProps) => (
+  <PatternFormat
+    {...props}
+    format="##.###.###/####-##"
+    customInput={Input}
+    placeholder="CNPJ"
+    size="middle"
+    className="h-8"
+  />
+);
+const PhoneInput = (props: PatternFormatProps) => (
+  <PatternFormat
+    {...props}
+    format="(##) ####-####"
+    customInput={Input}
+    placeholder="Telefone"
+    size="middle"
+    className="h-8"
+  />
+);
 export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
   const [form] = Form.useForm<FormValues>();
   const createMutation = useCreateEntity();
@@ -58,6 +78,7 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
     value: option.value,
     label: formatCategoryLabel(option.value),
   }));
+
   function handleSelectAll(event: CheckboxChangeEvent) {
     if (event.target.checked) {
       form.setFieldValue(
@@ -113,8 +134,12 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
       message.error("Informe o logo");
       return;
     }
-
-    const { partner_id: _partnerId, ...payload } = values;
+    const cleanValues = {
+      ...values,
+      cnpj: values.cnpj?.replace(/\D/g, ""),
+      telephone: values.telephone?.replace(/\D/g, ""),
+    };
+    const { partner_id: _partnerId, ...payload } = cleanValues;
     void _partnerId;
 
     if (isEditing && editingEntity)
@@ -194,10 +219,9 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
             <Form.Item
               name="cnpj"
               label="CNPJ"
-              rules={[{ required: true, message: "Informe o CNPJ" }, { min: 14, message: 'CNPJ deve ter 14 dígitos' },
-              { max: 14, message: 'CNPJ deve ter 14 dígitos' },]}
+              rules={[{ required: true, message: "Informe o CNPJ" }]}
             >
-              <Input placeholder="00.000.000/0000-00" />
+              <CNPJInput format="##.###.###/####-##" />
             </Form.Item>
           </Col>
         </Row>
@@ -219,10 +243,8 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
             <Form.Item
               name="telephone"
               label="Telefone"
-              rules={[{ min: 10, message: 'Telefone inválido' },
-              { max: 11, message: 'Telefone inválido' },]}
             >
-              <Input placeholder="(00) 00000-0000" />
+              <PhoneInput format="(##) #####-####" />
             </Form.Item>
           </Col>
 

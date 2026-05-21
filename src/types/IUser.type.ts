@@ -31,7 +31,7 @@ export interface IUser {
   consultant_hash: string;
   user_type: string;
   team: string;
-  cnpj: string;
+  cnpj: string | undefined;
   created_at: string;
   updated_at: string;
   company: {
@@ -67,7 +67,7 @@ export interface ICreateUser {
   person_responsible_id: number | null;
   user_type: string;
   team: string;
-  cnpj: string;
+  cnpj: string | undefined;
 }
 
 export interface IUpdateUser {
@@ -86,7 +86,7 @@ export interface IUpdateUser {
   person_responsible_id: number | null;
   user_type: string;
   team: string;
-  cnpj: string;
+  cnpj: string | undefined;
 }
 
 export interface IUserFilters {
