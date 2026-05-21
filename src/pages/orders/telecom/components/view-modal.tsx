@@ -3,7 +3,7 @@ import { useUpdateEntity, type EntityType } from "../config-page.const";
 import { OrderModalShell } from "../../common/components/order-modal-shell";
 import { OrderModalSection } from "../../common/components/order-modal-section";
 import ReadonlyField from "@/layout/common-components/ReadOnlyField";
-import { formatBRL, formatPaymentMethod, formatPhoneNumber } from "@/utils/number.utils";
+import { formatBRL, formatPaymentMethod, formatPhoneNumber, organizeDateFormat } from "@/utils/number.utils";
 import { formatCEP, formatCPF } from "@/utils/document.util";
 import { formatBrowserDisplay, formatDevice, formatOSDisplay, formatResolution, getAlertScenarios } from "@/utils/orders.util";
 import { ExclamationOutlined } from "@ant-design/icons";
@@ -297,12 +297,13 @@ export function ViewModal({
                                         </p>
                                         <p className="text-[14px] w-50 text-center">
                                             {viewingEntity.installation_preferred_date_one
-                                                ? `${viewingEntity.installation_preferred_date_one} - ${viewingEntity.installation_preferred_period_one || "-"}`
+                                                ? `${organizeDateFormat(viewingEntity.installation_preferred_date_one)} - ${viewingEntity.installation_preferred_period_one || "-"}`
                                                 : "-"}
                                         </p>
                                         <p className="text-[14px] w-50 text-center">
                                             {viewingEntity.installation_preferred_date_two
-                                                ? `${viewingEntity.installation_preferred_date_two} - ${viewingEntity.installation_preferred_period_two || "-"}`
+                                                ? `${organizeDateFormat(viewingEntity.installation_preferred_date_two)} - ${viewingEntity.installation_preferred_period_two || "-"}`
+
                                                 : "-"}
                                         </p>
                                         <p className="text-[14px] font-semibold w-32 text-center">{viewingEntity.due_day?.toString() || "-"}</p>
@@ -370,16 +371,7 @@ export function ViewModal({
                         </Row>
                     </OrderModalSection>
 
-                    <OrderModalSection title="Informações de Pagamento">
-                        <Row gutter={[16, 16]}>
-                            <Col span={12}><ReadonlyField label="Método de Pagamento" value={formatPaymentMethod(viewingEntity?.payment_method)} /></Col>
-                            <Col span={12}><ReadonlyField label="Nome do Banco" value={viewingEntity?.bank_name || '-'} copyable /></Col>
-                            <Col span={12}><ReadonlyField label="Agência" value={viewingEntity?.bank_branch || '-'} copyable /></Col>
-                            <Col span={12}><ReadonlyField label="Número da Conta" value={viewingEntity?.bank_account_number || '-'} copyable /></Col>
-                            <Col span={12}><ReadonlyField label="Titular da Conta" value={viewingEntity?.bank_account_holder_name || '-'} copyable /></Col>
-                            <Col span={12}><ReadonlyField label="CPF do Titular" value={formatCPF(viewingEntity?.bank_account_holder_cpf || '') || '-'} copyable /></Col>
-                        </Row>
-                    </OrderModalSection>
+
 
                     <OrderModalSection title="Informações do Cliente">
                         <Row gutter={[16, 16]}>
@@ -404,7 +396,16 @@ export function ViewModal({
                             <Col span={8}><ReadonlyField label="Nome Mãe (RFB)" value={viewingEntity?.rfb_mother_name} copyable /></Col>
                         </Row>
                     </OrderModalSection>
-
+                    <OrderModalSection title="Informações de Pagamento">
+                        <Row gutter={[16, 16]}>
+                            <Col span={12}><ReadonlyField label="Método de Pagamento" value={formatPaymentMethod(viewingEntity?.payment_method)} /></Col>
+                            <Col span={12}><ReadonlyField label="Nome do Banco" value={viewingEntity?.bank_name || '-'} copyable /></Col>
+                            <Col span={12}><ReadonlyField label="Agência" value={viewingEntity?.bank_branch || '-'} copyable /></Col>
+                            <Col span={12}><ReadonlyField label="Número da Conta" value={viewingEntity?.bank_account_number || '-'} copyable /></Col>
+                            <Col span={12}><ReadonlyField label="Titular da Conta" value={viewingEntity?.bank_account_holder_name || '-'} copyable /></Col>
+                            <Col span={12}><ReadonlyField label="CPF do Titular" value={formatCPF(viewingEntity?.bank_account_holder_cpf || '') || '-'} copyable /></Col>
+                        </Row>
+                    </OrderModalSection>
                     <OrderModalSection title="Contato">
                         <Row gutter={[16, 16]}>
                             <Col span={12}>
@@ -539,21 +540,20 @@ export function ViewModal({
                         },
                     }}
                 >
-                    <div className="flex flex-col justify-center bg-neutral-100 text-[14px] rounded-sm mt-3">
-                        <div className="p-4 pb-0">
-                            <p className="text-[15px]">Observação Consultor</p>
-                        </div>
-                        <Form form={observationForm} layout="vertical">
-                            <div className="flex flex-col p-4 text-[14px] w-full text-neutral-700">
-                                <Form.Item name="consultant_observation" style={{ marginBottom: 8 }}>
-                                    <Input.TextArea autoSize={{ minRows: 3, maxRows: 6 }} className="text-[16px] font-light text-[#353535] w-full" placeholder="Adicione aqui uma observação sobre esse pedido..." />
-                                </Form.Item>
-                                <Button className="self-end" loading={updateMutation.isPending} style={{ fontSize: "12px", height: "25px" }} onClick={handleSaveObservacao}>
-                                    Salvar
-                                </Button>
-                            </div>
-                        </Form>
-                    </div>
+                    <OrderModalSection title="Observação do Consultor">
+                        <div className="flex flex-col justify-center bg-neutral-100 text-[14px] rounded-sm mt-2">
+
+                            <Form form={observationForm} layout="vertical">
+                                <div className="flex flex-col p-4 text-[14px] w-full text-neutral-700">
+                                    <Form.Item name="consultant_observation" style={{ marginBottom: 8 }}>
+                                        <Input.TextArea autoSize={{ minRows: 3, maxRows: 6 }} className="text-[16px] font-light text-[#353535] w-full" placeholder="Adicione aqui uma observação sobre esse pedido..." />
+                                    </Form.Item>
+                                    <Button className="self-end" loading={updateMutation.isPending} style={{ fontSize: "12px", height: "25px" }} onClick={handleSaveObservacao}>
+                                        Salvar
+                                    </Button>
+                                </div>
+                            </Form>
+                        </div></OrderModalSection>
                 </ConfigProvider>
             </div>
         </OrderModalShell>

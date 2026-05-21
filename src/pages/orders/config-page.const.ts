@@ -176,6 +176,12 @@ export type FormValues = {
   phone?: string;
   additional_phone?: string;
   cnpj?: string;
+  payment_method?: string;
+  bank_name?: string;
+  bank_branch?: string;
+  bank_account_number?: string;
+  bank_account_holder_name?: string;
+  bank_account_holder_cpf?: string;
   address?: string;
   address_number?: string;
   district?: string;

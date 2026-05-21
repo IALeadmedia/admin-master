@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react";
-import { Form, Input, Row, Col, Select, Typography, Checkbox, DatePicker } from "antd";
+import { Form, Input, Row, Col, Select, Checkbox, DatePicker } from "antd";
 import dayjs from "dayjs";
 import {
     entityPage,
@@ -11,6 +11,7 @@ import { OrderModalShell } from "../../common/components/order-modal-shell";
 import { useProductQuery } from "@/hooks/products/useProductQuery";
 import { useResolvedOrderScope } from "@/hooks/orders/useResolvedOrderScope";
 import type { IProduct } from "@/types/IProduct.type";
+import { OrderModalSection } from "../../common/components/order-modal-section";
 
 type PlanSelectedExtraOption = {
     id: string;
@@ -218,330 +219,367 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
             onCancel={onClose}
             confirmLoading={isPending}
             destroyOnHidden
-            width={920}
+            width={960}
         >
-            <Form form={form} layout="vertical" style={{ marginTop: 16 }} className="max-h-110 overflow-y-auto scrollbar-thin">
-                <div className="flex flex-col bg-neutral-100 mb-3 rounded-sm p-3">
-                    <div className="flex items-center">
-                        <h2 className="text-[14px] text-[#666666]">Detalhes dos Planos</h2>
-                    </div>
+            <Form form={form} layout="vertical" style={{ marginTop: 8 }} className="max-h-110 overflow-y-auto scrollbar-thin">
+                <OrderModalSection title="Detalhes do Plano">
+                    <div className="flex flex-col bg-neutral-100 mb-3 rounded-sm p-3">
 
-                    <div className="mt-4 flex w-full flex-col text-neutral-700">
-                        <div className="flex items-center px-8 justify-between font-semibold text-[#666666] text-[14px]">
-                            <p className="w-72 text-center">Plano</p>
-                            <p className="w-28 text-center">Data Instalação 1</p>
-                            <p className="w-20 text-center">Período 1</p>
-                            <p className="w-28 text-center">Data Instalação 2</p>
-                            <p className="w-20 text-center">Período 2</p>
-                            <p className="w-20 text-center">Vencimento</p>
-                        </div>
-                        <hr className="border-t border-neutral-300" />
 
-                        <div className="flex px-8 items-center justify-between py-4 pb-0 text-[14px]">
-                            <div className="w-72 flex justify-center">
-                                <Form.Item name="plan_id" className="mb-0">
-                                    <Select
-                                        size="small"
-                                        showSearch
-                                        allowClear
-                                        placeholder="Selecione o plano"
-                                        className="min-w-72"
-                                        onChange={handlePlanChange}
-                                        options={planOptions}
-                                        optionFilterProp="label"
-                                        loading={isLoadingPlans}
-                                    />
-                                </Form.Item>
+                        <div className="mt-4 flex w-full flex-col text-neutral-700">
+                            <div className="flex items-center px-2 justify-between font-semibold text-[#666666] text-[14px]">
+                                <p className="w-72 text-center">Plano</p>
+                                <p className="w-28 text-center">Data Instalação 1</p>
+                                <p className="w-20 text-center">Período 1</p>
+                                <p className="w-28 text-center">Data Instalação 2</p>
+                                <p className="w-20 text-center">Período 2</p>
+                                <p className="w-20 text-center">Vencimento</p>
                             </div>
+                            <hr className="border-t border-neutral-300" />
 
-                            <div className="w-28 flex justify-center">
-                                <Form.Item name="installation_preferred_date_one" className="mb-0">
-                                    <DatePicker
-                                        format="DD/MM/YYYY"
-                                        placeholder="Data 1"
-                                        className="min-w-28 text-center"
-                                        size="small"
-                                        allowClear
-                                    />
-                                </Form.Item>
-                            </div>
-
-                            <div className="w-20 flex justify-center">
-                                <Form.Item name="installation_preferred_period_one" className="mb-0">
-                                    <Select
-                                        size="small"
-                                        placeholder="Período 1"
-                                        className="min-w-22"
-                                        options={[
-                                            { label: "MANHÃ", value: "MANHA" },
-                                            { label: "TARDE", value: "TARDE" },
-                                            { label: "NOITE", value: "NOITE" },
-                                        ]}
-                                    />
-                                </Form.Item>
-                            </div>
-
-                            <div className="w-28 flex justify-center">
-                                <Form.Item name="installation_preferred_date_two" className="mb-0">
-                                    <DatePicker
-                                        format="DD/MM/YYYY"
-                                        placeholder="Data 2"
-                                        className="min-w-28 text-center"
-                                        size="small"
-                                        allowClear
-                                    />
-                                </Form.Item>
-                            </div>
-
-                            <div className="w-20 flex justify-center">
-                                <Form.Item name="installation_preferred_period_two" className="mb-0">
-                                    <Select
-                                        size="small"
-                                        placeholder="Período 2"
-                                        className="min-w-22"
-                                        options={[
-                                            { label: "MANHÃ", value: "MANHA" },
-                                            { label: "TARDE", value: "TARDE" },
-                                            { label: "NOITE", value: "NOITE" },
-                                        ]}
-                                    />
-                                </Form.Item>
-                            </div>
-
-                            <div className="w-20 flex justify-center">
-                                <Form.Item name="due_day" className="mb-0">
-                                    <Select
-                                        size="small"
-                                        placeholder="Dia"
-                                        className="min-w-16"
-                                        showSearch
-                                        options={Array.from({ length: 31 }, (_, index) => ({
-                                            label: String(index + 1),
-                                            value: String(index + 1),
-                                        }))}
-                                    />
-                                </Form.Item>
-                            </div>
-                        </div>
-                        <hr className="border-t border-neutral-300 mx-2" />
-                    </div>
-
-                    {extrasOptions.length > 0 && (
-                        <div className="mt-4 bg-neutral-50 rounded-md p-4">
-                            <div className="font-semibold text-[#666666] text-[14px] mb-2">Extras disponíveis</div>
-                            <Form.Item name="selected_extras" className="mb-0">
-                                <Checkbox.Group style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                                    {extrasOptions.map((extra, idx) => (
-                                        <Checkbox key={`${extra.id}-${idx}`} value={extra.id}>
-                                            <span className="font-medium text-sm">{extra.label}</span>
-                                            {extra.options && extra.options[0] && (
-                                                <>
-                                                    {` R$${extra.options[0].price ?? ""} `}
-                                                    <span className="text-xs text-neutral-600">{extra.options[0].description}</span>
-                                                </>
-                                            )}
-                                        </Checkbox>
-                                    ))}
-                                </Checkbox.Group>
-                            </Form.Item>
-                        </div>
-                    )}
-                </div>
-
-                <Row gutter={16}>
-                    <Col span={6}>
-                        <Form.Item name="availability_pap" label="Disponibilidade PAP">
-                            <Select
-                                allowClear
-                                placeholder="Selecione"
-                                options={[
-                                    { label: "Disponível", value: true },
-                                    { label: "Indisponível", value: false },
-                                ]}
-                            />
-                        </Form.Item>
-                    </Col>
-                </Row>
-
-                <Typography.Title level={5} style={{ marginBottom: 12 }}>
-                    Informações do Cliente
-                </Typography.Title>
-                <Row gutter={16}>
-                    <Col span={8}>
-                        <Form.Item name="full_name" label="Nome completo">
-                            <Input placeholder="Nome completo" />
-                        </Form.Item>
-                    </Col>
-                    <Col span={8}>
-                        <Form.Item name="cpf" label="CPF">
-                            <Input placeholder="000.000.000-00" />
-                        </Form.Item>
-                    </Col>
-                    <Col span={8}>
-                        <Form.Item name="cnpj" label="CNPJ" rules={[
-                            { min: 14, message: 'CNPJ deve ter 14 dígitos' },
-                            { max: 14, message: 'CNPJ deve ter 14 dígitos' },
-                        ]}>
-                            <Input placeholder="00.000.000/0000-00" />
-                        </Form.Item>
-                    </Col>
-                </Row>
-
-                <Row gutter={16}>
-                    <Col span={8}>
-                        <Form.Item name="birth_date" label="Data de nascimento">
-                            <Input placeholder="DD/MM/AAAA" />
-                        </Form.Item>
-                    </Col>
-                    <Col span={8}>
-                        <Form.Item name="email" label="Email" rules={[{ type: "email", message: "Email inválido" }]}>
-                            <Input placeholder="exemplo@email.com" />
-                        </Form.Item>
-                    </Col>
-                    <Col span={8}>
-                        <Form.Item name="mother_full_name" label="Nome da mãe">
-                            <Input placeholder="Nome da mãe" />
-                        </Form.Item>
-                    </Col>
-                </Row>
-
-                <Row gutter={16}>
-                    <Col span={8}>
-                        <Form.Item name="phone" label="Telefone">
-                            <Input placeholder="(00) 00000-0000" />
-                        </Form.Item>
-                    </Col>
-                    <Col span={8}>
-                        <Form.Item name="additional_phone" label="Telefone adicional">
-                            <Input placeholder="(00) 00000-0000" />
-                        </Form.Item>
-                    </Col>
-                </Row>
-
-                <Typography.Title level={5} style={{ marginBottom: 12 }}>
-                    Informações de Endereço
-                </Typography.Title>
-                <Row gutter={16}>
-                    <Col span={8}>
-                        <Form.Item name="address" label="Endereço">
-                            <Input placeholder="Endereço" />
-                        </Form.Item>
-                    </Col>
-                    <Col span={4}>
-                        <Form.Item name="address_number" label="Número">
-                            <Input placeholder="Número" />
-                        </Form.Item>
-                    </Col>
-                    <Col span={4}>
-                        <Form.Item name={["address_complement", "building_or_house"]} label="Tipo">
-                            <Select
-                                placeholder="Tipo"
-                                options={[
-                                    { label: "Casa", value: "house" },
-                                    { label: "Edifício", value: "building" },
-                                ]}
-                            />
-                        </Form.Item>
-                    </Col>
-                    <Col span={8}>
-                        {selectedPropertyType === "house" ? (
-                            <Form.Item name={["address_complement", "home_complement"]} label="Complemento">
-                                <Input placeholder="Complemento" />
-                            </Form.Item>
-                        ) : (
-                            <Row gutter={8}>
-                                <Col span={12}>
-                                    <Form.Item name={["address_complement", "unit_type"]} label="Tipo da unidade">
+                            <div className="flex px-2 items-center justify-between gap-4 py-4 pb-0 text-[14px]">
+                                <div className="w-72 flex justify-center">
+                                    <Form.Item name="plan_id" className="mb-0">
                                         <Select
-                                            placeholder="Unidade"
+                                            size="small"
+                                            showSearch
+                                            allowClear
+                                            placeholder="Selecione o plano"
+                                            className="min-w-72"
+                                            onChange={handlePlanChange}
+                                            options={planOptions}
+                                            optionFilterProp="label"
+                                            loading={isLoadingPlans}
+                                        />
+                                    </Form.Item>
+                                </div>
+
+                                <div className="w-28 flex justify-center">
+                                    <Form.Item name="installation_preferred_date_one" className="mb-0">
+                                        <DatePicker
+                                            format="DD/MM/YYYY"
+                                            placeholder="Data 1"
+                                            className="min-w-28 text-center"
+                                            size="small"
+                                            allowClear
+                                        />
+                                    </Form.Item>
+                                </div>
+
+                                <div className="w-20 flex justify-center">
+                                    <Form.Item name="installation_preferred_period_one" className="mb-0">
+                                        <Select
+                                            size="small"
+                                            placeholder="Período 1"
+                                            className="min-w-22"
                                             options={[
-                                                { label: "Apartamento", value: "apto" },
-                                                { label: "Sala", value: "sala" },
-                                                { label: "Conjunto", value: "conjunto" },
-                                                { label: "Loja", value: "loja" },
-                                                { label: "Outros", value: "outros" },
+                                                { label: "MANHÃ", value: "MANHA" },
+                                                { label: "TARDE", value: "TARDE" },
+                                                { label: "NOITE", value: "NOITE" },
                                             ]}
                                         />
                                     </Form.Item>
-                                </Col>
-                                <Col span={12}>
-                                    <Form.Item name={["address_complement", "unit_number"]} label="Número da unidade">
-                                        <Input placeholder="Ex: 1203" />
+                                </div>
+
+                                <div className="w-28 flex justify-center">
+                                    <Form.Item name="installation_preferred_date_two" className="mb-0">
+                                        <DatePicker
+                                            format="DD/MM/YYYY"
+                                            placeholder="Data 2"
+                                            className="min-w-28 text-center"
+                                            size="small"
+                                            allowClear
+                                        />
                                     </Form.Item>
-                                </Col>
-                            </Row>
+                                </div>
+
+                                <div className="w-20 flex justify-center">
+                                    <Form.Item name="installation_preferred_period_two" className="mb-0">
+                                        <Select
+                                            size="small"
+                                            placeholder="Período 2"
+                                            className="min-w-22"
+                                            options={[
+                                                { label: "MANHÃ", value: "MANHA" },
+                                                { label: "TARDE", value: "TARDE" },
+                                                { label: "NOITE", value: "NOITE" },
+                                            ]}
+                                        />
+                                    </Form.Item>
+                                </div>
+
+                                <div className="w-20 flex justify-center">
+                                    <Form.Item name="due_day" className="mb-0">
+                                        <Select
+                                            size="small"
+                                            placeholder="Dia"
+                                            className="min-w-16"
+                                            showSearch
+                                            options={Array.from({ length: 31 }, (_, index) => ({
+                                                label: String(index + 1),
+                                                value: String(index + 1),
+                                            }))}
+                                        />
+                                    </Form.Item>
+                                </div>
+                            </div>
+                            <hr className="border-t border-neutral-300 mx-2" />
+                        </div>
+
+                        {extrasOptions.length > 0 && (
+                            <div className="mt-4 bg-neutral-50 rounded-md p-4">
+                                <div className="font-semibold text-[#666666] text-[14px] mb-2">Extras disponíveis</div>
+                                <Form.Item name="selected_extras" className="mb-0">
+                                    <Checkbox.Group style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                                        {extrasOptions.map((extra, idx) => (
+                                            <Checkbox key={`${extra.id}-${idx}`} value={extra.id}>
+                                                <span className="font-medium text-sm">{extra.label}</span>
+                                                {extra.options && extra.options[0] && (
+                                                    <>
+                                                        {` R$${extra.options[0].price ?? ""} `}
+                                                        <span className="text-xs text-neutral-600">{extra.options[0].description}</span>
+                                                    </>
+                                                )}
+                                            </Checkbox>
+                                        ))}
+                                    </Checkbox.Group>
+                                </Form.Item>
+                            </div>
                         )}
-                    </Col>
-                </Row>
+                    </div>
+                </OrderModalSection>
 
-                <Row gutter={16}>
-                    <Col span={4}>
-                        <Form.Item name={["address_complement", "floor"]} label="Andar">
-                            <Input placeholder="Andar" />
-                        </Form.Item>
-                    </Col>
-                    <Col span={4}>
-                        <Form.Item name={["address_complement", "lot"]} label="Lote">
-                            <Input placeholder="Lote" />
-                        </Form.Item>
-                    </Col>
-                    <Col span={4}>
-                        <Form.Item name={["address_complement", "square"]} label="Quadra">
-                            <Input placeholder="Quadra" />
-                        </Form.Item>
-                    </Col>
-                    <Col span={8}>
-                        <Form.Item name={["address_complement", "reference_point"]} label="Ponto de referência">
-                            <Input placeholder="Ponto de referência" />
-                        </Form.Item>
-                    </Col>
-                    <Col span={4}>
-                        <Form.Item name="single_zip_code" label="CEP único">
-                            <Select
-                                allowClear
-                                placeholder="Selecione"
-                                options={[
-                                    { label: "Sim", value: true },
-                                    { label: "Não", value: false },
-                                ]}
-                            />
-                        </Form.Item>
-                    </Col>
-                </Row>
+                <OrderModalSection title="Informações de Pagamento">
+                    <Row gutter={16}>
+                        <Col span={8}>
+                            <Form.Item name="payment_method" label="Método de Pagamento">
+                                <Input placeholder="Método de Pagamento" />
+                            </Form.Item>
+                        </Col>
+                        <Col span={8}>
+                            <Form.Item name="bank_name" label="Nome do Banco">
+                                <Input placeholder="Nome do Banco" />
+                            </Form.Item>
+                        </Col>
+                        <Col span={8}>
+                            <Form.Item name="bank_branch" label="Agência">
+                                <Input placeholder="Agência" />
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                    <Row gutter={16}>
+                        <Col span={8}>
+                            <Form.Item name="bank_account_number" label="Número da Conta">
+                                <Input placeholder="Número da Conta" />
+                            </Form.Item>
+                        </Col>
+                        <Col span={8}>
+                            <Form.Item name="bank_account_holder_name" label="Titular da Conta">
+                                <Input placeholder="Titular da Conta" />
+                            </Form.Item>
+                        </Col>
+                        <Col span={8}>
+                            <Form.Item name="bank_account_holder_cpf" label="CPF do Titular">
+                                <Input placeholder="CPF do Titular" />
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                </OrderModalSection>
 
-                <Row gutter={16}>
-                    <Col span={8}>
-                        <Form.Item name="district" label="Bairro">
-                            <Input placeholder="Bairro" />
-                        </Form.Item>
-                    </Col>
-                    <Col span={8}>
-                        <Form.Item name="city" label="Cidade">
-                            <Input placeholder="Cidade" />
-                        </Form.Item>
-                    </Col>
-                    <Col span={4}>
-                        <Form.Item name="state" label="UF">
-                            <Input placeholder="UF" />
-                        </Form.Item>
-                    </Col>
-                    <Col span={4}>
-                        <Form.Item name="zip_code" label="CEP">
-                            <Input placeholder="CEP" />
-                        </Form.Item>
-                    </Col>
-                </Row>
+                <OrderModalSection title="Disponibilidade">
+                    <Row gutter={16}>
+                        <Col span={6}>
+                            <Form.Item name="availability_pap" label="Disponibilidade PAP">
+                                <Select
+                                    allowClear
+                                    placeholder="Selecione"
+                                    options={[
+                                        { label: "Disponível", value: true },
+                                        { label: "Indisponível", value: false },
+                                    ]}
+                                />
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                </OrderModalSection>
 
-                <Typography.Title level={5} style={{ marginBottom: 12 }}>
-                    Observações
-                </Typography.Title>
-                <Row gutter={16}>
-                    <Col span={24}>
-                        <Form.Item name="consultant_observation" label="Observação do consultor">
-                            <Input.TextArea rows={3} placeholder="Digite observações internas" />
-                        </Form.Item>
-                    </Col>
-                </Row>
+                <OrderModalSection title="Informações do Cliente">
+                    <Row gutter={16}>
+                        <Col span={8}>
+                            <Form.Item name="full_name" label="Nome completo">
+                                <Input placeholder="Nome completo" />
+                            </Form.Item>
+                        </Col>
+                        <Col span={8}>
+                            <Form.Item name="cpf" label="CPF">
+                                <Input placeholder="000.000.000-00" />
+                            </Form.Item>
+                        </Col>
+                        <Col span={8}>
+                            <Form.Item name="cnpj" label="CNPJ" rules={[
+                                { min: 14, message: 'CNPJ deve ter 14 dígitos' },
+                                { max: 14, message: 'CNPJ deve ter 14 dígitos' },
+                            ]}>
+                                <Input placeholder="00.000.000/0000-00" />
+                            </Form.Item>
+                        </Col>
+                    </Row>
+
+                    <Row gutter={16}>
+                        <Col span={8}>
+                            <Form.Item name="birth_date" label="Data de nascimento">
+                                <Input placeholder="DD/MM/AAAA" />
+                            </Form.Item>
+                        </Col>
+                        <Col span={8}>
+                            <Form.Item name="email" label="Email" rules={[{ type: "email", message: "Email inválido" }]}>
+                                <Input placeholder="exemplo@email.com" />
+                            </Form.Item>
+                        </Col>
+                        <Col span={8}>
+                            <Form.Item name="mother_full_name" label="Nome da mãe">
+                                <Input placeholder="Nome da mãe" />
+                            </Form.Item>
+                        </Col>
+                    </Row>
+
+                    <Row gutter={16}>
+                        <Col span={8}>
+                            <Form.Item name="phone" label="Telefone">
+                                <Input placeholder="(00) 00000-0000" />
+                            </Form.Item>
+                        </Col>
+                        <Col span={8}>
+                            <Form.Item name="additional_phone" label="Telefone adicional">
+                                <Input placeholder="(00) 00000-0000" />
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                </OrderModalSection>
+
+
+                <OrderModalSection title="Endereço">
+                    <Row gutter={16}>
+                        <Col span={8}>
+                            <Form.Item name="address" label="Endereço">
+                                <Input placeholder="Endereço" />
+                            </Form.Item>
+                        </Col>
+                        <Col span={4}>
+                            <Form.Item name="address_number" label="Número">
+                                <Input placeholder="Número" />
+                            </Form.Item>
+                        </Col>
+                        <Col span={4}>
+                            <Form.Item name={["address_complement", "building_or_house"]} label="Tipo">
+                                <Select
+                                    placeholder="Tipo"
+                                    options={[
+                                        { label: "Casa", value: "house" },
+                                        { label: "Edifício", value: "building" },
+                                    ]}
+                                />
+                            </Form.Item>
+                        </Col>
+                        <Col span={8}>
+                            {selectedPropertyType === "house" ? (
+                                <Form.Item name={["address_complement", "home_complement"]} label="Complemento">
+                                    <Input placeholder="Complemento" />
+                                </Form.Item>
+                            ) : (
+                                <Row gutter={8}>
+                                    <Col span={12}>
+                                        <Form.Item name={["address_complement", "unit_type"]} label="Tipo da unidade">
+                                            <Select
+                                                placeholder="Unidade"
+                                                options={[
+                                                    { label: "Apartamento", value: "apto" },
+                                                    { label: "Sala", value: "sala" },
+                                                    { label: "Conjunto", value: "conjunto" },
+                                                    { label: "Loja", value: "loja" },
+                                                    { label: "Outros", value: "outros" },
+                                                ]}
+                                            />
+                                        </Form.Item>
+                                    </Col>
+                                    <Col span={12}>
+                                        <Form.Item name={["address_complement", "unit_number"]} label="Número da unidade">
+                                            <Input placeholder="Ex: 1203" />
+                                        </Form.Item>
+                                    </Col>
+                                </Row>
+                            )}
+                        </Col>
+                    </Row>
+
+                    <Row gutter={16}>
+                        <Col span={4}>
+                            <Form.Item name={["address_complement", "floor"]} label="Andar">
+                                <Input placeholder="Andar" />
+                            </Form.Item>
+                        </Col>
+                        <Col span={4}>
+                            <Form.Item name={["address_complement", "lot"]} label="Lote">
+                                <Input placeholder="Lote" />
+                            </Form.Item>
+                        </Col>
+                        <Col span={4}>
+                            <Form.Item name={["address_complement", "square"]} label="Quadra">
+                                <Input placeholder="Quadra" />
+                            </Form.Item>
+                        </Col>
+                        <Col span={8}>
+                            <Form.Item name={["address_complement", "reference_point"]} label="Ponto de referência">
+                                <Input placeholder="Ponto de referência" />
+                            </Form.Item>
+                        </Col>
+                        <Col span={4}>
+                            <Form.Item name="single_zip_code" label="CEP único">
+                                <Select
+                                    allowClear
+                                    placeholder="Selecione"
+                                    options={[
+                                        { label: "Sim", value: true },
+                                        { label: "Não", value: false },
+                                    ]}
+                                />
+                            </Form.Item>
+                        </Col>
+                    </Row>
+
+                    <Row gutter={16}>
+                        <Col span={8}>
+                            <Form.Item name="district" label="Bairro">
+                                <Input placeholder="Bairro" />
+                            </Form.Item>
+                        </Col>
+                        <Col span={8}>
+                            <Form.Item name="city" label="Cidade">
+                                <Input placeholder="Cidade" />
+                            </Form.Item>
+                        </Col>
+                        <Col span={4}>
+                            <Form.Item name="state" label="UF">
+                                <Input placeholder="UF" />
+                            </Form.Item>
+                        </Col>
+                        <Col span={4}>
+                            <Form.Item name="zip_code" label="CEP">
+                                <Input placeholder="CEP" />
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                </OrderModalSection>
+
+                <OrderModalSection title="Observação do Consultor">
+                    <Row gutter={16}>
+                        <Col span={24}>
+                            <Form.Item name="consultant_observation">
+                                <Input.TextArea rows={3} placeholder="Adicione aqui uma observação sobre esse pedido..." />
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                </OrderModalSection>
             </Form>
         </OrderModalShell>
     );
