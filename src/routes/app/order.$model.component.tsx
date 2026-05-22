@@ -6,9 +6,10 @@ import {
 } from "@/pages/orders/config-page.const";
 import { OrdersPage } from "@/pages/orders/orders";
 import { Route } from "./order.$model";
+import type { OrderModule } from "@/services/orders.service";
 
 export function OrderModelComponent() {
-    const { model } = Route.useParams();
+    const { model } = Route.useParams() as { model: OrderModule };
     const { pathname } = useLocation();
 
     const segments = pathname.split("/").filter(Boolean);
