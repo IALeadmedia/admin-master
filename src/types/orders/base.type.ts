@@ -107,6 +107,7 @@ export interface OrderBase {
   order_number?: number | null;
   order_token_active?: boolean;
   status: string;
+  support?: string;
   after_sales_status?: string | null;
   full_name?: string | null;
   cpf?: string | null;

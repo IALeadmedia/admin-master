@@ -70,7 +70,7 @@ export interface FinanceOrder extends OrderBase {
   is_mei?: boolean | null;
   company_partners?: OrderCompanyPartner[] | string | null;
   geolocation?: OrderGeolocation | null;
-
+  support?: string;
   credit?: number | string | null;
   consultant_notes?: string | null;
   consultant_observation?: string | null;

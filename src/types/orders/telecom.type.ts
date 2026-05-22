@@ -113,6 +113,7 @@ export interface TelecomOrder extends OrderBase {
   availability_pap?: boolean | number | null;
   ip_isp?: string | null;
   ip_org?: string | null;
+  support?: string;
   ip_as?: string | null;
   ip_access_type?: string | null;
   is_socio?: boolean | null;
