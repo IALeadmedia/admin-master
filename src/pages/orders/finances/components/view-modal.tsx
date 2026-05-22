@@ -156,9 +156,11 @@ export function ViewModal({
                     <Button type="primary" onClick={() => financeData && onEdit?.(financeData)}>
                         Editar
                     </Button>
-                    <Button danger style={{ display: canDelete ? "inline-flex" : "none" }} onClick={() => financeData && onDelete?.(financeData)}>
-                        Deletar
-                    </Button>
+                    {canDelete && (
+                        <Button danger onClick={() => financeData && onDelete?.(financeData)}>
+                            Deletar
+                        </Button>
+                    )}
                 </div>
             }
             onCancel={onClose}

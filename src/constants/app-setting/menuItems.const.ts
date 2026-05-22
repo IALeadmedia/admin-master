@@ -44,7 +44,6 @@ export const menuOptionsAdmin: MenuItem[] = [
 // telas do menu específicas para cada empresa
 export const menuOptionsTim: MenuItem[] = [
   ...menuOptionsCommon,
-
   {
     label: "Produtos",
     items: [
@@ -73,9 +72,65 @@ export const menuOptionsTim: MenuItem[] = [
   },
 ];
 
-export const menuOptionsClaro: MenuItem[] = [...menuOptionsCommon];
+export const menuOptionsClaro: MenuItem[] = [
+  ...menuOptionsCommon,
+  {
+    label: "Produtos",
+    items: [
+      {
+        label: "Banda Larga",
+        to: "/app/products/telecom/banda-larga",
+      },
+      {
+        label: "Telefonia Móvel",
+        to: "/app/products/telecom/telefonia-movel",
+      },
+    ],
+  },
+  {
+    label: "Pedidos",
+    items: [
+      {
+        label: "Banda Larga",
+        to: "/app/order/telecom/banda-larga",
+      },
+      {
+        label: "Telefonia Móvel",
+        to: "/app/order/telecom/telefonia-movel",
+      },
+    ],
+  },
+];
 
-export const menuOptionsVivo: MenuItem[] = [...menuOptionsCommon];
+export const menuOptionsVivo: MenuItem[] = [
+  ...menuOptionsCommon,
+  {
+    label: "Produtos",
+    items: [
+      {
+        label: "Banda Larga",
+        to: "/app/products/telecom/banda-larga",
+      },
+      {
+        label: "Telefonia Móvel",
+        to: "/app/products/telecom/telefonia-movel",
+      },
+    ],
+  },
+  {
+    label: "Pedidos",
+    items: [
+      {
+        label: "Banda Larga",
+        to: "/app/order/telecom/banda-larga",
+      },
+      {
+        label: "Telefonia Móvel",
+        to: "/app/order/telecom/telefonia-movel",
+      },
+    ],
+  },
+];
 
 export const menuOptionsVR: MenuItem[] = [...menuOptionsCommon];
 
@@ -87,5 +142,61 @@ export const menuOptionsC6: MenuItem[] = [
   },
 ];
 
-export const menuOptionsBrisanet: MenuItem[] = [...menuOptionsCommon];
-export const menuOptionsAlgar: MenuItem[] = [...menuOptionsCommon];
+export const menuOptionsBrisanet: MenuItem[] = [
+  ...menuOptionsCommon,
+  {
+    label: "Produtos",
+    items: [
+      {
+        label: "Banda Larga",
+        to: "/app/products/telecom/banda-larga",
+      },
+      {
+        label: "Telefonia Móvel",
+        to: "/app/products/telecom/telefonia-movel",
+      },
+    ],
+  },
+  {
+    label: "Pedidos",
+    items: [
+      {
+        label: "Banda Larga",
+        to: "/app/order/telecom/banda-larga",
+      },
+      {
+        label: "Telefonia Móvel",
+        to: "/app/order/telecom/telefonia-movel",
+      },
+    ],
+  },
+];
+export const menuOptionsAlgar: MenuItem[] = [
+  ...menuOptionsCommon,
+  {
+    label: "Produtos",
+    items: [
+      {
+        label: "Banda Larga",
+        to: "/app/products/telecom/banda-larga",
+      },
+      {
+        label: "Telefonia Móvel",
+        to: "/app/products/telecom/telefonia-movel",
+      },
+    ],
+  },
+  {
+    label: "Pedidos",
+    items: [
+      {
+        label: "Banda Larga",
+        to: "/app/order/telecom/banda-larga",
+      },
+      {
+        label: "Telefonia Móvel",
+        to: "/app/order/telecom/telefonia-movel",
+      },
+    ],
+  },
+];

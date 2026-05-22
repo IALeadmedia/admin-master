@@ -266,9 +266,11 @@ export function ViewModal({
                     <Button type="primary" onClick={() => viewingEntity && onEdit?.(viewingEntity)}>
                         Editar
                     </Button>
-                    <Button danger style={{ display: canDelete ? "inline-flex" : "none" }} onClick={() => viewingEntity && onDelete?.(viewingEntity)}>
-                        Deletar
-                    </Button>
+                    {canDelete && (
+                        <Button danger onClick={() => viewingEntity && onDelete?.(viewingEntity)}>
+                            Deletar
+                        </Button>
+                    )}
                 </div>
             }
             onCancel={onClose}
