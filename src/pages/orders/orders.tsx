@@ -50,13 +50,13 @@ export function OrdersPage({ model, category }: OrdersPageProps) {
   });
 
   const titleLabel = hasCategories
-    ? getOrderCategoryLabelByModel(effectiveCategory ?? "", resolvedModel)
-    : segmentRegistry[resolvedModel].label;
+    ? ` - ${getOrderCategoryLabelByModel(effectiveCategory ?? "", resolvedModel)}`
+    : "";
 
   return (
     <div className="py-6 min-h-[calc(100vh-160px)]">
       <Typography.Title level={3} style={{ marginBottom: 16 }}>
-        {entityPage.plural} - {titleLabel}
+        {entityPage.plural}{titleLabel}
       </Typography.Title>
       <CommonTableMain
         data={data?.orders || []}

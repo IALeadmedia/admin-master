@@ -30,12 +30,12 @@ admin.megalead.digital → domínio geral do ADMIN
 esses domínios, colocar no lugar dos numeros de portas dos options 
 */
 
-const [subdomain] = window.location.hostname.split("."); // - PRODUÇÃO // usar esse
-// const subdomain = window.location.port; // - DEV // remover essse quando ja tiver os domínios configurados
+//const [subdomain] = window.location.hostname.split("."); // - PRODUÇÃO // usar esse
+const subdomain = window.location.port; // - DEV // remover essse quando ja tiver os domínios configurados
 const url = window.location.origin;
 
 export const options = {
-  admin: {
+  9000: {
     name: "Admin",
     logo: "/megalead.png",
     primaryColor: "#333333",

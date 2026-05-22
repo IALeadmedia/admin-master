@@ -121,7 +121,7 @@ export function ProductsAdminPage() {
             {!selectedSegmentId ? (
                 <Card style={{ marginBottom: 16 }}>
                     <Typography.Paragraph>
-                        Selecione um modelo/segmento usando o seletor "Modelo/Segmento" no topo da página.
+                        Selecione um segmento usando o seletor "Segmento" no topo da página.
                     </Typography.Paragraph>
                 </Card>
             ) : (

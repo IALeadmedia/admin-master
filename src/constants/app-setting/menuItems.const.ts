@@ -37,17 +37,14 @@ export const menuOptionsAdmin: MenuItem[] = [
   },
   {
     label: "Pedidos",
-    to: "/app/order/finances",
+    to: "/app/order",
   },
 ];
 
 // telas do menu específicas para cada empresa
 export const menuOptionsTim: MenuItem[] = [
   ...menuOptionsCommon,
-  // {
-  //   label: "Dashboard",
-  //   to: "/app",
-  // },
+
   {
     label: "Produtos",
     items: [
@@ -61,47 +58,32 @@ export const menuOptionsTim: MenuItem[] = [
       },
     ],
   },
-  // {
-  //   label: "Pedidos",
-  //   items: [
-  //     {
-  //       label: "Banda Larga",
-  //       to: "/app/order/telecom/banda-larga",
-  //     },
-  //     {
-  //       label: "Telefonia Móvel",
-  //       to: "/app/order/telecom/telefonia-movel",
-  //     },
-  //   ],
-  // },
+  {
+    label: "Pedidos",
+    items: [
+      {
+        label: "Banda Larga",
+        to: "/app/order/telecom/banda-larga",
+      },
+      {
+        label: "Telefonia Móvel",
+        to: "/app/order/telecom/telefonia-movel",
+      },
+    ],
+  },
 ];
 
 export const menuOptionsClaro: MenuItem[] = [...menuOptionsCommon];
 
-export const menuOptionsVivo: MenuItem[] = [
-  ...menuOptionsCommon,
-  // {
-  //   label: "Dashboard",
-  //   to: "/app",
-  // },
-];
+export const menuOptionsVivo: MenuItem[] = [...menuOptionsCommon];
 
 export const menuOptionsVR: MenuItem[] = [...menuOptionsCommon];
 
 export const menuOptionsC6: MenuItem[] = [
   ...menuOptionsCommon,
   {
-    label: "Produtos",
-    items: [
-      {
-        label: "Maquininha",
-        to: "/app/products/finances/maquinha-cartao",
-      },
-      {
-        label: "Conta PJ",
-        to: "/app/products/finances/conta-pj",
-      },
-    ],
+    label: "Pedidos",
+    to: "/app/order/finances",
   },
 ];
 

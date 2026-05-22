@@ -17,8 +17,14 @@ import {
 import { useOrderCategoryFilter } from "./useOrderCategoryFilter";
 
 export function OrdersAdminPage() {
-    const { selectedSegmentId, selectedPartnerId } = useAdminScope();
-    const { data, isLoading } = useListEntity();
+    const { selectedSegmentId, selectedCompanyId, selectedPartnerId } = useAdminScope();
+
+    const hasScope = !!selectedSegmentId && !!selectedCompanyId;
+
+    const { data, isLoading } = useListEntity({
+        model: resolveOrderModel(selectedSegmentId),
+        enabled: hasScope,
+    });
     const orders = useMemo(() => data?.orders ?? [], [data?.orders]);
     const model = resolveOrderModel(selectedSegmentId);
     const { hasCategories } = segmentRegistry[model];
@@ -53,9 +59,11 @@ export function OrdersAdminPage() {
     const columns = getOrderColumnsByModel(model, companiesData?.companies ?? []);
     const { FormModal: FormModalComponent, ViewModal: ViewModalComponent } = segmentComponents[model];
 
-    const pageTitle = hasCategories
-        ? `${entityPage.plural} - ${getOrderCategoryLabelByModel(effectiveCategory ?? "", model)}`
-        : `${entityPage.plural} - ${segmentRegistry[model].label}`;
+    const pageTitle = !hasScope
+        ? "Pedidos"
+        : hasCategories
+            ? `${entityPage.plural} - ${getOrderCategoryLabelByModel(effectiveCategory ?? "", model)}`
+            : `${entityPage.plural}`;
 
     return (
         <div className="py-6 min-h-[calc(100vh-160px)]">
@@ -63,12 +71,12 @@ export function OrdersAdminPage() {
                 {pageTitle}
             </Typography.Title>
 
-            {!selectedSegmentId ? (
+            {!hasScope ? (<>
                 <Card style={{ marginBottom: 16 }}>
                     <Typography.Paragraph>
-                        Selecione um modelo/segmento usando o seletor "Modelo/Segmento" no topo da página.
+                        Selecione um segmento usando o seletor "Segmento" no topo da página.
                     </Typography.Paragraph>
-                </Card>
+                </Card></>
             ) : (
                 <CommonTableMain
                     data={filteredOrders}
