@@ -21,7 +21,7 @@ export function summarizeName(fullName?: string | null): string {
 const categoryLabelMap: Record<string, string> = {
   "banda-larga": "Banda Larga",
   "telefonia-movel": "Telefonia Móvel",
-  maquininha: "Maquininha",
+  "maquinha-cartao": "Maquininha",
 };
 
 export function formatCategoryLabel(category: string) {

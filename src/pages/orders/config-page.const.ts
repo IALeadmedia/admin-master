@@ -10,8 +10,8 @@ import type {
 } from "@/types/IOrder.type";
 import type { ICompany } from "@/types/ICompany.type";
 import type { OrderModule } from "@/services/orders.service";
-import { getFinanceColumns } from "./finances/config-page.const";
-import { getColumns as getTelecomColumns } from "./telecom/components/columns.tsx";
+import { getFinanceOrderColumns } from "./finances/components/columns";
+import { getColumns as getTelecomColumns } from "./telecom/components/columns";
 
 export const entityPage = dictionaryQueryClient.orders;
 export const useUpdateEntity = useUpdateOrderMutation;
@@ -22,7 +22,7 @@ export type EntityType = IOrderTelecom;
 export type OrderModel = OrderModule;
 
 export type TelecomOrderCategory = "banda-larga" | "telefonia-movel";
-export type FinanceOrderCategory = "maquininha" | "emprestimo";
+export type FinanceOrderCategory = "maquinha-cartao" | "conta-pj";
 export type BenefitsOrderCategory = "beneficios";
 export type OrderCategory =
   | TelecomOrderCategory
@@ -33,13 +33,13 @@ export const defaultOrderModel: OrderModel = "telecom";
 
 export const defaultCategoryByModel: Record<OrderModel, OrderCategory> = {
   telecom: "banda-larga",
-  finances: "maquininha",
+  finances: "maquinha-cartao",
   benefits: "beneficios",
 };
 
 const categoriesByModel: Record<OrderModel, OrderCategory[]> = {
   telecom: ["banda-larga", "telefonia-movel"],
-  finances: ["maquininha", "emprestimo"],
+  finances: ["maquinha-cartao", "conta-pj"],
   benefits: ["beneficios"],
 };
 
@@ -49,8 +49,8 @@ const telecomOrderCategoryLabelMap: Record<TelecomOrderCategory, string> = {
 };
 
 const financeOrderCategoryLabelMap: Record<FinanceOrderCategory, string> = {
-  maquininha: "Maquininha",
-  emprestimo: "Empréstimo",
+  "maquinha-cartao": "Maquininha",
+  "conta-pj": "Conta PJ",
 };
 
 const benefitsOrderCategoryLabelMap: Record<BenefitsOrderCategory, string> = {
@@ -153,7 +153,7 @@ export function getOrderColumnsByModel(
   }
 
   if (model === "finances") {
-    return getFinanceColumns() as TableColumnsType<EntityType>;
+    return getFinanceOrderColumns() as TableColumnsType<EntityType>;
   }
 
   return undefined;

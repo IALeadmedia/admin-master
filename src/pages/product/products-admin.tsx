@@ -15,8 +15,8 @@ const categoryOptions: Record<ProductModel, Array<{ label: string; value: string
         { label: "Telefonia Móvel", value: "telefonia-movel" },
     ],
     finances: [
-        { label: "Maquininha", value: "maquininha" },
-        { label: "Empréstimo", value: "emprestimo" },
+        { label: "Maquininha", value: "maquinha-cartao" },
+        { label: "Conta PJ", value: "conta-pj" },
     ],
 };
 

@@ -5,8 +5,10 @@ import {
   defaultCategoryByModel,
   resolveOrderModel,
 } from "@/pages/orders/config-page.const";
+import { OrderModelRoute } from "@/pages/orders/order-route-components";
 
 export const Route = createFileRoute("/app/order/$model")({
+  component: OrderModelRoute,
   beforeLoad: ({ params, location }) => {
     if (!can(getStoredUserRole(), "orders", "view")) {
       throw redirect({ to: "/app" });
@@ -17,6 +19,10 @@ export const Route = createFileRoute("/app/order/$model")({
     }
 
     const model = resolveOrderModel(params.model);
+
+    if (model === "finances") {
+      return;
+    }
 
     // Avoid redirect loops when this parent route is matched together with
     // /app/order/$model/$category.

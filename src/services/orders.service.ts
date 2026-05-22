@@ -62,5 +62,3 @@ export class OrdersService {
     );
   }
 }
-
-export { OrdersService as BandaLargaService };

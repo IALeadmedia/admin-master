@@ -29,7 +29,7 @@ function getFinanceHeaderColumns(): TableColumnsType<FinanceOrderRecord> {
                     ? "Conta PJ"
                     : landing_page === "cartao-pj-c6"
                         ? "Cartão PJ"
-                        : landing_page === "maquininha-c6-empresas"
+                        : landing_page === "maquinha-cartao-c6-empresas"
                             ? "Maquininha"
                             : "-",
         },
@@ -43,8 +43,8 @@ function getFinanceHeaderColumns(): TableColumnsType<FinanceOrderRecord> {
                 const labelMap: Record<string, string> = {
                     "conta-pj": "Conta PJ",
                     "capital-giro-c6": "Capital de Giro",
-                    maquininha: "Maquininha",
-                    investimentos: "Investimentos",
+                    "maquinha-cartao": "Maquininha",
+                    "investimentos": "Investimentos",
                     "cartao-credito": "Cartão de Crédito",
                     "reducao-dividas": "Redução de Dívidas",
                     outro: "Outro",

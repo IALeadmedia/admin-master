@@ -25,6 +25,7 @@ export function OrdersAdminPage() {
     const { data, isLoading } = useListEntity();
     const orders = useMemo(() => data?.orders ?? [], [data?.orders]);
     const model = resolveOrderModel(selectedSegmentId);
+    const shouldFilterByCategory = model !== "finances";
     const { data: companiesData } = useCompanyQuery({ enabled: !!selectedSegmentId });
     const { data: partnersData } = usePartnerQuery({
         segmentId: selectedSegmentId,
@@ -33,6 +34,8 @@ export function OrdersAdminPage() {
     });
 
     const partnerCategories = useMemo(() => {
+        if (!shouldFilterByCategory) return [];
+
         if (selectedPartnerId != null) {
             return partnersData?.partners?.[0]?.category ?? [];
         }
@@ -42,9 +45,11 @@ export function OrdersAdminPage() {
                 (partnersData?.partners ?? []).flatMap((partner) => partner.category ?? []),
             ),
         );
-    }, [partnersData?.partners, selectedPartnerId]);
+    }, [partnersData?.partners, selectedPartnerId, shouldFilterByCategory]);
 
     const categoryOptions = useMemo(() => {
+        if (!shouldFilterByCategory) return [];
+
         const categories = partnerCategories.length
             ? partnerCategories
             : Array.from(
@@ -60,11 +65,13 @@ export function OrdersAdminPage() {
             }];
 
         return source;
-    }, [model, orders, partnerCategories]);
+    }, [model, orders, partnerCategories, shouldFilterByCategory]);
 
     const [selectedCategory, setSelectedCategory] = useState<string | undefined>();
 
     const resolvedSelectedCategory = useMemo(() => {
+        if (!shouldFilterByCategory) return undefined;
+
         if (!categoryOptions.length) return undefined;
 
         const hasSelected =
@@ -72,38 +79,48 @@ export function OrdersAdminPage() {
             categoryOptions.some((option) => option.value === selectedCategory);
 
         return hasSelected ? selectedCategory : categoryOptions[0].value;
-    }, [categoryOptions, selectedCategory]);
+    }, [categoryOptions, selectedCategory, shouldFilterByCategory]);
 
     const filteredOrders = useMemo(() => {
+        if (!shouldFilterByCategory) return orders;
+
         const hasCategoryData = orders.some((order) => Boolean(order.category));
 
         if (!resolvedSelectedCategory || !hasCategoryData) return orders;
         return orders.filter((order) => order.category === resolvedSelectedCategory);
-    }, [orders, resolvedSelectedCategory]);
+    }, [orders, resolvedSelectedCategory, shouldFilterByCategory]);
 
     const effectiveCategory = useMemo(
         () =>
-            resolvePartnerCategory(
-                resolvedSelectedCategory,
-                partnerCategories,
-                model,
-            ),
-        [model, partnerCategories, resolvedSelectedCategory],
+            !shouldFilterByCategory
+                ? undefined
+                : resolvePartnerCategory(
+                    resolvedSelectedCategory,
+                    partnerCategories,
+                    model,
+                ),
+        [model, partnerCategories, resolvedSelectedCategory, shouldFilterByCategory],
     );
     const columns = getOrderColumnsByModel(model, companiesData?.companies ?? []);
     const FormModalComponent = model === "finances" ? FinanceFormModal : TelecomFormModal;
     const ViewModalComponent = model === "finances" ? FinanceViewModal : TelecomViewModal;
 
-    const categorySelect = {
-        options: categoryOptions,
-        value: effectiveCategory,
-        onChange: setSelectedCategory,
-    };
+    const categorySelect = shouldFilterByCategory
+        ? {
+            options: categoryOptions,
+            value: effectiveCategory,
+            onChange: setSelectedCategory,
+        }
+        : undefined;
+
+    const pageTitle = shouldFilterByCategory
+        ? `${entityPage.plural} - ${getOrderCategoryLabelByModel(effectiveCategory ?? "", model)}`
+        : `${entityPage.plural} - Financeiro`;
 
     return (
         <div className="py-6 min-h-[calc(100vh-160px)]">
             <Typography.Title level={3} style={{ marginBottom: 16 }}>
-                {entityPage.plural} - {getOrderCategoryLabelByModel(effectiveCategory, model)}
+                {pageTitle}
             </Typography.Title>
 
             {!selectedSegmentId ? (

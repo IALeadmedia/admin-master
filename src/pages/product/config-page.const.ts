@@ -59,7 +59,7 @@ export const defaultProductModel: ProductModel = "telecom";
 
 export const defaultCategoryByModel: Record<ProductModel, string> = {
   telecom: "banda-larga",
-  finances: "maquininha",
+  finances: "maquinha-cartao",
 };
 
 export function isKnownProductModel(model: string): model is ProductModel {

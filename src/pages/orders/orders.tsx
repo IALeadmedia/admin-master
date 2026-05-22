@@ -1,6 +1,5 @@
 import { Typography } from "antd";
 
-
 import {
   entityPage,
   getOrderCategoryLabelByModel,
@@ -10,7 +9,6 @@ import {
   resolvePartnerCategory,
   useListEntity,
 } from "./config-page.const";
-import { useParams } from "@tanstack/react-router";
 import { useResolvedOrderScope } from "@/hooks/orders/useResolvedOrderScope";
 import { useCompanyQuery } from "@/hooks/companies/useCompanyQuery";
 import { usePartnerQuery } from "@/hooks/partners/usePartnerQuery";
@@ -37,16 +35,9 @@ interface OrdersPageProps {
 }
 
 export function OrdersPage({ model, category }: OrdersPageProps) {
-  const routeParams = useParams({
-    from: "/app/order/$model/$category",
-    shouldThrow: false,
-  });
-
-  const rawModel = model ?? routeParams?.model;
-  const rawCategory = category ?? routeParams?.category;
-
-  const resolvedModel = resolveOrderModel(rawModel);
-  const resolvedCategory = resolveOrderCategory(rawCategory, resolvedModel);
+  const resolvedModel = resolveOrderModel(model);
+  const isFinanceModel = resolvedModel === "finances";
+  const resolvedCategory = isFinanceModel ? undefined : resolveOrderCategory(category, resolvedModel);
   const { resolvedPartnerId } = useResolvedOrderScope(resolvedModel);
   const { data: companiesData } = useCompanyQuery();
   const { data: partnersData } = usePartnerQuery({
@@ -55,24 +46,30 @@ export function OrdersPage({ model, category }: OrdersPageProps) {
   });
 
   const partnerCategories = partnersData?.partners?.[0]?.category ?? [];
-  const effectiveCategory = resolvePartnerCategory(
-    resolvedCategory,
-    partnerCategories,
-    resolvedModel,
-  );
+  const effectiveCategory = isFinanceModel
+    ? undefined
+    : resolvePartnerCategory(
+      resolvedCategory,
+      partnerCategories,
+      resolvedModel,
+    );
   const columns = getOrderColumnsByModel(resolvedModel, companiesData?.companies ?? []);
   const { FormModal: FormModalComponent, ViewModal: ViewModalComponent } =
     orderSegmentComponents[resolvedModel === "finances" ? "finances" : "telecom"];
 
   const { data, isLoading } = useListEntity({
     model: resolvedModel,
-    filters: { category: effectiveCategory },
+    filters: effectiveCategory ? { category: effectiveCategory } : undefined,
   });
+
+  const titleLabel = isFinanceModel
+    ? "Financeiro"
+    : getOrderCategoryLabelByModel(effectiveCategory ?? "", resolvedModel);
 
   return (
     <div className="py-6 min-h-[calc(100vh-160px)]">
       <Typography.Title level={3} style={{ marginBottom: 16 }}>
-        {entityPage.plural} - {getOrderCategoryLabelByModel(effectiveCategory, resolvedModel)}
+        {entityPage.plural} - {titleLabel}
       </Typography.Title>
       <CommonTableMain
         data={data?.orders || []}

@@ -37,7 +37,7 @@ export const menuOptionsAdmin: MenuItem[] = [
   },
   {
     label: "Pedidos",
-    to: "/app/order",
+    to: "/app/order/finances",
   },
 ];
 
@@ -95,11 +95,11 @@ export const menuOptionsC6: MenuItem[] = [
     items: [
       {
         label: "Maquininha",
-        to: "/app/products/finances/maquininha",
+        to: "/app/products/finances/maquinha-cartao",
       },
       {
-        label: "Empréstimo",
-        to: "/app/products/finances/emprestimo",
+        label: "Conta PJ",
+        to: "/app/products/finances/conta-pj",
       },
     ],
   },
