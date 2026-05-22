@@ -132,7 +132,7 @@ export interface OrderBase {
   city?: string | null;
   state?: string | null;
   zip_code?: string | null;
-  single_zip_code?: boolean | null;
+  single_zip_code?: boolean | undefined;
   address_complement?: OrderAddressComplement | null;
   consultant_observation?: string | null;
   responsible_consultant?: string | null;

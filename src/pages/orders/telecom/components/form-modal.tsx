@@ -566,7 +566,6 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
                     </Row>
                 </OrderModalSection>
 
-
                 <OrderModalSection title="Endereço">
                     <Row gutter={16}>
                         <Col span={8}>
