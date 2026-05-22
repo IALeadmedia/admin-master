@@ -31,6 +31,11 @@ interface CompaniesTableProps {
   categorySelect?: CategorySelectProps;
   FormModalComponent: ComponentType<FormModalProps>;
   ViewModalComponent: ComponentType<ViewModalProps>;
+  currentPage?: number;
+  pageSize?: number;
+  total?: number;
+  onPageChange?: (page: number) => void;
+  onPageSizeChange?: (size: number) => void;
 }
 
 export function TableMain({
@@ -40,6 +45,11 @@ export function TableMain({
   categorySelect,
   FormModalComponent,
   ViewModalComponent,
+  currentPage,
+  pageSize = 20,
+  total,
+  onPageChange,
+  onPageSizeChange,
 }: CompaniesTableProps) {
   const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
   const [searchText, setSearchText] = useState("");
@@ -123,10 +133,27 @@ export function TableMain({
               }
               : undefined
           }
-          pagination={{
-            pageSize: 10,
-            showTotal: (total) => `Total: ${total} ${entityPage.plural.toLowerCase()}`,
-          }}
+          pagination={
+            currentPage !== undefined
+              ? {
+                current: currentPage,
+                pageSize,
+                total,
+                locale: { items_per_page: "" },
+                pageSizeOptions: [5, 10, 20, 50, 100],
+                showSizeChanger: true,
+                showTotal: (t) => `Total: ${t} ${entityPage.plural.toLowerCase()}`,
+                onChange: (p) => onPageChange?.(p),
+                onShowSizeChange: (_: number, size: number) => {
+                  onPageSizeChange?.(size);
+                  onPageChange?.(1);
+                },
+              }
+              : {
+                pageSize: 20,
+                showTotal: (t) => `Total: ${t} ${entityPage.plural.toLowerCase()}`,
+              }
+          }
           scroll={{ y: 800 }}
           onRow={(record) => ({
             onClick: () => handleView(record),

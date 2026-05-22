@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Card, Typography } from "antd";
 import { useAdminScope } from "@/context/admin-scope-provider";
 import { useCompanyQuery } from "@/hooks/companies/useCompanyQuery";
@@ -20,14 +20,11 @@ export function OrdersAdminPage() {
     const { selectedSegmentId, selectedCompanyId, selectedPartnerId } = useAdminScope();
 
     const hasScope = !!selectedSegmentId && !!selectedCompanyId;
-
-    const { data, isLoading } = useListEntity({
-        model: resolveOrderModel(selectedSegmentId),
-        enabled: hasScope,
-    });
-    const orders = useMemo(() => data?.orders ?? [], [data?.orders]);
     const model = resolveOrderModel(selectedSegmentId);
     const { hasCategories } = segmentRegistry[model];
+
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(20);
 
     const { data: companiesData } = useCompanyQuery({ enabled: !!selectedSegmentId });
     const { data: partnersData } = usePartnerQuery({
@@ -50,11 +47,28 @@ export function OrdersAdminPage() {
         );
     }, [hasCategories, partnersData?.partners, selectedPartnerId]);
 
-    const { categorySelect, filteredOrders, effectiveCategory } = useOrderCategoryFilter({
+    // Category filter state derived from partner categories (server-side filtering)
+    const { categorySelect, effectiveCategory } = useOrderCategoryFilter({
         model,
-        orders,
+        orders: [],
         partnerCategories,
     });
+
+    // Reset to page 1 when model or category changes
+    useEffect(() => {
+        setPage(1);
+    }, [model, effectiveCategory]);
+
+    const { data, isLoading } = useListEntity({
+        model,
+        filters: effectiveCategory ? { category: effectiveCategory } : undefined,
+        page,
+        per_page: pageSize,
+        enabled: hasScope,
+    });
+
+    const orders = useMemo(() => data?.orders ?? [], [data?.orders]);
+    const total = data?.total ?? 0;
 
     const columns = getOrderColumnsByModel(model, companiesData?.companies ?? []);
     const { FormModal: FormModalComponent, ViewModal: ViewModalComponent } = segmentComponents[model];
@@ -71,20 +85,25 @@ export function OrdersAdminPage() {
                 {pageTitle}
             </Typography.Title>
 
-            {!hasScope ? (<>
+            {!hasScope ? (
                 <Card style={{ marginBottom: 16 }}>
                     <Typography.Paragraph>
                         Selecione um segmento usando o seletor "Segmento" no topo da página.
                     </Typography.Paragraph>
-                </Card></>
+                </Card>
             ) : (
                 <CommonTableMain
-                    data={filteredOrders}
+                    data={orders}
                     isLoading={isLoading}
                     columns={columns}
                     categorySelect={categorySelect}
                     FormModalComponent={FormModalComponent}
                     ViewModalComponent={ViewModalComponent}
+                    currentPage={page}
+                    pageSize={pageSize}
+                    total={total}
+                    onPageChange={setPage}
+                    onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
                 />
             )}
         </div>

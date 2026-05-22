@@ -1,4 +1,5 @@
 import { Typography } from "antd";
+import { useState } from "react";
 
 import {
   entityPage,
@@ -44,9 +45,14 @@ export function OrdersPage({ model, category }: OrdersPageProps) {
   const { FormModal: FormModalComponent, ViewModal: ViewModalComponent } =
     segmentComponents[resolvedModel];
 
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+
   const { data, isLoading } = useListEntity({
     model: resolvedModel,
     filters: effectiveCategory ? { category: effectiveCategory } : undefined,
+    page,
+    per_page: pageSize,
   });
 
   const titleLabel = hasCategories
@@ -64,6 +70,11 @@ export function OrdersPage({ model, category }: OrdersPageProps) {
         columns={columns}
         FormModalComponent={FormModalComponent}
         ViewModalComponent={ViewModalComponent}
+        currentPage={page}
+        pageSize={pageSize}
+        total={data?.total ?? 0}
+        onPageChange={setPage}
+        onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
       />
     </div>
   );
