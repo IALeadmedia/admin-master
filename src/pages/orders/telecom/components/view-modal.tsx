@@ -506,7 +506,7 @@ export function ViewModal({
                 </div>
 
                 {(viewingEntity?.status === "FECHADO" || viewingEntity?.status === "fechado") &&
-                    getAlertScenarios(viewingEntity?.availability ?? undefined, viewingEntity?.found_via_range, viewingEntity?.single_zip_code, viewingEntity?.status).map((scenario, idx) => (
+                    getAlertScenarios({ availability: viewingEntity?.availability ?? undefined, found_via_range: viewingEntity?.found_via_range, single_zip_code: viewingEntity?.single_zip_code, status: viewingEntity?.status }).map((scenario, idx) => (
                         <div key={idx} className="flex flex-col gap-2 mb-3 rounded-sm p-3 w-full" style={{ backgroundColor: scenario.color }}>
                             <div className="flex items-center">
                                 <h2 className="text-[14px] font-semibold">

@@ -7,6 +7,7 @@ import {
   resolveOrderModel,
   resolveOrderCategory,
   resolvePartnerCategory,
+  segmentComponents,
   segmentRegistry,
   useListEntity,
 } from "./config-page.const";
@@ -14,16 +15,6 @@ import { useResolvedOrderScope } from "@/hooks/orders/useResolvedOrderScope";
 import { useCompanyQuery } from "@/hooks/companies/useCompanyQuery";
 import { usePartnerQuery } from "@/hooks/partners/usePartnerQuery";
 import { TableMain as CommonTableMain } from "./common/components/table";
-import { FormModal as TelecomFormModal } from "./telecom/components/form-modal";
-import { ViewModal as TelecomViewModal } from "./telecom/components/view-modal";
-import { FormModal as FinanceFormModal } from "./finances/components/form-modal";
-import { ViewModal as FinanceViewModal } from "./finances/components/view-modal";
-
-const segmentComponents = {
-  finances: { FormModal: FinanceFormModal, ViewModal: FinanceViewModal },
-  telecom: { FormModal: TelecomFormModal, ViewModal: TelecomViewModal },
-  benefits: { FormModal: TelecomFormModal, ViewModal: TelecomViewModal },
-};
 
 interface OrdersPageProps {
   model?: string;

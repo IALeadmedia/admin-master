@@ -5,10 +5,10 @@ import {
   resolveOrderCategory,
   resolveOrderModel,
 } from "@/pages/orders/config-page.const";
-import { OrderModelCategoryRoute } from "@/pages/orders/order-route-components";
+import { OrdersPage } from "@/pages/orders/orders";
 
 export const Route = createFileRoute("/app/order/$model/$category")({
-  component: OrderModelCategoryRoute,
+  component: OrderModelCategoryComponent,
   beforeLoad: ({ params }) => {
     if (!can(getStoredUserRole(), "orders", "view")) {
       throw redirect({ to: "/app" });
@@ -33,3 +33,8 @@ export const Route = createFileRoute("/app/order/$model/$category")({
     }
   },
 });
+
+function OrderModelCategoryComponent() {
+  const { model, category } = Route.useParams();
+  return <OrdersPage model={model} category={category} />;
+}

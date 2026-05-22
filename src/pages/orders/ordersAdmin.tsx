@@ -4,26 +4,17 @@ import { useAdminScope } from "@/context/admin-scope-provider";
 import { useCompanyQuery } from "@/hooks/companies/useCompanyQuery";
 import { usePartnerQuery } from "@/hooks/partners/usePartnerQuery";
 import { TableMain as CommonTableMain } from "./common/components/table";
-import { FormModal as TelecomFormModal } from "./telecom/components/form-modal";
-import { ViewModal as TelecomViewModal } from "./telecom/components/view-modal";
-import { FormModal as FinanceFormModal } from "./finances/components/form-modal";
-import { ViewModal as FinanceViewModal } from "./finances/components/view-modal";
 
 import {
     entityPage,
     getOrderCategoryLabelByModel,
     getOrderColumnsByModel,
     resolveOrderModel,
+    segmentComponents,
     segmentRegistry,
     useListEntity,
 } from "./config-page.const";
 import { useOrderCategoryFilter } from "./useOrderCategoryFilter";
-
-const segmentComponents = {
-    finances: { FormModal: FinanceFormModal, ViewModal: FinanceViewModal },
-    telecom: { FormModal: TelecomFormModal, ViewModal: TelecomViewModal },
-    benefits: { FormModal: TelecomFormModal, ViewModal: TelecomViewModal },
-};
 
 export function OrdersAdminPage() {
     const { selectedSegmentId, selectedPartnerId } = useAdminScope();

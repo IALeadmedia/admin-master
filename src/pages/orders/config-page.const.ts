@@ -2,15 +2,19 @@ import { dictionaryQueryClient } from "@/constants/dictionaryQueryClient.const";
 import { useDeleteOrderMutation } from "@/hooks/orders/useDeleteOrderMutation";
 import { useOrderQuery } from "@/hooks/orders/useOrderQuery";
 import { useUpdateOrderMutation } from "@/hooks/orders/useUpdateOrderMutation";
+import type { ComponentType } from "react";
 import type { TableColumnsType } from "antd";
-import type { Dayjs } from "dayjs";
-import type { OrderAddressComplement, TelecomOrder } from "@/types/orders";
+import type { TelecomOrder } from "@/types/orders";
 import type { ICompany } from "@/types/ICompany.type";
 import type { OrderModule } from "@/services/orders.service";
 import type { OrderCategory, TelecomOrderCategory } from "./segment.registry";
 import { getFinanceOrderColumns } from "./finances/components/columns";
 import { getColumns as getTelecomColumns } from "./telecom/components/columns";
 import { segmentRegistry } from "./segment.registry";
+import { FormModal as TelecomFormModal } from "./telecom/components/form-modal";
+import { ViewModal as TelecomViewModal } from "./telecom/components/view-modal";
+import { FormModal as FinanceFormModal } from "./finances/components/form-modal";
+import { ViewModal as FinanceViewModal } from "./finances/components/view-modal";
 
 export type {
   OrderCategory,
@@ -135,36 +139,13 @@ export function getOrderColumnsByModel(
   return undefined;
 }
 
-export type FormValues = {
-  plan_id?: number | string;
-  selected_extras?: Array<number | string>;
-  installation_preferred_date_one?: string | Dayjs;
-  installation_preferred_period_one?: string;
-  installation_preferred_date_two?: string | Dayjs;
-  installation_preferred_period_two?: string;
-  due_day?: string | number;
-  availability_pap?: boolean;
-  full_name?: string;
-  cpf?: string;
-  birth_date?: string;
-  email?: string;
-  mother_full_name?: string;
-  phone?: string;
-  additional_phone?: string;
-  cnpj?: string;
-  payment_method?: string;
-  bank_name?: string;
-  bank_branch?: string;
-  bank_account_number?: string;
-  bank_account_holder_name?: string;
-  bank_account_holder_cpf?: string;
-  address?: string;
-  address_number?: string;
-  district?: string;
-  city?: string;
-  state?: string;
-  zip_code?: string;
-  single_zip_code?: boolean;
-  consultant_observation?: string;
-  address_complement?: Partial<OrderAddressComplement>;
+export const segmentComponents: Record<
+  OrderModel,
+  { FormModal: ComponentType<any>; ViewModal: ComponentType<any> }
+> = {
+  telecom: { FormModal: TelecomFormModal, ViewModal: TelecomViewModal },
+  finances: { FormModal: FinanceFormModal, ViewModal: FinanceViewModal },
+  benefits: { FormModal: TelecomFormModal, ViewModal: TelecomViewModal },
 };
+
+export type { FormValues } from "@/types/orders";

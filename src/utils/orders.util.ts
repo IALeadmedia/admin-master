@@ -101,12 +101,17 @@ export const formatResolution = (resolution: any) => {
   return "-";
 };
 
-export const getAlertScenarios = (
-  availability?: boolean | number,
-  found_via_range?: boolean | null,
-  single_zip_code?: boolean | null,
-  status?: string,
-) => {
+export const getAlertScenarios = ({
+  availability,
+  found_via_range,
+  single_zip_code,
+  status,
+}: {
+  availability?: boolean | number;
+  found_via_range?: boolean | null;
+  single_zip_code?: boolean | null;
+  status?: string;
+} = {}) => {
   const scenarios: { color: string; content: React.ReactNode }[] = [];
   const noAvailability =
     availability === false || availability === null || availability === 0;

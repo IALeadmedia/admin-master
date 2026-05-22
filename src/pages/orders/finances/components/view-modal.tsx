@@ -425,7 +425,7 @@ export function ViewModal({
                     </OrderModalSection>
 
                     {(financeData?.status === "FECHADO" || financeData?.status === "fechado") &&
-                        getAlertScenarios(financeData?.single_zip_code, financeData?.status).map((scenario, idx) => (
+                        getAlertScenarios({ single_zip_code: financeData?.single_zip_code, status: financeData?.status }).map((scenario, idx) => (
                             <div
                                 key={idx}
                                 className="flex flex-col gap-2 mb-3 rounded-sm p-3 w-full"
