@@ -1,12 +1,8 @@
 import { useEffect, useMemo } from "react";
 import { Form, Input, Row, Col, Select, Checkbox, DatePicker } from "antd";
 import dayjs from "dayjs";
-import {
-    entityPage,
-    useUpdateEntity,
-    type EntityType,
-} from "../config-page.const";
-import type { FormValues } from "../../config-page.const";
+
+import { entityPage, useUpdateEntity, type EntityType, type FormValues } from "../../config-page.const";
 import { OrderModalShell } from "../../common/components/order-modal-shell";
 import { useProductQuery } from "@/hooks/products/useProductQuery";
 import { useResolvedOrderScope } from "@/hooks/orders/useResolvedOrderScope";

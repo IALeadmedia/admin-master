@@ -4,66 +4,37 @@ import { useOrderQuery } from "@/hooks/orders/useOrderQuery";
 import { useUpdateOrderMutation } from "@/hooks/orders/useUpdateOrderMutation";
 import type { TableColumnsType } from "antd";
 import type { Dayjs } from "dayjs";
-import type {
-  IOrderAddressComplement,
-  IOrderTelecom,
-} from "@/types/IOrder.type";
+import type { OrderAddressComplement, TelecomOrder } from "@/types/orders";
 import type { ICompany } from "@/types/ICompany.type";
 import type { OrderModule } from "@/services/orders.service";
+import type { OrderCategory, TelecomOrderCategory } from "./segment.registry";
 import { getFinanceOrderColumns } from "./finances/components/columns";
 import { getColumns as getTelecomColumns } from "./telecom/components/columns";
+import { segmentRegistry } from "./segment.registry";
+
+export type {
+  OrderCategory,
+  TelecomOrderCategory,
+  FinanceOrderCategory,
+  BenefitsOrderCategory,
+  SegmentConfig,
+} from "./segment.registry";
+export { segmentRegistry };
 
 export const entityPage = dictionaryQueryClient.orders;
 export const useUpdateEntity = useUpdateOrderMutation;
 export const useDeleteEntity = useDeleteOrderMutation;
 export const useListEntity = useOrderQuery;
-export type EntityType = IOrderTelecom;
+export type EntityType = TelecomOrder;
 
 export type OrderModel = OrderModule;
-
-export type TelecomOrderCategory = "banda-larga" | "telefonia-movel";
-export type FinanceOrderCategory = "maquinha-cartao" | "conta-pj";
-export type BenefitsOrderCategory = "beneficios";
-export type OrderCategory =
-  | TelecomOrderCategory
-  | FinanceOrderCategory
-  | BenefitsOrderCategory;
 
 export const defaultOrderModel: OrderModel = "telecom";
 
 export const defaultCategoryByModel: Record<OrderModel, OrderCategory> = {
-  telecom: "banda-larga",
-  finances: "maquinha-cartao",
-  benefits: "beneficios",
-};
-
-const categoriesByModel: Record<OrderModel, OrderCategory[]> = {
-  telecom: ["banda-larga", "telefonia-movel"],
-  finances: ["maquinha-cartao", "conta-pj"],
-  benefits: ["beneficios"],
-};
-
-const telecomOrderCategoryLabelMap: Record<TelecomOrderCategory, string> = {
-  "banda-larga": "Banda Larga",
-  "telefonia-movel": "Telefonia Móvel",
-};
-
-const financeOrderCategoryLabelMap: Record<FinanceOrderCategory, string> = {
-  "maquinha-cartao": "Maquininha",
-  "conta-pj": "Conta PJ",
-};
-
-const benefitsOrderCategoryLabelMap: Record<BenefitsOrderCategory, string> = {
-  beneficios: "Benefícios",
-};
-
-const orderCategoryLabelMapByModel: Record<
-  OrderModel,
-  Record<string, string>
-> = {
-  telecom: telecomOrderCategoryLabelMap,
-  finances: financeOrderCategoryLabelMap,
-  benefits: benefitsOrderCategoryLabelMap,
+  telecom: segmentRegistry.telecom.defaultCategory,
+  finances: segmentRegistry.finances.defaultCategory,
+  benefits: segmentRegistry.benefits.defaultCategory,
 };
 
 export function isTelecomOrderCategory(
@@ -71,7 +42,7 @@ export function isTelecomOrderCategory(
 ): category is TelecomOrderCategory {
   return (
     !!category &&
-    categoriesByModel.telecom.includes(category as TelecomOrderCategory)
+    (segmentRegistry.telecom.categories as readonly string[]).includes(category)
   );
 }
 
@@ -79,16 +50,16 @@ export function resolveOrderCategory(
   rawCategory?: string,
   model: OrderModel = defaultOrderModel,
 ): OrderCategory {
-  const categories = categoriesByModel[model];
-  if (!rawCategory) return defaultCategoryByModel[model];
+  const { categories, defaultCategory } = segmentRegistry[model];
+  if (!rawCategory) return defaultCategory;
 
-  return categories.includes(rawCategory as OrderCategory)
+  return (categories as readonly string[]).includes(rawCategory)
     ? (rawCategory as OrderCategory)
-    : defaultCategoryByModel[model];
+    : defaultCategory;
 }
 
 export function isKnownOrderModel(model: string): model is OrderModel {
-  return model in categoriesByModel;
+  return model in segmentRegistry;
 }
 
 export function resolveOrderModel(rawModel?: string): OrderModel {
@@ -100,28 +71,33 @@ export function getOrderCategoryLabelByModel(
   category: string,
   model: OrderModel = defaultOrderModel,
 ): string {
-  return orderCategoryLabelMapByModel[model]?.[category] ?? category;
+  return segmentRegistry[model]?.categoryLabelMap[category] ?? category;
 }
 
 export function getOrderCategoryOptionsByModel(
   model: OrderModel = defaultOrderModel,
 ): Array<{ label: string; value: OrderCategory }> {
-  return (categoriesByModel[model] ?? []).map((category) => ({
-    value: category,
-    label: getOrderCategoryLabelByModel(category, model),
-  }));
+  return (segmentRegistry[model].categories as readonly OrderCategory[]).map(
+    (category) => ({
+      value: category,
+      label: getOrderCategoryLabelByModel(category, model),
+    }),
+  );
 }
 
 export function getPartnerCategoryOptions(
   categories: string[] = [],
   model: OrderModel = defaultOrderModel,
 ): Array<{ label: string; value: string }> {
-  const allowedCategories = categoriesByModel[model];
+  const allowedCategories = segmentRegistry[model]
+    .categories as readonly string[];
   const uniqueCategories = Array.from(new Set(categories)).filter(Boolean);
-  const source = uniqueCategories.length ? uniqueCategories : allowedCategories;
+  const source = uniqueCategories.length
+    ? uniqueCategories
+    : [...allowedCategories];
 
   return source
-    .filter((category) => allowedCategories.includes(category as OrderCategory))
+    .filter((category) => allowedCategories.includes(category))
     .map((category) => ({
       value: category,
       label: getOrderCategoryLabelByModel(category, model),
@@ -190,5 +166,5 @@ export type FormValues = {
   zip_code?: string;
   single_zip_code?: boolean;
   consultant_observation?: string;
-  address_complement?: Partial<IOrderAddressComplement>;
+  address_complement?: Partial<OrderAddressComplement>;
 };

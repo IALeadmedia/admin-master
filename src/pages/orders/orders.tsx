@@ -7,6 +7,7 @@ import {
   resolveOrderModel,
   resolveOrderCategory,
   resolvePartnerCategory,
+  segmentRegistry,
   useListEntity,
 } from "./config-page.const";
 import { useResolvedOrderScope } from "@/hooks/orders/useResolvedOrderScope";
@@ -18,16 +19,11 @@ import { ViewModal as TelecomViewModal } from "./telecom/components/view-modal";
 import { FormModal as FinanceFormModal } from "./finances/components/form-modal";
 import { ViewModal as FinanceViewModal } from "./finances/components/view-modal";
 
-const orderSegmentComponents = {
-  finances: {
-    FormModal: FinanceFormModal,
-    ViewModal: FinanceViewModal,
-  },
-  telecom: {
-    FormModal: TelecomFormModal,
-    ViewModal: TelecomViewModal,
-  },
-} as const;
+const segmentComponents = {
+  finances: { FormModal: FinanceFormModal, ViewModal: FinanceViewModal },
+  telecom: { FormModal: TelecomFormModal, ViewModal: TelecomViewModal },
+  benefits: { FormModal: TelecomFormModal, ViewModal: TelecomViewModal },
+};
 
 interface OrdersPageProps {
   model?: string;
@@ -36,8 +32,8 @@ interface OrdersPageProps {
 
 export function OrdersPage({ model, category }: OrdersPageProps) {
   const resolvedModel = resolveOrderModel(model);
-  const isFinanceModel = resolvedModel === "finances";
-  const resolvedCategory = isFinanceModel ? undefined : resolveOrderCategory(category, resolvedModel);
+  const { hasCategories } = segmentRegistry[resolvedModel];
+  const resolvedCategory = hasCategories ? resolveOrderCategory(category, resolvedModel) : undefined;
   const { resolvedPartnerId } = useResolvedOrderScope(resolvedModel);
   const { data: companiesData } = useCompanyQuery();
   const { data: partnersData } = usePartnerQuery({
@@ -46,25 +42,25 @@ export function OrdersPage({ model, category }: OrdersPageProps) {
   });
 
   const partnerCategories = partnersData?.partners?.[0]?.category ?? [];
-  const effectiveCategory = isFinanceModel
-    ? undefined
-    : resolvePartnerCategory(
+  const effectiveCategory = hasCategories
+    ? resolvePartnerCategory(
       resolvedCategory,
       partnerCategories,
       resolvedModel,
-    );
+    )
+    : undefined;
   const columns = getOrderColumnsByModel(resolvedModel, companiesData?.companies ?? []);
   const { FormModal: FormModalComponent, ViewModal: ViewModalComponent } =
-    orderSegmentComponents[resolvedModel === "finances" ? "finances" : "telecom"];
+    segmentComponents[resolvedModel];
 
   const { data, isLoading } = useListEntity({
     model: resolvedModel,
     filters: effectiveCategory ? { category: effectiveCategory } : undefined,
   });
 
-  const titleLabel = isFinanceModel
-    ? "Financeiro"
-    : getOrderCategoryLabelByModel(effectiveCategory ?? "", resolvedModel);
+  const titleLabel = hasCategories
+    ? getOrderCategoryLabelByModel(effectiveCategory ?? "", resolvedModel)
+    : segmentRegistry[resolvedModel].label;
 
   return (
     <div className="py-6 min-h-[calc(100vh-160px)]">

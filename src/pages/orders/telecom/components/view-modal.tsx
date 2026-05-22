@@ -1,5 +1,5 @@
 import { Col, Row, Button, Form, ConfigProvider, Input, Select, Tooltip, } from "antd";
-import { useUpdateEntity, type EntityType } from "../config-page.const";
+
 import { OrderModalShell } from "../../common/components/order-modal-shell";
 import { OrderModalSection } from "../../common/components/order-modal-section";
 import ReadonlyField from "@/layout/common-components/ReadOnlyField";
@@ -13,6 +13,7 @@ import { EmpresasDisplay } from "../../common/components/companiesDisplay";
 import type { OrderOperatorsAvailability } from "@/types/orders/base.type";
 import { appSetting } from "@/constants/app-setting/config.const";
 import anonymousAvatar from "@/assets/anonymous_avatar.png";
+import { useUpdateEntity, type EntityType } from "../../config-page.const";
 function resolveOperatorKey(companyName?: string | null) {
     return companyName?.split(" ")[0]?.toLowerCase().trim();
 }

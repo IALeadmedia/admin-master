@@ -1,5 +1,5 @@
 ﻿import { dictionaryQueryClient } from "@/constants/dictionaryQueryClient.const";
-import type { IOrderTelecomFilters } from "@/types/IOrder.type";
+import type { TelecomOrderFilters, TelecomOrderResponse } from "@/types/orders";
 import { useQuery } from "@tanstack/react-query";
 import { useResolvedOrderScope } from "./useResolvedOrderScope";
 import type { OrderModule } from "@/services/orders.service";
@@ -12,7 +12,7 @@ export function useOrderQuery({
   per_page = 20,
 }: {
   model?: OrderModule;
-  filters?: Omit<IOrderTelecomFilters, "company_id" | "partner_id">;
+  filters?: Omit<TelecomOrderFilters, "company_id" | "partner_id">;
   enabled?: boolean;
   page?: number;
   per_page?: number;
@@ -25,7 +25,7 @@ export function useOrderQuery({
     resolvedPartnerId,
   } = useResolvedOrderScope(model);
 
-  const resolvedFilters: IOrderTelecomFilters = {
+  const resolvedFilters: TelecomOrderFilters = {
     ...filters,
     ...(resolvedCompanyId != null ? { company_id: resolvedCompanyId } : {}),
     ...(resolvedPartnerId != null ? { partner_id: resolvedPartnerId } : {}),
@@ -45,7 +45,11 @@ export function useOrderQuery({
       per_page,
     ],
     queryFn: () =>
-      entity.service.getAll(resolvedModule, resolvedOperator, resolvedFilters),
+      entity.service.getAll<TelecomOrderResponse>(
+        resolvedModule,
+        resolvedOperator,
+        resolvedFilters,
+      ),
     retry: 2,
     enabled,
   });

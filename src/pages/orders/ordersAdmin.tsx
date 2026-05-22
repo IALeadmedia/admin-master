@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Card, Typography } from "antd";
 import { useAdminScope } from "@/context/admin-scope-provider";
 import { useCompanyQuery } from "@/hooks/companies/useCompanyQuery";
@@ -10,22 +10,28 @@ import { FormModal as FinanceFormModal } from "./finances/components/form-modal"
 import { ViewModal as FinanceViewModal } from "./finances/components/view-modal";
 
 import {
-    defaultCategoryByModel,
     entityPage,
     getOrderCategoryLabelByModel,
     getOrderColumnsByModel,
-    getPartnerCategoryOptions,
     resolveOrderModel,
-    resolvePartnerCategory,
+    segmentRegistry,
     useListEntity,
 } from "./config-page.const";
+import { useOrderCategoryFilter } from "./useOrderCategoryFilter";
+
+const segmentComponents = {
+    finances: { FormModal: FinanceFormModal, ViewModal: FinanceViewModal },
+    telecom: { FormModal: TelecomFormModal, ViewModal: TelecomViewModal },
+    benefits: { FormModal: TelecomFormModal, ViewModal: TelecomViewModal },
+};
 
 export function OrdersAdminPage() {
     const { selectedSegmentId, selectedPartnerId } = useAdminScope();
     const { data, isLoading } = useListEntity();
     const orders = useMemo(() => data?.orders ?? [], [data?.orders]);
     const model = resolveOrderModel(selectedSegmentId);
-    const shouldFilterByCategory = model !== "finances";
+    const { hasCategories } = segmentRegistry[model];
+
     const { data: companiesData } = useCompanyQuery({ enabled: !!selectedSegmentId });
     const { data: partnersData } = usePartnerQuery({
         segmentId: selectedSegmentId,
@@ -34,7 +40,7 @@ export function OrdersAdminPage() {
     });
 
     const partnerCategories = useMemo(() => {
-        if (!shouldFilterByCategory) return [];
+        if (!hasCategories) return [];
 
         if (selectedPartnerId != null) {
             return partnersData?.partners?.[0]?.category ?? [];
@@ -45,77 +51,20 @@ export function OrdersAdminPage() {
                 (partnersData?.partners ?? []).flatMap((partner) => partner.category ?? []),
             ),
         );
-    }, [partnersData?.partners, selectedPartnerId, shouldFilterByCategory]);
+    }, [hasCategories, partnersData?.partners, selectedPartnerId]);
 
-    const categoryOptions = useMemo(() => {
-        if (!shouldFilterByCategory) return [];
+    const { categorySelect, filteredOrders, effectiveCategory } = useOrderCategoryFilter({
+        model,
+        orders,
+        partnerCategories,
+    });
 
-        const categories = partnerCategories.length
-            ? partnerCategories
-            : Array.from(
-                new Set(orders.map((order) => order.category).filter(Boolean)),
-            ) as string[];
-
-        const options = getPartnerCategoryOptions(categories, model);
-        const source = options.length
-            ? options
-            : [{
-                label: getOrderCategoryLabelByModel(defaultCategoryByModel[model], model),
-                value: defaultCategoryByModel[model],
-            }];
-
-        return source;
-    }, [model, orders, partnerCategories, shouldFilterByCategory]);
-
-    const [selectedCategory, setSelectedCategory] = useState<string | undefined>();
-
-    const resolvedSelectedCategory = useMemo(() => {
-        if (!shouldFilterByCategory) return undefined;
-
-        if (!categoryOptions.length) return undefined;
-
-        const hasSelected =
-            selectedCategory &&
-            categoryOptions.some((option) => option.value === selectedCategory);
-
-        return hasSelected ? selectedCategory : categoryOptions[0].value;
-    }, [categoryOptions, selectedCategory, shouldFilterByCategory]);
-
-    const filteredOrders = useMemo(() => {
-        if (!shouldFilterByCategory) return orders;
-
-        const hasCategoryData = orders.some((order) => Boolean(order.category));
-
-        if (!resolvedSelectedCategory || !hasCategoryData) return orders;
-        return orders.filter((order) => order.category === resolvedSelectedCategory);
-    }, [orders, resolvedSelectedCategory, shouldFilterByCategory]);
-
-    const effectiveCategory = useMemo(
-        () =>
-            !shouldFilterByCategory
-                ? undefined
-                : resolvePartnerCategory(
-                    resolvedSelectedCategory,
-                    partnerCategories,
-                    model,
-                ),
-        [model, partnerCategories, resolvedSelectedCategory, shouldFilterByCategory],
-    );
     const columns = getOrderColumnsByModel(model, companiesData?.companies ?? []);
-    const FormModalComponent = model === "finances" ? FinanceFormModal : TelecomFormModal;
-    const ViewModalComponent = model === "finances" ? FinanceViewModal : TelecomViewModal;
+    const { FormModal: FormModalComponent, ViewModal: ViewModalComponent } = segmentComponents[model];
 
-    const categorySelect = shouldFilterByCategory
-        ? {
-            options: categoryOptions,
-            value: effectiveCategory,
-            onChange: setSelectedCategory,
-        }
-        : undefined;
-
-    const pageTitle = shouldFilterByCategory
+    const pageTitle = hasCategories
         ? `${entityPage.plural} - ${getOrderCategoryLabelByModel(effectiveCategory ?? "", model)}`
-        : `${entityPage.plural} - Financeiro`;
+        : `${entityPage.plural} - ${segmentRegistry[model].label}`;
 
     return (
         <div className="py-6 min-h-[calc(100vh-160px)]">
@@ -142,3 +91,5 @@ export function OrdersAdminPage() {
         </div>
     );
 }
+
+

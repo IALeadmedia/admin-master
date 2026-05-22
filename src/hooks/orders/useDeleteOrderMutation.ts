@@ -1,6 +1,6 @@
 ﻿import { dictionaryQueryClient } from "@/constants/dictionaryQueryClient.const";
 import { messageQueryFeedback as fb } from "@/helpers/MessageQueryFeedback.helper";
-import type { IOrderTelecomResponse } from "@/types/IOrder.type";
+import type { TelecomOrderResponse } from "@/types/orders";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useResolvedOrderScope } from "./useResolvedOrderScope";
 
@@ -24,13 +24,11 @@ export function useDeleteOrderMutation() {
     onMutate: async ({ ids }: DeleteOrderMutationVariables) => {
       await queryClient.cancelQueries({ queryKey: [entity.key] });
 
-      const previousQueries = queryClient.getQueriesData<IOrderTelecomResponse>(
-        {
-          queryKey: [entity.key],
-        },
-      );
+      const previousQueries = queryClient.getQueriesData<TelecomOrderResponse>({
+        queryKey: [entity.key],
+      });
 
-      queryClient.setQueriesData<IOrderTelecomResponse>(
+      queryClient.setQueriesData<TelecomOrderResponse>(
         { queryKey: [entity.key] },
         (old) => {
           if (!old) return old;

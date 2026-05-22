@@ -1,5 +1,5 @@
 import { type TableColumnsType } from "antd";
-import type { FinanceOrderType } from "../config-page.const";
+import type { FinanceOrder } from "@/types/orders/finances.type";
 import {
     getSharedOrderColumnsAfter,
     getSharedOrderColumnsBefore,
@@ -7,10 +7,10 @@ import {
 import { formatBRL } from "@/utils/number.utils";
 
 type UseAllTableColumnsProps = {
-    columns?: TableColumnsType<FinanceOrderType>;
+    columns?: TableColumnsType<FinanceOrder>;
 };
 
-type FinanceOrderRecord = FinanceOrderType & {
+type FinanceOrderRecord = FinanceOrder & {
     pf_temperature?: number | null;
     products_of_interest?: string | string[] | null;
     landing_page?: string | null;

@@ -19,4 +19,4 @@ export type {
   TelecomOrderFilters,
   TelecomOrderResponse,
 } from "./telecom.type";
-export type { FinanceOrderFormValues } from "./forms.type";
+export type { FinanceOrderFormValues } from "./finances.type";
