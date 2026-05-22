@@ -1,8 +1,4 @@
 import { httpClientAxios } from "@/http/api";
-import type {
-  IOrderTelecomFilters,
-  IOrderTelecomResponse,
-} from "@/types/IOrder.type";
 
 export type OrderModule = "telecom" | "finances" | "benefits";
 
@@ -11,18 +7,14 @@ function resolveOrdersBasePath(module: OrderModule, operator: string): string {
 }
 
 export class OrdersService {
-  static async getAll(
+  static async getAll<T = Record<string, unknown>>(
     module: OrderModule,
     operator: string,
-    filters?: IOrderTelecomFilters,
-  ): Promise<IOrderTelecomResponse> {
-    const { data } = await httpClientAxios.get<IOrderTelecomResponse>(
+    filters?: object,
+  ): Promise<T> {
+    const { data } = await httpClientAxios.get<T>(
       resolveOrdersBasePath(module, operator),
-      {
-        params: {
-          ...filters,
-        },
-      },
+      { params: filters },
     );
     return data;
   }
@@ -62,5 +54,3 @@ export class OrdersService {
     );
   }
 }
-
-export { OrdersService as BandaLargaService };

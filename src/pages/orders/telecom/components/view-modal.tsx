@@ -1,9 +1,9 @@
 import { Col, Row, Button, Form, ConfigProvider, Input, Select, Tooltip, } from "antd";
-import { useUpdateEntity, type EntityType } from "../config-page.const";
+
 import { OrderModalShell } from "../../common/components/order-modal-shell";
 import { OrderModalSection } from "../../common/components/order-modal-section";
 import ReadonlyField from "@/layout/common-components/ReadOnlyField";
-import { formatBRL, formatPaymentMethod, formatPhoneNumber } from "@/utils/number.utils";
+import { formatBRL, formatPaymentMethod, formatPhoneNumber, organizeDateFormat } from "@/utils/number.utils";
 import { formatCEP, formatCPF } from "@/utils/document.util";
 import { formatBrowserDisplay, formatDevice, formatOSDisplay, formatResolution, getAlertScenarios } from "@/utils/orders.util";
 import { ExclamationOutlined } from "@ant-design/icons";
@@ -11,13 +11,26 @@ import React, { useEffect, useState } from "react";
 import { useUpdateOrderStatusMutation } from "@/hooks/orders/useUpdateOrderStatusMutation";
 import { EmpresasDisplay } from "../../common/components/companiesDisplay";
 import type { OrderOperatorsAvailability } from "@/types/orders/base.type";
+import { appSetting } from "@/constants/app-setting/config.const";
+import anonymousAvatar from "@/assets/anonymous_avatar.png";
+import { useUpdateEntity, type EntityType } from "../../config-page.const";
+function resolveOperatorKey(companyName?: string | null) {
+    return companyName?.split(" ")[0]?.toLowerCase().trim();
+}
 
-export const AvailabilityStatus = ({ localData }: { localData: { operators_availability?: OrderOperatorsAvailability | null } }) => {
-    const timAvailability = localData.operators_availability?.tim;
+export const AvailabilityStatus = ({
+    localData,
+    companyName,
+}: {
+    localData: { operators_availability?: OrderOperatorsAvailability | null };
+    companyName?: string | null;
+}) => {
+    const operatorKey = resolveOperatorKey(companyName);
+    const operatorAvailability = operatorKey ? localData.operators_availability?.[operatorKey] : undefined;
 
     if (
-        timAvailability?.available === null ||
-        timAvailability?.available === undefined
+        operatorAvailability?.available === null ||
+        operatorAvailability?.available === undefined
     ) {
         return (
             <div className="flex flex-col items-center mt-2">
@@ -26,8 +39,8 @@ export const AvailabilityStatus = ({ localData }: { localData: { operators_avail
         );
     }
 
-    if (timAvailability.available) {
-        if (timAvailability.found_via_range) {
+    if (operatorAvailability.available) {
+        if (operatorAvailability.found_via_range) {
             return (
                 <div className="flex flex-col items-center mt-2">
                     <div className="flex items-center justify-center mb-2">
@@ -40,8 +53,8 @@ export const AvailabilityStatus = ({ localData }: { localData: { operators_avail
                         </Tooltip>
                     </div>
                     <div className="text-center text-[11px] text-neutral-600 bg-yellow-50 px-2 py-1 rounded">
-                        <strong>Range numérico:</strong> {timAvailability.range_min} - {" "}
-                        {timAvailability.range_max}
+                        <strong>Range numérico:</strong> {operatorAvailability.range_min} - {" "}
+                        {operatorAvailability.range_max}
                     </div>
                 </div>
             );
@@ -171,6 +184,8 @@ export function ViewModal({
         return null;
     }
 
+    const resolvedCompanyName = viewingEntity.company ?? null;
+
     const handleSaveObservacao = async () => {
         const values = await observationForm.validateFields();
         if (values.consultant_observation?.trim() !== "") {
@@ -180,7 +195,7 @@ export function ViewModal({
             });
         }
     };
-
+    const color = appSetting.primaryColor;
     return (
         <OrderModalShell
             open={open}
@@ -194,8 +209,8 @@ export function ViewModal({
                             <ConfigProvider
                                 theme={{
                                     components: {
-                                        Select: { hoverBorderColor: "#0026d9", activeBorderColor: "#0026d9", activeOutlineColor: "none" },
-                                        Input: { hoverBorderColor: "#0026d9", activeBorderColor: "#0026d9" },
+                                        Select: { hoverBorderColor: color, activeBorderColor: color, activeOutlineColor: "none" },
+                                        Input: { hoverBorderColor: color, activeBorderColor: color },
                                     },
                                 }}
                             >
@@ -251,9 +266,11 @@ export function ViewModal({
                     <Button type="primary" onClick={() => viewingEntity && onEdit?.(viewingEntity)}>
                         Editar
                     </Button>
-                    <Button danger style={{ display: canDelete ? "inline-flex" : "none" }} onClick={() => viewingEntity && onDelete?.(viewingEntity)}>
-                        Deletar
-                    </Button>
+                    {canDelete && (
+                        <Button danger onClick={() => viewingEntity && onDelete?.(viewingEntity)}>
+                            Deletar
+                        </Button>
+                    )}
                 </div>
             }
             onCancel={onClose}
@@ -283,26 +300,27 @@ export function ViewModal({
                                         </p>
                                         <p className="text-[14px] w-50 text-center">
                                             {viewingEntity.installation_preferred_date_one
-                                                ? `${viewingEntity.installation_preferred_date_one} - ${viewingEntity.installation_preferred_period_one || "-"}`
+                                                ? `${organizeDateFormat(viewingEntity.installation_preferred_date_one)} - ${viewingEntity.installation_preferred_period_one || "-"}`
                                                 : "-"}
                                         </p>
                                         <p className="text-[14px] w-50 text-center">
                                             {viewingEntity.installation_preferred_date_two
-                                                ? `${viewingEntity.installation_preferred_date_two} - ${viewingEntity.installation_preferred_period_two || "-"}`
+                                                ? `${organizeDateFormat(viewingEntity.installation_preferred_date_two)} - ${viewingEntity.installation_preferred_period_two || "-"}`
+
                                                 : "-"}
                                         </p>
                                         <p className="text-[14px] font-semibold w-32 text-center">{viewingEntity.due_day?.toString() || "-"}</p>
-                                        <p className="text-[14px] font-bold w-46 text-center text-[#0026d9]">
+                                        <p className={`text-[14px] font-bold w-46 text-center text-${color}`}>
                                             {viewingEntity.price_summary?.total_monthly ? formatBRL(viewingEntity.price_summary.total_monthly) : "-"}
                                         </p>
                                         {viewingEntity.selected_extras && viewingEntity.selected_extras.length > 0 ? (
                                             <Tooltip title="Ver extras adicionados ao plano" placement="top">
-                                                <button className="w-12 text-center text-[#0026d9] font-bold focus:outline-none" onClick={() => toggleExpand(String(viewingEntity.id))} aria-label="Expandir extras" type="button">
+                                                <button className={`w-12 text-center text-${color} font-bold focus:outline-none`} onClick={() => toggleExpand(String(viewingEntity.id))} aria-label="Expandir extras" type="button">
                                                     {expanded[viewingEntity.id] ? "−" : "+"}
                                                 </button>
                                             </Tooltip>
                                         ) : (
-                                            <button className="w-12 text-center text-[#0026d9] font-bold focus:outline-none" type="button" disabled aria-label="Sem extras" />
+                                            <button className={`w-12 text-center text-${color} font-bold focus:outline-none`} type="button" disabled aria-label="Sem extras" />
                                         )}
                                     </div>
                                     {expanded[viewingEntity.id] && viewingEntity.selected_extras && viewingEntity.selected_extras.length > 0 && (
@@ -344,7 +362,7 @@ export function ViewModal({
                             <Col span={12}>
                                 <div style={{ background: '#fff', borderRadius: 6, padding: 16, textAlign: 'center', border: '1px solid #f0f0f0' }}>
                                     <p style={{ fontSize: 14, fontWeight: 500, color: '#555', marginBottom: 8 }}>Disponibilidade</p>
-                                    <AvailabilityStatus localData={viewingEntity} />
+                                    <AvailabilityStatus localData={viewingEntity} companyName={resolvedCompanyName} />
                                 </div>
                             </Col>
                             <Col span={12}>
@@ -356,23 +374,14 @@ export function ViewModal({
                         </Row>
                     </OrderModalSection>
 
-                    <OrderModalSection title="Informações de Pagamento">
-                        <Row gutter={[16, 16]}>
-                            <Col span={12}><ReadonlyField label="Método de Pagamento" value={formatPaymentMethod(viewingEntity?.payment_method)} /></Col>
-                            <Col span={12}><ReadonlyField label="Nome do Banco" value={viewingEntity?.bank_name || '-'} copyable /></Col>
-                            <Col span={12}><ReadonlyField label="Agência" value={viewingEntity?.bank_branch || '-'} copyable /></Col>
-                            <Col span={12}><ReadonlyField label="Número da Conta" value={viewingEntity?.bank_account_number || '-'} copyable /></Col>
-                            <Col span={12}><ReadonlyField label="Titular da Conta" value={viewingEntity?.bank_account_holder_name || '-'} copyable /></Col>
-                            <Col span={12}><ReadonlyField label="CPF do Titular" value={formatCPF(viewingEntity?.bank_account_holder_cpf || '') || '-'} copyable /></Col>
-                        </Row>
-                    </OrderModalSection>
+
 
                     <OrderModalSection title="Informações do Cliente">
                         <Row gutter={[16, 16]}>
                             <Col span={24}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
                                     <div style={{ position: 'relative' }}>
-                                        <img src={viewingEntity?.whatsapp?.avatar || '/assets/anonymous_avatar.png'} style={{ width: 40, height: 40, borderRadius: '50%', outline: viewingEntity?.pf_temperature === 10 ? '2px solid #d63535' : 'none' }} />
+                                        <img src={viewingEntity?.whatsapp?.avatar || anonymousAvatar} style={{ width: 40, height: 40, borderRadius: '50%', outline: viewingEntity?.pf_temperature === 10 ? '2px solid #d63535' : 'none' }} />
                                         {viewingEntity?.pf_temperature === 10 && (
                                             <span style={{ position: 'absolute', top: -4, right: -4, fontSize: 12 }}>🔥</span>
                                         )}
@@ -390,7 +399,16 @@ export function ViewModal({
                             <Col span={8}><ReadonlyField label="Nome Mãe (RFB)" value={viewingEntity?.rfb_mother_name} copyable /></Col>
                         </Row>
                     </OrderModalSection>
-
+                    <OrderModalSection title="Informações de Pagamento">
+                        <Row gutter={[16, 16]}>
+                            <Col span={12}><ReadonlyField label="Método de Pagamento" value={formatPaymentMethod(viewingEntity?.payment_method)} /></Col>
+                            <Col span={12}><ReadonlyField label="Nome do Banco" value={viewingEntity?.bank_name || '-'} copyable /></Col>
+                            <Col span={12}><ReadonlyField label="Agência" value={viewingEntity?.bank_branch || '-'} copyable /></Col>
+                            <Col span={12}><ReadonlyField label="Número da Conta" value={viewingEntity?.bank_account_number || '-'} copyable /></Col>
+                            <Col span={12}><ReadonlyField label="Titular da Conta" value={viewingEntity?.bank_account_holder_name || '-'} copyable /></Col>
+                            <Col span={12}><ReadonlyField label="CPF do Titular" value={formatCPF(viewingEntity?.bank_account_holder_cpf || '') || '-'} copyable /></Col>
+                        </Row>
+                    </OrderModalSection>
                     <OrderModalSection title="Contato">
                         <Row gutter={[16, 16]}>
                             <Col span={12}>
@@ -453,12 +471,12 @@ export function ViewModal({
                             <Col span={8}><ReadonlyField label="Ponto de Referência" value={viewingEntity?.address_complement?.reference_point || '-'} copyable /></Col>
                             <Col span={12}><ReadonlyField label="Coordenadas" value={viewingEntity?.geolocation?.latitude && viewingEntity?.geolocation?.longitude ? `${viewingEntity?.geolocation.latitude}, ${viewingEntity?.geolocation.longitude}` : '-'} /></Col>
                             <Col span={6} style={{ display: 'flex', alignItems: 'flex-end' }}>
-                                <a href={viewingEntity?.geolocation?.maps_link} target="_blank" rel="noopener noreferrer" style={{ color: '#0026d9' }}>
+                                <a href={viewingEntity?.geolocation?.maps_link} target="_blank" rel="noopener noreferrer" style={{ color: color }}>
                                     Ver no Google Maps
                                 </a>
                             </Col>
                             <Col span={6} style={{ display: 'flex', alignItems: 'flex-end' }}>
-                                <a href={viewingEntity?.geolocation?.street_view_link} target="_blank" rel="noopener noreferrer" style={{ color: '#0026d9' }}>
+                                <a href={viewingEntity?.geolocation?.street_view_link} target="_blank" rel="noopener noreferrer" style={{ color: color }}>
                                     Ver no Street View
                                 </a>
                             </Col>
@@ -490,7 +508,7 @@ export function ViewModal({
                 </div>
 
                 {(viewingEntity?.status === "FECHADO" || viewingEntity?.status === "fechado") &&
-                    getAlertScenarios(viewingEntity?.availability ?? undefined, viewingEntity?.found_via_range, viewingEntity?.single_zip_code, viewingEntity?.status).map((scenario, idx) => (
+                    getAlertScenarios({ availability: viewingEntity?.availability ?? undefined, found_via_range: viewingEntity?.found_via_range, single_zip_code: viewingEntity?.single_zip_code, status: viewingEntity?.status }).map((scenario, idx) => (
                         <div key={idx} className="flex flex-col gap-2 mb-3 rounded-sm p-3 w-full" style={{ backgroundColor: scenario.color }}>
                             <div className="flex items-center">
                                 <h2 className="text-[14px] font-semibold">
@@ -510,36 +528,35 @@ export function ViewModal({
                     theme={{
                         components: {
                             Input: {
-                                hoverBorderColor: "#0026d9",
-                                activeBorderColor: "#0026d9",
+                                hoverBorderColor: color,
+                                activeBorderColor: color,
                                 activeShadow: "none",
                                 colorBorder: "#bfbfbf",
                                 colorTextPlaceholder: "#666666",
                             },
                             Button: {
-                                colorBorder: "#0026d9",
-                                colorText: "#0026d9",
-                                colorPrimary: "#0026d9",
-                                colorPrimaryHover: "#0026d9",
+                                colorBorder: color,
+                                colorText: color,
+                                colorPrimary: color,
+                                colorPrimaryHover: color,
                             },
                         },
                     }}
                 >
-                    <div className="flex flex-col justify-center bg-neutral-100 text-[14px] rounded-sm mt-3">
-                        <div className="p-4 pb-0">
-                            <p className="text-[15px]">Observação Consultor</p>
-                        </div>
-                        <Form form={observationForm} layout="vertical">
-                            <div className="flex flex-col p-4 text-[14px] w-full text-neutral-700">
-                                <Form.Item name="consultant_observation" style={{ marginBottom: 8 }}>
-                                    <Input.TextArea autoSize={{ minRows: 3, maxRows: 6 }} className="text-[16px] font-light text-[#353535] w-full" placeholder="Adicione aqui uma observação sobre esse pedido..." />
-                                </Form.Item>
-                                <Button className="self-end" loading={updateMutation.isPending} style={{ fontSize: "12px", height: "25px" }} onClick={handleSaveObservacao}>
-                                    Salvar
-                                </Button>
-                            </div>
-                        </Form>
-                    </div>
+                    <OrderModalSection title="Observação do Consultor">
+                        <div className="flex flex-col justify-center bg-neutral-100 text-[14px] rounded-sm mt-2">
+
+                            <Form form={observationForm} layout="vertical">
+                                <div className="flex flex-col p-4 text-[14px] w-full text-neutral-700">
+                                    <Form.Item name="consultant_observation" style={{ marginBottom: 8 }}>
+                                        <Input.TextArea autoSize={{ minRows: 3, maxRows: 6 }} className="text-[16px] font-light text-[#353535] w-full" placeholder="Adicione aqui uma observação sobre esse pedido..." />
+                                    </Form.Item>
+                                    <Button className="self-end" loading={updateMutation.isPending} style={{ fontSize: "12px", height: "25px" }} onClick={handleSaveObservacao}>
+                                        Salvar
+                                    </Button>
+                                </div>
+                            </Form>
+                        </div></OrderModalSection>
                 </ConfigProvider>
             </div>
         </OrderModalShell>

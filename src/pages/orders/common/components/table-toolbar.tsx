@@ -15,6 +15,7 @@ interface TableToolbarProps {
     canDelete: boolean;
     deleteLabel: string;
     categorySelect?: CategorySelectProps;
+    clientTypeSelect?: CategorySelectProps;
 }
 
 export function TableToolbar({
@@ -25,6 +26,7 @@ export function TableToolbar({
     canDelete,
     deleteLabel,
     categorySelect,
+    clientTypeSelect,
 }: TableToolbarProps) {
     return (
         <div
@@ -51,6 +53,15 @@ export function TableToolbar({
                         value={categorySelect.value}
                         onChange={categorySelect.onChange}
                         style={{ minWidth: 220 }}
+                    />
+                )}
+                {clientTypeSelect && (
+                    <Select
+                        options={clientTypeSelect.options}
+                        value={clientTypeSelect.value}
+                        onChange={clientTypeSelect.onChange}
+                        style={{ minWidth: 160 }}
+                        placeholder="PF / PJ"
                     />
                 )}
                 {canDelete && selectedCount > 0 && (

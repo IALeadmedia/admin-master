@@ -1,5 +1,5 @@
 import { type TableColumnsType } from "antd";
-import type { FinanceOrderType } from "../config-page.const";
+import type { FinanceOrder } from "@/types/orders/finances.type";
 import {
     getSharedOrderColumnsAfter,
     getSharedOrderColumnsBefore,
@@ -7,10 +7,10 @@ import {
 import { formatBRL } from "@/utils/number.utils";
 
 type UseAllTableColumnsProps = {
-    columns?: TableColumnsType<FinanceOrderType>;
+    columns?: TableColumnsType<FinanceOrder>;
 };
 
-type FinanceOrderRecord = FinanceOrderType & {
+type FinanceOrderRecord = FinanceOrder & {
     pf_temperature?: number | null;
     products_of_interest?: string | string[] | null;
     landing_page?: string | null;
@@ -29,7 +29,7 @@ function getFinanceHeaderColumns(): TableColumnsType<FinanceOrderRecord> {
                     ? "Conta PJ"
                     : landing_page === "cartao-pj-c6"
                         ? "Cartão PJ"
-                        : landing_page === "maquininha-c6-empresas"
+                        : landing_page === "maquinha-cartao-c6-empresas"
                             ? "Maquininha"
                             : "-",
         },
@@ -43,8 +43,8 @@ function getFinanceHeaderColumns(): TableColumnsType<FinanceOrderRecord> {
                 const labelMap: Record<string, string> = {
                     "conta-pj": "Conta PJ",
                     "capital-giro-c6": "Capital de Giro",
-                    maquininha: "Maquininha",
-                    investimentos: "Investimentos",
+                    "maquinha-cartao": "Maquininha",
+                    "investimentos": "Investimentos",
                     "cartao-credito": "Cartão de Crédito",
                     "reducao-dividas": "Redução de Dívidas",
                     outro: "Outro",

@@ -35,19 +35,15 @@ export const menuOptionsAdmin: MenuItem[] = [
     label: "Produtos",
     to: "/app/products",
   },
-  // {
-  //   label: "Pedidos",
-  //   to: "/app/order",
-  // },
+  {
+    label: "Pedidos",
+    to: "/app/order",
+  },
 ];
 
 // telas do menu específicas para cada empresa
 export const menuOptionsTim: MenuItem[] = [
   ...menuOptionsCommon,
-  // {
-  //   label: "Dashboard",
-  //   to: "/app",
-  // },
   {
     label: "Produtos",
     items: [
@@ -61,29 +57,91 @@ export const menuOptionsTim: MenuItem[] = [
       },
     ],
   },
-  // {
-  //   label: "Pedidos",
-  //   items: [
-  //     {
-  //       label: "Banda Larga",
-  //       to: "/app/order/telecom/banda-larga",
-  //     },
-  //     {
-  //       label: "Telefonia Móvel",
-  //       to: "/app/order/telecom/telefonia-movel",
-  //     },
-  //   ],
-  // },
+  {
+    label: "Pedidos",
+    items: [
+      {
+        label: "Banda Larga PF",
+        to: "/app/order/telecom/banda-larga/pf",
+      },
+      {
+        label: "Banda Larga PJ",
+        to: "/app/order/telecom/banda-larga/pj",
+      },
+      // {
+      //   label: "Telefonia Móvel",
+      //   to: "/app/order/telecom/telefonia-movel",
+      // },
+    ],
+  },
 ];
 
-export const menuOptionsClaro: MenuItem[] = [...menuOptionsCommon];
+export const menuOptionsClaro: MenuItem[] = [
+  ...menuOptionsCommon,
+  {
+    label: "Produtos",
+    items: [
+      {
+        label: "Banda Larga",
+        to: "/app/products/telecom/banda-larga",
+      },
+      {
+        label: "Telefonia Móvel",
+        to: "/app/products/telecom/telefonia-movel",
+      },
+    ],
+  },
+  {
+    label: "Pedidos",
+    items: [
+      {
+        label: "Banda Larga PF",
+        to: "/app/order/telecom/banda-larga/pf",
+      },
+      {
+        label: "Banda Larga PJ",
+        to: "/app/order/telecom/banda-larga/pj",
+      },
+      // {
+      //   label: "Telefonia Móvel",
+      //   to: "/app/order/telecom/telefonia-movel",
+      // },
+    ],
+  },
+];
 
 export const menuOptionsVivo: MenuItem[] = [
   ...menuOptionsCommon,
-  // {
-  //   label: "Dashboard",
-  //   to: "/app",
-  // },
+  {
+    label: "Produtos",
+    items: [
+      {
+        label: "Banda Larga",
+        to: "/app/products/telecom/banda-larga",
+      },
+      {
+        label: "Telefonia Móvel",
+        to: "/app/products/telecom/telefonia-movel",
+      },
+    ],
+  },
+  {
+    label: "Pedidos",
+    items: [
+      {
+        label: "Banda Larga PF",
+        to: "/app/order/telecom/banda-larga/pf",
+      },
+      {
+        label: "Banda Larga PJ",
+        to: "/app/order/telecom/banda-larga/pj",
+      },
+      // {
+      //   label: "Telefonia Móvel",
+      //   to: "/app/order/telecom/telefonia-movel",
+      // },
+    ],
+  },
 ];
 
 export const menuOptionsVR: MenuItem[] = [...menuOptionsCommon];
@@ -91,19 +149,74 @@ export const menuOptionsVR: MenuItem[] = [...menuOptionsCommon];
 export const menuOptionsC6: MenuItem[] = [
   ...menuOptionsCommon,
   {
-    label: "Produtos",
-    items: [
-      {
-        label: "Maquininha",
-        to: "/app/products/finances/maquininha",
-      },
-      {
-        label: "Empréstimo",
-        to: "/app/products/finances/emprestimo",
-      },
-    ],
+    label: "Pedidos",
+    to: "/app/order/finances",
   },
 ];
 
-export const menuOptionsBrisanet: MenuItem[] = [...menuOptionsCommon];
-export const menuOptionsAlgar: MenuItem[] = [...menuOptionsCommon];
+export const menuOptionsBrisanet: MenuItem[] = [
+  ...menuOptionsCommon,
+  {
+    label: "Produtos",
+    items: [
+      {
+        label: "Banda Larga",
+        to: "/app/products/telecom/banda-larga",
+      },
+      {
+        label: "Telefonia Móvel",
+        to: "/app/products/telecom/telefonia-movel",
+      },
+    ],
+  },
+  {
+    label: "Pedidos",
+    items: [
+      {
+        label: "Banda Larga PF",
+        to: "/app/order/telecom/banda-larga/pf",
+      },
+      {
+        label: "Banda Larga PJ",
+        to: "/app/order/telecom/banda-larga/pj",
+      },
+      // {
+      //   label: "Telefonia Móvel",
+      //   to: "/app/order/telecom/telefonia-movel",
+      // },
+    ],
+  },
+];
+export const menuOptionsAlgar: MenuItem[] = [
+  ...menuOptionsCommon,
+  {
+    label: "Produtos",
+    items: [
+      {
+        label: "Banda Larga",
+        to: "/app/products/telecom/banda-larga",
+      },
+      {
+        label: "Telefonia Móvel",
+        to: "/app/products/telecom/telefonia-movel",
+      },
+    ],
+  },
+  {
+    label: "Pedidos",
+    items: [
+      {
+        label: "Banda Larga PF",
+        to: "/app/order/telecom/banda-larga/pf",
+      },
+      {
+        label: "Banda Larga PJ",
+        to: "/app/order/telecom/banda-larga/pj",
+      },
+      // {
+      //   label: "Telefonia Móvel",
+      //   to: "/app/order/telecom/telefonia-movel",
+      // },
+    ],
+  },
+];

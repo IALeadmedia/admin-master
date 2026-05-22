@@ -1,0 +1,106 @@
+import { useMemo, useState } from "react";
+import type {
+  EntityType,
+  OrderCategory,
+  OrderModel,
+} from "./config-page.const";
+import {
+  defaultCategoryByModel,
+  getOrderCategoryLabelByModel,
+  getPartnerCategoryOptions,
+  resolvePartnerCategory,
+  segmentRegistry,
+} from "./config-page.const";
+
+interface UseOrderCategoryFilterParams {
+  model: OrderModel;
+  orders: EntityType[];
+  partnerCategories: string[];
+}
+
+interface UseOrderCategoryFilterResult {
+  categorySelect:
+    | {
+        options: Array<{ label: string; value: string }>;
+        value: OrderCategory | undefined;
+        onChange: (value: string | undefined) => void;
+      }
+    | undefined;
+  filteredOrders: EntityType[];
+  effectiveCategory: OrderCategory | undefined;
+}
+
+export function useOrderCategoryFilter({
+  model,
+  orders,
+  partnerCategories,
+}: UseOrderCategoryFilterParams): UseOrderCategoryFilterResult {
+  const { hasCategories } = segmentRegistry[model];
+  const [selectedCategory, setSelectedCategory] = useState<
+    string | undefined
+  >();
+
+  const categoryOptions = useMemo(() => {
+    if (!hasCategories) return [];
+
+    const categoriesFromOrders = Array.from(
+      new Set(orders.map((order) => order.category).filter(Boolean)),
+    ) as string[];
+
+    const categories = partnerCategories.length
+      ? partnerCategories
+      : categoriesFromOrders;
+
+    const options = getPartnerCategoryOptions(categories, model);
+    return options.length
+      ? options
+      : [
+          {
+            label: getOrderCategoryLabelByModel(
+              defaultCategoryByModel[model],
+              model,
+            ),
+            value: defaultCategoryByModel[model],
+          },
+        ];
+  }, [hasCategories, model, orders, partnerCategories]);
+
+  const resolvedSelectedCategory = useMemo(() => {
+    if (!hasCategories || !categoryOptions.length) return undefined;
+
+    const hasSelected =
+      selectedCategory &&
+      categoryOptions.some((o) => o.value === selectedCategory);
+    return hasSelected ? selectedCategory : categoryOptions[0].value;
+  }, [categoryOptions, hasCategories, selectedCategory]);
+
+  const filteredOrders = useMemo(() => {
+    if (!hasCategories) return orders;
+
+    const hasCategoryData = orders.some((o) => Boolean(o.category));
+    if (!resolvedSelectedCategory || !hasCategoryData) return orders;
+    return orders.filter((o) => o.category === resolvedSelectedCategory);
+  }, [hasCategories, orders, resolvedSelectedCategory]);
+
+  const effectiveCategory = useMemo(
+    () =>
+      !hasCategories
+        ? undefined
+        : resolvePartnerCategory(
+            resolvedSelectedCategory,
+            partnerCategories,
+            model,
+          ),
+    [hasCategories, model, partnerCategories, resolvedSelectedCategory],
+  );
+
+  const categorySelect = hasCategories
+    ? {
+        options: categoryOptions,
+        value: effectiveCategory,
+        onChange: setSelectedCategory,
+      }
+    : undefined;
+
+  return { categorySelect, filteredOrders, effectiveCategory };
+}

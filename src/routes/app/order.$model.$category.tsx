@@ -5,10 +5,10 @@ import {
   resolveOrderCategory,
   resolveOrderModel,
 } from "@/pages/orders/config-page.const";
-import { OrdersPage } from "@/pages/orders/orders";
+import { OrderModelCategoryComponent } from "./order.$model.$category.component";
 
 export const Route = createFileRoute("/app/order/$model/$category")({
-  component: OrdersPage,
+  component: OrderModelCategoryComponent,
   beforeLoad: ({ params }) => {
     if (!can(getStoredUserRole(), "orders", "view")) {
       throw redirect({ to: "/app" });
@@ -19,6 +19,10 @@ export const Route = createFileRoute("/app/order/$model/$category")({
     }
 
     const model = resolveOrderModel(params.model);
+    if (model === "finances") {
+      throw redirect({ to: "/app/order/$model", params: { model } });
+    }
+
     const category = resolveOrderCategory(params.category, model);
 
     if (model !== params.model || category !== params.category) {

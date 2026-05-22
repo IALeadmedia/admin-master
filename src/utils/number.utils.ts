@@ -64,3 +64,12 @@ export const formatPaymentMethod = (method?: string | null) => {
 
   return paymentMethodLabels[method] || method;
 };
+
+export const organizeDateFormat = (date: string | Date | undefined): string => {
+  if (!date) return "";
+
+  const dateString =
+    typeof date === "string" ? date : date.toISOString().split("T")[0];
+
+  return dateString.split("-").reverse().join("/");
+};

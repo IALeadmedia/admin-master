@@ -1,29 +1,33 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Card, Typography } from "antd";
 import { useAdminScope } from "@/context/admin-scope-provider";
+import { useCompanyQuery } from "@/hooks/companies/useCompanyQuery";
 import { usePartnerQuery } from "@/hooks/partners/usePartnerQuery";
 import { TableMain as CommonTableMain } from "./common/components/table";
-import { FormModal as TelecomFormModal } from "./telecom/components/form-modal";
-import { ViewModal as TelecomViewModal } from "./telecom/components/view-modal";
-import { FormModal as FinanceFormModal } from "./finances/components/form-modal";
-import { ViewModal as FinanceViewModal } from "./finances/components/view-modal";
 
 import {
-    defaultCategoryByModel,
     entityPage,
     getOrderCategoryLabelByModel,
     getOrderColumnsByModel,
-    getPartnerCategoryOptions,
     resolveOrderModel,
-    resolvePartnerCategory,
+    segmentComponents,
+    segmentRegistry,
     useListEntity,
 } from "./config-page.const";
+import { useOrderCategoryFilter } from "./useOrderCategoryFilter";
 
 export function OrdersAdminPage() {
-    const { selectedSegmentId, selectedPartnerId } = useAdminScope();
-    const { data, isLoading } = useListEntity();
-    const orders = data?.orders ?? [];
+    const { selectedSegmentId, selectedCompanyId, selectedPartnerId } = useAdminScope();
+
+    const hasScope = !!selectedSegmentId && !!selectedCompanyId;
     const model = resolveOrderModel(selectedSegmentId);
+    const { hasCategories } = segmentRegistry[model];
+
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(20);
+    const [clientType, setClientType] = useState<"PF" | "PJ" | "">("");
+
+    const { data: companiesData } = useCompanyQuery({ enabled: !!selectedSegmentId });
     const { data: partnersData } = usePartnerQuery({
         segmentId: selectedSegmentId,
         partnerId: selectedPartnerId,
@@ -31,6 +35,8 @@ export function OrdersAdminPage() {
     });
 
     const partnerCategories = useMemo(() => {
+        if (!hasCategories) return [];
+
         if (selectedPartnerId != null) {
             return partnersData?.partners?.[0]?.category ?? [];
         }
@@ -40,86 +46,88 @@ export function OrdersAdminPage() {
                 (partnersData?.partners ?? []).flatMap((partner) => partner.category ?? []),
             ),
         );
-    }, [partnersData?.partners, selectedPartnerId]);
+    }, [hasCategories, partnersData?.partners, selectedPartnerId]);
 
-    const categoryOptions = useMemo(() => {
-        const categories = partnerCategories.length
-            ? partnerCategories
-            : Array.from(
-                new Set(orders.map((order) => order.category).filter(Boolean)),
-            ) as string[];
+    // Category filter state derived from partner categories (server-side filtering)
+    const { categorySelect, effectiveCategory } = useOrderCategoryFilter({
+        model,
+        orders: [],
+        partnerCategories,
+    });
 
-        const options = getPartnerCategoryOptions(categories, model);
-        const source = options.length
-            ? options
-            : [{
-                label: getOrderCategoryLabelByModel(defaultCategoryByModel[model], model),
-                value: defaultCategoryByModel[model],
-            }];
+    const isBandaLarga = model === "telecom" && effectiveCategory === "banda-larga";
 
-        return source;
-    }, [model, orders, partnerCategories]);
+    // Reset clientType and page when model or category changes
+    useEffect(() => {
+        setPage(1);
+        if (!isBandaLarga) setClientType("");
+    }, [model, effectiveCategory, isBandaLarga]);
 
-    const [selectedCategory, setSelectedCategory] = useState<string | undefined>();
+    const { data, isLoading } = useListEntity({
+        model,
+        filters: {
+            ...(effectiveCategory ? { category: effectiveCategory } : {}),
+            ...(clientType ? { client_type: clientType } : {}),
+        },
+        page,
+        per_page: pageSize,
+        enabled: hasScope,
+    });
 
-    const resolvedSelectedCategory = useMemo(() => {
-        if (!categoryOptions.length) return undefined;
+    const orders = useMemo(() => data?.orders ?? [], [data?.orders]);
+    const total = data?.total ?? 0;
 
-        const hasSelected =
-            selectedCategory &&
-            categoryOptions.some((option) => option.value === selectedCategory);
+    const clientTypeSelect = isBandaLarga
+        ? {
+            options: [
+                { label: "PF e PJ", value: "" },
+                { label: "Pessoa Física (PF)", value: "PF" },
+                { label: "Pessoa Jurídica (PJ)", value: "PJ" },
+            ],
+            value: clientType,
+            onChange: (v: string) => { setClientType(v as "PF" | "PJ" | ""); setPage(1); },
+        }
+        : undefined;
 
-        return hasSelected ? selectedCategory : categoryOptions[0].value;
-    }, [categoryOptions, selectedCategory]);
+    const columns = getOrderColumnsByModel(model, companiesData?.companies ?? []);
+    const { FormModal: FormModalComponent, ViewModal: ViewModalComponent } = segmentComponents[model];
 
-    const filteredOrders = useMemo(() => {
-        const hasCategoryData = orders.some((order) => Boolean(order.category));
-
-        if (!resolvedSelectedCategory || !hasCategoryData) return orders;
-        return orders.filter((order) => order.category === resolvedSelectedCategory);
-    }, [orders, resolvedSelectedCategory]);
-
-    const effectiveCategory = useMemo(
-        () =>
-            resolvePartnerCategory(
-                resolvedSelectedCategory,
-                partnerCategories,
-                model,
-            ),
-        [model, partnerCategories, resolvedSelectedCategory],
-    );
-    const columns = getOrderColumnsByModel(model);
-    const FormModalComponent = model === "finances" ? FinanceFormModal : TelecomFormModal;
-    const ViewModalComponent = model === "finances" ? FinanceViewModal : TelecomViewModal;
-
-    const categorySelect = {
-        options: categoryOptions,
-        value: effectiveCategory,
-        onChange: setSelectedCategory,
-    };
+    const pageTitle = !hasScope
+        ? "Pedidos"
+        : hasCategories
+            ? `${entityPage.plural} - ${getOrderCategoryLabelByModel(effectiveCategory ?? "", model)}`
+            : `${entityPage.plural}`;
 
     return (
         <div className="py-6 min-h-[calc(100vh-160px)]">
             <Typography.Title level={3} style={{ marginBottom: 16 }}>
-                {entityPage.plural} - {getOrderCategoryLabelByModel(effectiveCategory, model)}
+                {pageTitle}
             </Typography.Title>
 
-            {!selectedSegmentId ? (
+            {!hasScope ? (
                 <Card style={{ marginBottom: 16 }}>
                     <Typography.Paragraph>
-                        Selecione um modelo/segmento usando o seletor "Modelo/Segmento" no topo da página.
+                        Selecione um segmento usando o seletor "Segmento" no topo da página.
                     </Typography.Paragraph>
                 </Card>
             ) : (
                 <CommonTableMain
-                    data={filteredOrders}
+                    data={orders}
                     isLoading={isLoading}
                     columns={columns}
                     categorySelect={categorySelect}
+                    clientTypeSelect={clientTypeSelect}
                     FormModalComponent={FormModalComponent}
                     ViewModalComponent={ViewModalComponent}
+                    currentPage={page}
+                    pageSize={pageSize}
+                    total={total}
+                    onPageChange={setPage}
+                    onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
                 />
             )}
         </div>
     );
 }
+
+

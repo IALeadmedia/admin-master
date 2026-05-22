@@ -116,6 +116,12 @@ export interface OrderBase {
   birth_date?: string | null;
   mother_full_name?: string | null;
   cnpj?: string | null;
+  payment_method?: string | null;
+  bank_name?: string | null;
+  bank_branch?: string | null;
+  bank_account_number?: string | null;
+  bank_account_holder_name?: string | null;
+  bank_account_holder_cpf?: string | null;
   company_legal_name?: string | null;
   business_partner?: string | null;
   landing_page?: string | null;
@@ -126,7 +132,7 @@ export interface OrderBase {
   city?: string | null;
   state?: string | null;
   zip_code?: string | null;
-  single_zip_code?: boolean | null;
+  single_zip_code?: boolean | undefined;
   address_complement?: OrderAddressComplement | null;
   consultant_observation?: string | null;
   responsible_consultant?: string | null;

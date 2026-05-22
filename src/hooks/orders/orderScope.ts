@@ -66,10 +66,9 @@ export function resolveOrderModule(
 /** Resolve o operador: prioridade = explícito → appSetting.name (não-admin) → fallback tim */
 export function resolveOrderOperator(
   explicitOperator?: string,
-  isAdminContext?: boolean,
+  _isAdminContext?: boolean,
 ): OrderOperator {
   const normalizedExplicit = explicitOperator?.toLowerCase();
-  console.log(isAdminContext);
   if (
     normalizedExplicit &&
     validOrderOperators.has(normalizedExplicit as OrderOperator)

@@ -17,6 +17,8 @@ import {
     formatBrowserDisplay,
     formatOSDisplay,
     formatResolution,
+    normalizeCompanyPartners,
+    normalizeNames,
 } from "@/utils/orders.util";
 import type {
     OrderBase,
@@ -27,8 +29,8 @@ import type {
 } from "@/types/orders/base.type";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { Thermometer } from "@/layout/common-components/Thermomter";
-
-type OrderCommonRecord = OrderBase & {
+import anonymousAvatar from "@/assets/anonymous_avatar.png";
+export type OrderCommonRecord = OrderBase & {
     rfb_name?: string | null;
     rfb_birth_date?: string | null;
     rfb_mother_name?: string | null;
@@ -57,143 +59,121 @@ export type SharedOrderRecord = OrderCommonRecord & {
     credit?: boolean | number | string | null;
 };
 
-function normalizeNames(name1?: string | null, name2?: string | null) {
-    if (!name1 || !name2) return null;
-
-    const normalizeText = (text: string) =>
-        text
-            .toLowerCase()
-            .trim()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "");
-
-    return normalizeText(name1) === normalizeText(name2);
-}
-
-function normalizeCompanyPartners(companyPartners?: OrderCommonRecord["company_partners"]) {
-    if (!companyPartners) return [] as Array<{ cnpj: string; nome: string; porte: string }>;
-
-    if (Array.isArray(companyPartners)) {
-        return companyPartners;
-    }
-
-    try {
-        const parsed = JSON.parse(companyPartners);
-        return Array.isArray(parsed) ? parsed : [];
-    } catch {
-        return [];
-    }
-}
-
 
 export function getSharedOrderColumnsBefore<T extends OrderCommonRecord>(): TableColumnsType<T> {
-    return [{
-        title: "",
-        dataIndex: "consultant_observation",
-        width: 30,
-        render: (consultant_observation) => (
-            <Tooltip
-                placement="top"
-                title={consultant_observation || "Sem observações"}
-                overlayInnerStyle={{ fontSize: 12 }}
-            >
-                {consultant_observation && <ExclamationCircleOutlined />}
-            </Tooltip>
-        ),
-    },
-    {
-        title: "",
-        dataIndex: ["whatsapp", "avatar"],
-        width: 80,
-        render: (avatar, record) => {
-            const avatarSrc = avatar || "/assets/anonymous_avatar.png";
+    return [
+        {
+            title: "",
+            dataIndex: "consultant_observation",
+            width: 30,
+            render: (consultant_observation) => (
+                <Tooltip
+                    placement="top"
+                    title={consultant_observation || "Sem observações"}
+                    overlayInnerStyle={{ fontSize: 12 }}
+                >
+                    {consultant_observation && <ExclamationCircleOutlined />}
+                </Tooltip>
+            ),
+        },
+        {
+            title: "",
+            dataIndex: "whatsapp",
+            width: 80,
+            render: (whatsapp, record) => {
+                const avatarSrc = whatsapp?.avatar || anonymousAvatar;
 
-            if (record.pf_temperature === 10) {
-                return (
-                    <div className="flex bg-[#d63535] rounded-full w-9 h-9 items-center justify-center relative">
+                if (record.pf_temperature === 10) {
+                    return (
+                        <div className="flex bg-[#d63535] rounded-full w-9 h-9 items-center justify-center relative">
 
 
-                        <img
-                            src={avatarSrc}
-                            className="rounded-full w-9 h-9 object-cover"
-                        />
-                        <div className="text-sm absolute -top-1 -right-1 flex items-center justify-center">
-                            🔥
+                            <img
+                                src={avatarSrc}
+                                className="rounded-full w-9 h-9 object-cover"
+                            />
+                            <div className="text-sm absolute -top-1 -right-1 flex items-center justify-center">
+                                🔥
+                            </div>
+
                         </div>
+                    );
+                }
+                return (
 
-                    </div>
+                    <img
+                        src={avatarSrc}
+                        className="rounded-full w-9 h-9 object-cover"
+                    />
                 );
-            }
-            return (
-
-                <img
-                    src={avatarSrc}
-
-                />
-            );
+            },
         },
-    },
-    {
-        title: "Temperatura",
-        dataIndex: "pf_temperature",
-        width: 140,
-        render: (pf_temperature) => (
-            <div className="flex w-[120px] h-2 items-center gap-1 mr-4">
-                {" "}
-                <Thermometer min={0} max={10} value={pf_temperature || 0} />
-            </div>
-        ),
-    },
-    {
-        title: "ID",
-        dataIndex: "order_number",
-        width: 110,
-        render: (order_number, record) =>
-            order_number ? order_number : record.id || "-",
-    },
-
-    {
-        title: "Abertura",
-        dataIndex: "created_at",
-        width: 110,
-
-    },
-    {
-        title: "Pedido",
-        dataIndex: "status",
-        render: (status: string) =>
-            status === "ABERTO"
-                ? "Aberto"
-                : status === "FECHADO"
-                    ? "Fechado"
-                    : status === "CANCELADO"
-                        ? "Cancelado"
-                        : "-",
-        width: 80,
-    }, {
-        title: "Tramitação",
-        ellipsis: {
-            showTitle: false,
+        {
+            title: "Temperatura",
+            dataIndex: "pf_temperature",
+            width: 140,
+            render: (pf_temperature) => (
+                <div className="flex w-30 h-2 items-center gap-1 mr-4">
+                    {" "}
+                    <Thermometer min={0} max={10} value={pf_temperature || 0} />
+                </div>
+            ),
         },
-        dataIndex: "after_sales_status",
-        width: 155,
+        {
+            title: "ID",
+            dataIndex: "order_number",
+            width: 110,
+            render: (order_number, record) =>
+                order_number ? order_number : record.id || "-",
+        },
+        {
+            title: "Abertura",
+            dataIndex: "created_at",
+            width: 110,
 
-        render: (after_sales_status) => (
-            <Tooltip
-                placement="topLeft"
-                title={after_sales_status}
-                overlayInnerStyle={{ fontSize: 12 }}
-            >
-                {after_sales_status || "-"}
-            </Tooltip>
-        ),
-    }, {
-        title: "Recadastro",
-        dataIndex: "number_attempts_second_call",
-        width: 110,
-        render: (number_attempts_second_call) => number_attempts_second_call || "-",
-    },
-    {
+        },
+        {
+            title: "Pedido",
+            dataIndex: "status",
+            render: (status: string) =>
+                status === "ABERTO"
+                    ? "Aberto"
+                    : status === "FECHADO"
+                        ? "Fechado"
+                        : status === "CANCELADO"
+                            ? "Cancelado"
+                            : "-",
+            width: 80,
+        },
+        {
+            title: "Tramitação",
+            ellipsis: {
+                showTitle: false,
+            },
+            dataIndex: "after_sales_status",
+            width: 155,
+
+            render: (after_sales_status) => (
+                <Tooltip
+                    placement="topLeft"
+                    title={after_sales_status}
+                    overlayInnerStyle={{ fontSize: 12 }}
+                >
+                    {after_sales_status || "-"}
+                </Tooltip>
+            ),
+        },
+        {
+            title: "Recadastro",
+            dataIndex: "number_attempts_second_call",
+            width: 110,
+            render: (number_attempts_second_call) => number_attempts_second_call || "-",
+        },
+    ] as TableColumnsType<T>;
+}
+
+export function getSharedOrderColumnsAfter<T extends OrderCommonRecord>(): TableColumnsType<T> {
+    return [{
         title: "CPF",
         dataIndex: "cpf",
         width: 120,
@@ -460,11 +440,7 @@ export function getSharedOrderColumnsBefore<T extends OrderCommonRecord>(): Tabl
                 ) : null}
             </span>
         ),
-    },] as TableColumnsType<T>;
-}
-
-export function getSharedOrderColumnsAfter<T extends OrderCommonRecord>(): TableColumnsType<T> {
-    return [
+    },
     {
         title: "CEP",
         dataIndex: "zip_code",

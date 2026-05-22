@@ -1,4 +1,11 @@
-import type { OrderAddressComplement, OrderBase, OrderCompanyPartner, OrderFingerprint, OrderGeolocation, OrderWhatsAppInfo } from "./base.type";
+import type {
+  OrderAddressComplement,
+  OrderBase,
+  OrderCompanyPartner,
+  OrderFingerprint,
+  OrderGeolocation,
+  OrderWhatsAppInfo,
+} from "./base.type";
 
 export interface FinanceOrderResponse {
   success: boolean;

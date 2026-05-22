@@ -8,19 +8,6 @@ export class AuthService {
       { email, password },
     );
     return data;
-
-    // console.log(email, password);
-
-    // return {
-    //   name: "Admin",
-    //   email: "admin@example.com",
-    //   cpf: "12345678900",
-    //   role: "admin",
-    //   telephone: "1234567890",
-    //   company_id: "1",
-    //   partner_id: "1",
-    //   partner_url_logo: "https://vivo.empresas.gold/assets/logo-site.png",
-    // };
   }
 
   static async logout() {

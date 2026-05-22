@@ -15,8 +15,8 @@ const categoryOptions: Record<ProductModel, Array<{ label: string; value: string
         { label: "Telefonia Móvel", value: "telefonia-movel" },
     ],
     finances: [
-        { label: "Maquininha", value: "maquininha" },
-        { label: "Empréstimo", value: "emprestimo" },
+        { label: "Maquininha", value: "maquinha-cartao" },
+        { label: "Conta PJ", value: "conta-pj" },
     ],
 };
 
@@ -121,7 +121,7 @@ export function ProductsAdminPage() {
             {!selectedSegmentId ? (
                 <Card style={{ marginBottom: 16 }}>
                     <Typography.Paragraph>
-                        Selecione um modelo/segmento usando o seletor "Modelo/Segmento" no topo da página.
+                        Selecione um segmento usando o seletor "Segmento" no topo da página.
                     </Typography.Paragraph>
                 </Card>
             ) : (
