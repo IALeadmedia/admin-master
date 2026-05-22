@@ -29,6 +29,7 @@ interface CompaniesTableProps {
   isLoading: boolean;
   columns?: TableColumnsType<any>;
   categorySelect?: CategorySelectProps;
+  clientTypeSelect?: CategorySelectProps;
   FormModalComponent: ComponentType<FormModalProps>;
   ViewModalComponent: ComponentType<ViewModalProps>;
   currentPage?: number;
@@ -43,6 +44,7 @@ export function TableMain({
   isLoading,
   columns,
   categorySelect,
+  clientTypeSelect,
   FormModalComponent,
   ViewModalComponent,
   currentPage,
@@ -116,6 +118,7 @@ export function TableMain({
         onBulkDelete={handleBulkDelete}
         canDelete={canDeleteOrders}
         categorySelect={categorySelect}
+        clientTypeSelect={clientTypeSelect}
         deleteLabel={`Deletar ${entityPage.plural.toLowerCase()}`}
       />
       <div className="flex overflow-y-auto">
@@ -142,7 +145,7 @@ export function TableMain({
                 locale: { items_per_page: "" },
                 pageSizeOptions: [5, 10, 20, 50, 100],
                 showSizeChanger: true,
-                showTotal: (t) => `Total: ${t} ${entityPage.plural.toLowerCase()}`,
+                showTotal: (t) => `Total de ${t} ${entityPage.plural.toLowerCase()}`,
                 onChange: (p) => onPageChange?.(p),
                 onShowSizeChange: (_: number, size: number) => {
                   onPageSizeChange?.(size);
@@ -151,7 +154,7 @@ export function TableMain({
               }
               : {
                 pageSize: 20,
-                showTotal: (t) => `Total: ${t} ${entityPage.plural.toLowerCase()}`,
+                showTotal: (t) => `Total de ${t} ${entityPage.plural.toLowerCase()}`,
               }
           }
           scroll={{ y: 800 }}

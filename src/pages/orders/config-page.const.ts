@@ -71,6 +71,12 @@ export function resolveOrderModel(rawModel?: string): OrderModel {
   return isKnownOrderModel(normalized) ? normalized : defaultOrderModel;
 }
 
+export function resolveOrderClientType(raw?: string): "PF" | "PJ" | undefined {
+  if (!raw) return undefined;
+  const upper = raw.toUpperCase();
+  return upper === "PF" || upper === "PJ" ? upper : undefined;
+}
+
 export function getOrderCategoryLabelByModel(
   category: string,
   model: OrderModel = defaultOrderModel,

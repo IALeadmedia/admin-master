@@ -5,7 +5,7 @@ import {
     defaultCategoryByModel,
     resolveOrderModel,
 } from "@/pages/orders/config-page.const";
-import { OrdersPage } from "@/pages/orders/orders";
+import { OrderModelComponent } from "./order.$model.component";
 
 export const Route = createFileRoute("/app/order/$model")({
     component: OrderModelComponent,
@@ -37,8 +37,3 @@ export const Route = createFileRoute("/app/order/$model")({
         });
     },
 });
-
-function OrderModelComponent() {
-    const { model } = Route.useParams();
-    return <OrdersPage model={model} />;
-}

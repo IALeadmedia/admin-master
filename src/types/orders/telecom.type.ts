@@ -36,6 +36,7 @@ export interface TelecomOrderFilters {
   company_id?: number;
   partner_id?: number;
   category?: string;
+  client_type?: "PF" | "PJ";
   landing_page?: string;
   business_partner?: string;
 }

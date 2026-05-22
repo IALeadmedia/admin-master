@@ -25,6 +25,7 @@ export function OrdersAdminPage() {
 
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(20);
+    const [clientType, setClientType] = useState<"PF" | "PJ" | "">("");
 
     const { data: companiesData } = useCompanyQuery({ enabled: !!selectedSegmentId });
     const { data: partnersData } = usePartnerQuery({
@@ -54,14 +55,20 @@ export function OrdersAdminPage() {
         partnerCategories,
     });
 
-    // Reset to page 1 when model or category changes
+    const isBandaLarga = model === "telecom" && effectiveCategory === "banda-larga";
+
+    // Reset clientType and page when model or category changes
     useEffect(() => {
         setPage(1);
-    }, [model, effectiveCategory]);
+        if (!isBandaLarga) setClientType("");
+    }, [model, effectiveCategory, isBandaLarga]);
 
     const { data, isLoading } = useListEntity({
         model,
-        filters: effectiveCategory ? { category: effectiveCategory } : undefined,
+        filters: {
+            ...(effectiveCategory ? { category: effectiveCategory } : {}),
+            ...(clientType ? { client_type: clientType } : {}),
+        },
         page,
         per_page: pageSize,
         enabled: hasScope,
@@ -69,6 +76,18 @@ export function OrdersAdminPage() {
 
     const orders = useMemo(() => data?.orders ?? [], [data?.orders]);
     const total = data?.total ?? 0;
+
+    const clientTypeSelect = isBandaLarga
+        ? {
+            options: [
+                { label: "PF e PJ", value: "" },
+                { label: "Pessoa Física (PF)", value: "PF" },
+                { label: "Pessoa Jurídica (PJ)", value: "PJ" },
+            ],
+            value: clientType,
+            onChange: (v: string) => { setClientType(v as "PF" | "PJ" | ""); setPage(1); },
+        }
+        : undefined;
 
     const columns = getOrderColumnsByModel(model, companiesData?.companies ?? []);
     const { FormModal: FormModalComponent, ViewModal: ViewModalComponent } = segmentComponents[model];
@@ -97,6 +116,7 @@ export function OrdersAdminPage() {
                     isLoading={isLoading}
                     columns={columns}
                     categorySelect={categorySelect}
+                    clientTypeSelect={clientTypeSelect}
                     FormModalComponent={FormModalComponent}
                     ViewModalComponent={ViewModalComponent}
                     currentPage={page}

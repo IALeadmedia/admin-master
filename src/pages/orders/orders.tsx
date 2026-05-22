@@ -7,6 +7,7 @@ import {
   getOrderColumnsByModel,
   resolveOrderModel,
   resolveOrderCategory,
+  resolveOrderClientType,
   resolvePartnerCategory,
   segmentComponents,
   segmentRegistry,
@@ -20,12 +21,14 @@ import { TableMain as CommonTableMain } from "./common/components/table";
 interface OrdersPageProps {
   model?: string;
   category?: string;
+  clientType?: string;
 }
 
-export function OrdersPage({ model, category }: OrdersPageProps) {
+export function OrdersPage({ model, category, clientType }: OrdersPageProps) {
   const resolvedModel = resolveOrderModel(model);
   const { hasCategories } = segmentRegistry[resolvedModel];
   const resolvedCategory = hasCategories ? resolveOrderCategory(category, resolvedModel) : undefined;
+  const resolvedClientType = resolveOrderClientType(clientType);
   const { resolvedPartnerId } = useResolvedOrderScope(resolvedModel);
   const { data: companiesData } = useCompanyQuery();
   const { data: partnersData } = usePartnerQuery({
@@ -50,13 +53,17 @@ export function OrdersPage({ model, category }: OrdersPageProps) {
 
   const { data, isLoading } = useListEntity({
     model: resolvedModel,
-    filters: effectiveCategory ? { category: effectiveCategory } : undefined,
+    filters: {
+      ...(effectiveCategory ? { category: effectiveCategory } : {}),
+      ...(resolvedClientType ? { client_type: resolvedClientType } : {}),
+    },
     page,
     per_page: pageSize,
   });
 
+  const clientTypeLabel = resolvedClientType ? ` ${resolvedClientType}` : "";
   const titleLabel = hasCategories
-    ? ` - ${getOrderCategoryLabelByModel(effectiveCategory ?? "", resolvedModel)}`
+    ? ` - ${getOrderCategoryLabelByModel(effectiveCategory ?? "", resolvedModel)}${clientTypeLabel}`
     : "";
 
   return (
