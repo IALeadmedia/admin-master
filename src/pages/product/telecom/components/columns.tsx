@@ -3,14 +3,29 @@ import { ConfigProvider, Switch, Tooltip, type TableColumnsType } from "antd";
 import type { EntityType } from "../config-page.const";
 import type { useUpdateProductMutation } from "@/hooks/products/useUpdateProductMutation";
 import { appSetting } from "@/constants/app-setting/config.const";
+import type { ICompany } from "@/types/ICompany.type";
 
 type UpdateMutation = ReturnType<typeof useUpdateProductMutation>;
 
 export function getColumns(
   updateMutation: UpdateMutation,
   canSeeOnlineSwitch: boolean,
+  companies: ICompany[] = [],
 ): TableColumnsType<EntityType> {
   const columns: TableColumnsType<EntityType> = [
+    {
+      title: "Empresa",
+      dataIndex: "company_id",
+      key: "company_id",
+      width: 100,
+      render: (company_id: number) =>
+        companies.find((c) => c.company_id === company_id)?.company_name ?? "-",
+      sorter: (a, b) => {
+        const nameA = companies.find((c) => c.company_id === a.company_id)?.company_name ?? "";
+        const nameB = companies.find((c) => c.company_id === b.company_id)?.company_name ?? "";
+        return nameA.localeCompare(nameB);
+      },
+    },
     {
       title: "Plano",
       dataIndex: "name",

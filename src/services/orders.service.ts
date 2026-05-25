@@ -19,6 +19,20 @@ export class OrdersService {
     return data;
   }
 
+  /** Busca todos os pedidos de um segmento sem filtrar por operadora/empresa.
+   *  Rota: GET /{module}/orders
+   *  Exclusivo para admin quando apenas o segmento está selecionado.
+   */
+  static async getAllBySegment<T = Record<string, unknown>>(
+    module: OrderModule,
+    filters?: object,
+  ): Promise<T> {
+    const { data } = await httpClientAxios.get<T>(`/${module}/orders`, {
+      params: filters,
+    });
+    return data;
+  }
+
   static async update(
     id: number,
     module: OrderModule,
