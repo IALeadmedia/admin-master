@@ -9,7 +9,8 @@ export type OrderOperator =
   | "c6"
   | "algar"
   | "brisanet"
-  | "nio";
+  | "nio"
+  | "vero";
 
 const validOrderModules = new Set<OrderModule>([
   "telecom",
@@ -26,6 +27,7 @@ const validOrderOperators = new Set<OrderOperator>([
   "algar",
   "brisanet",
   "nio",
+  "vero",
 ]);
 
 // Mapeia operadora → módulo para usuários não-admin
@@ -36,6 +38,7 @@ export const operatorModuleMap: Record<string, OrderModule> = {
   algar: "telecom",
   brisanet: "telecom",
   nio: "telecom",
+  vero: "telecom",
   vr: "benefits",
   c6: "finances",
 };

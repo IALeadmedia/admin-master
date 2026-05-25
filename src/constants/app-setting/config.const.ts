@@ -5,6 +5,8 @@ import vrLogo from "@/assets/logos/vr-logo.png";
 import c6Logo from "@/assets/logos/c6-logo.png";
 import brisanetLogo from "@/assets/logos/brisanet-logo.png";
 import algarLogo from "@/assets/logos/algar-logo.png";
+import veroLogo from "@/assets/logos/vero-logo.svg";
+import nioLogo from "@/assets/logos/nio-logo.svg";
 import {
   menuOptionsClaro,
   menuOptionsTim,
@@ -13,6 +15,8 @@ import {
   menuOptionsC6,
   menuOptionsBrisanet,
   menuOptionsAlgar,
+  menuOptionsVero,
+  menuOptionsNio,
   menuOptionsAdmin,
 } from "./menuItems.const";
 
@@ -104,6 +108,24 @@ export const options = {
     baseUrl: "https://evolution.bigdates.com.br:3720",
     favicon: `${url}/favicon/algar.ico`,
     optionsMenu: menuOptionsAlgar,
+    isAdminDomain: false,
+  },
+  vero: {
+    name: "Vero",
+    logo: veroLogo,
+    primaryColor: "#D63066",
+    baseUrl: "https://evolution.bigdates.com.br:3720",
+    favicon: `${url}/favicon/vero.ico`,
+    optionsMenu: menuOptionsVero,
+    isAdminDomain: false,
+  },
+  nio: {
+    name: "Nio",
+    logo: nioLogo,
+    primaryColor: "#14412A",
+    baseUrl: "https://evolution.bigdates.com.br:3720",
+    favicon: `${url}/favicon/nio.ico`,
+    optionsMenu: menuOptionsNio,
     isAdminDomain: false,
   },
 };

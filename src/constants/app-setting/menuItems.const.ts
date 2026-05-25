@@ -220,3 +220,70 @@ export const menuOptionsAlgar: MenuItem[] = [
     ],
   },
 ];
+export const menuOptionsVero: MenuItem[] = [
+  ...menuOptionsCommon,
+  {
+    label: "Produtos",
+    items: [
+      {
+        label: "Banda Larga",
+        to: "/app/products/telecom/banda-larga",
+      },
+      {
+        label: "Telefonia Móvel",
+        to: "/app/products/telecom/telefonia-movel",
+      },
+    ],
+  },
+  {
+    label: "Pedidos",
+    items: [
+      {
+        label: "Banda Larga PF",
+        to: "/app/order/telecom/banda-larga/pf",
+      },
+      {
+        label: "Banda Larga PJ",
+        to: "/app/order/telecom/banda-larga/pj",
+      },
+      // {
+      //   label: "Telefonia Móvel",
+      //   to: "/app/order/telecom/telefonia-movel",
+      // },
+    ],
+  },
+];
+
+export const menuOptionsNio: MenuItem[] = [
+  ...menuOptionsCommon,
+  {
+    label: "Produtos",
+    items: [
+      {
+        label: "Banda Larga",
+        to: "/app/products/telecom/banda-larga",
+      },
+      {
+        label: "Telefonia Móvel",
+        to: "/app/products/telecom/telefonia-movel",
+      },
+    ],
+  },
+  {
+    label: "Pedidos",
+    items: [
+      {
+        label: "Banda Larga PF",
+        to: "/app/order/telecom/banda-larga/pf",
+      },
+      {
+        label: "Banda Larga PJ",
+        to: "/app/order/telecom/banda-larga/pj",
+      },
+      // {
+      //   label: "Telefonia Móvel",
+      //   to: "/app/order/telecom/telefonia-movel",
+      // },
+    ],
+  },
+];

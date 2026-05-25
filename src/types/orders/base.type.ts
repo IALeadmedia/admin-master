@@ -81,6 +81,7 @@ export interface OrderOperatorsAvailability {
   claro?: OrderOperatorsAvailabilityItem;
   net?: OrderOperatorsAvailabilityItem;
   nio?: OrderOperatorsAvailabilityItem;
+  vero?: OrderOperatorsAvailabilityItem;
   sky?: OrderOperatorsAvailabilityItem;
   algar?: OrderOperatorsAvailabilityItem;
   [operatorName: string]: OrderOperatorsAvailabilityItem | undefined;
