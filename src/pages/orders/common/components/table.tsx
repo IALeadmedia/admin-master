@@ -155,10 +155,11 @@ export function TableMain({
       <Tooltip
         title={
           selectedRowKeys.length > 0
-            ? `Exportar ${selectedRowKeys.length} selecionados`
-            : "Exportar todos os pedidos visíveis"
+            ? `Exportar ${selectedRowKeys.length} selecionados em .xlsx`
+            : "Exportar todos os pedidos em .xlsx"
         }
         placement="top"
+        overlayStyle={{ fontSize: "12px" }}
       >
         <Button
           icon={<DownloadOutlined />}
