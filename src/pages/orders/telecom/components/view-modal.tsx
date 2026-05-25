@@ -11,9 +11,12 @@ import React, { useEffect, useState } from "react";
 import { useUpdateOrderStatusMutation } from "@/hooks/orders/useUpdateOrderStatusMutation";
 import { EmpresasDisplay } from "../../common/components/companiesDisplay";
 import type { OrderOperatorsAvailability } from "@/types/orders/base.type";
-import { appSetting } from "@/constants/app-setting/config.const";
+import { appSetting, isAdminDomain } from "@/constants/app-setting/config.const";
 import anonymousAvatar from "@/assets/anonymous_avatar.png";
 import { useUpdateEntity, type EntityType } from "../../config-page.const";
+import { useAuth } from "@/context/auth-provider";
+import { usePartnerQuery } from "@/hooks/partners/usePartnerQuery";
+
 function resolveOperatorKey(companyName?: string | null) {
     return companyName?.split(" ")[0]?.toLowerCase().trim();
 }
@@ -180,6 +183,15 @@ export function ViewModal({
         }
     }, [open, viewingEntity, observationForm]);
 
+    const { isGlobalAdmin } = useAuth();
+    const isAdmin = isAdminDomain && isGlobalAdmin;
+
+    const { data: partnerData } = usePartnerQuery({
+        partnerId: viewingEntity?.partner_id ?? undefined,
+        enabled: isAdmin && !!viewingEntity?.partner_id,
+    });
+    const partnerName = partnerData?.partners?.[0]?.partner_name;
+
     if (!viewingEntity) {
         return null;
     }
@@ -279,6 +291,26 @@ export function ViewModal({
         >
             <div className="max-h-100 overflow-y-auto scrollbar-thin">
                 <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    {isAdmin && (
+                        <OrderModalSection title="Empresa / Parceiro">
+                            <Row gutter={[16, 16]}>
+                                <Col span={12}>
+                                    <ReadonlyField
+                                        label="Empresa"
+                                        value={viewingEntity.company || (viewingEntity.company_id ? `#${viewingEntity.company_id}` : "-")}
+                                    />
+                                </Col>
+                                <Col span={12}>
+                                    <ReadonlyField
+                                        label="Parceiro"
+                                        value={viewingEntity.partner_id
+                                            ? (partnerName ?? `#${viewingEntity.partner_id}`)
+                                            : "-"}
+                                    />
+                                </Col>
+                            </Row>
+                        </OrderModalSection>
+                    )}
                     <OrderModalSection title="Detalhes do Plano">
                         <div className="mt-4 text-neutral-700">
                             <div className="flex items-center font-semibold text-[#666666] text-[14px]">
@@ -327,6 +359,7 @@ export function ViewModal({
                                         <div className="bg-neutral-50 px-8 py-2">
                                             <div className="font-semibold text-[#666666] text-[14px] mb-1">Extras adicionados</div>
                                             <ul className="divide-y divide-neutral-100">
+                                                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                                                 {viewingEntity.selected_extras.map((extra: any) => {
                                                     const opt = extra.options && extra.options[0] ? extra.options[0] : undefined;
                                                     return (

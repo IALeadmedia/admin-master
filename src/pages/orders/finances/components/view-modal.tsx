@@ -11,8 +11,10 @@ import { useUpdateEntity } from "../../config-page.const";
 import type { FinanceOrder } from "@/types/orders";
 import anonymousAvatar from "@/assets/anonymous_avatar.png";
 import { EmpresasDisplay } from "../../common/components/companiesDisplay";
-import { appSetting } from "@/constants/app-setting/config.const";
+import { appSetting, isAdminDomain } from "@/constants/app-setting/config.const";
 import { useUpdateOrderStatusMutation } from "@/hooks/orders/useUpdateOrderStatusMutation";
+import { useAuth } from "@/context/auth-provider";
+import { usePartnerQuery } from "@/hooks/partners/usePartnerQuery";
 const financeProductLabelMap = {
     "conta-pj": "Conta PJ",
     "capital-giro-c6": "Capital de Giro",
@@ -48,6 +50,15 @@ export function ViewModal({
     const [consultor, setConsultor] = useState("");
     const [idCRM, setIdCRM] = useState("");
     const [idCORP, setIdCORP] = useState("");
+
+    const { isGlobalAdmin } = useAuth();
+    const isAdmin = isAdminDomain && isGlobalAdmin;
+
+    const { data: partnerData } = usePartnerQuery({
+        partnerId: viewingEntity?.partner_id ?? undefined,
+        enabled: isAdmin && !!viewingEntity?.partner_id,
+    });
+    const partnerName = partnerData?.partners?.[0]?.partner_name;
 
     const financeData = viewingEntity;
 
@@ -168,6 +179,26 @@ export function ViewModal({
             width={1000}
         >  <div className="max-h-100 overflow-y-auto scrollbar-thin">
                 <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                    {isAdmin && (
+                        <OrderModalSection title="Empresa / Parceiro">
+                            <Row gutter={[16, 16]}>
+                                <Col span={12}>
+                                    <ReadonlyField
+                                        label="Empresa"
+                                        value={financeData?.company || (financeData?.company_id ? `#${financeData.company_id}` : "-")}
+                                    />
+                                </Col>
+                                <Col span={12}>
+                                    <ReadonlyField
+                                        label="Parceiro"
+                                        value={financeData?.partner_id
+                                            ? (partnerName ?? `#${financeData.partner_id}`)
+                                            : "-"}
+                                    />
+                                </Col>
+                            </Row>
+                        </OrderModalSection>
+                    )}
                     <OrderModalSection title="Produtos de Interesse">
                         <Row gutter={[16, 16]}>
                             <Col span={12}>

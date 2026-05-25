@@ -1,8 +1,10 @@
-import { useMemo, useState, useEffect } from "react";
-import { Card, Typography } from "antd";
+import { useMemo, useState, useEffect, useRef, startTransition } from "react";
+import { Card, Typography, Tooltip } from "antd";
+import type { TableColumnsType } from "antd";
 import { useAdminScope } from "@/context/admin-scope-provider";
 import { useCompanyQuery } from "@/hooks/companies/useCompanyQuery";
 import { usePartnerQuery } from "@/hooks/partners/usePartnerQuery";
+import { useAllSegmentOrdersQuery } from "@/hooks/orders/useAllSegmentOrdersQuery";
 import { TableMain as CommonTableMain } from "./common/components/table";
 
 import {
@@ -19,7 +21,11 @@ import { useOrderCategoryFilter } from "./useOrderCategoryFilter";
 export function OrdersAdminPage() {
     const { selectedSegmentId, selectedCompanyId, selectedPartnerId } = useAdminScope();
 
+    // Segmento selecionado sem empresa → rota "all segment" (GET /{module}/orders)
+    const hasSegmentOnly = !!selectedSegmentId && !selectedCompanyId;
+    // Segmento + empresa selecionados → rota normal com operadora
     const hasScope = !!selectedSegmentId && !!selectedCompanyId;
+
     const model = resolveOrderModel(selectedSegmentId);
     const { hasCategories } = segmentRegistry[model];
 
@@ -57,22 +63,45 @@ export function OrdersAdminPage() {
 
     const isBandaLarga = model === "telecom" && effectiveCategory === "banda-larga";
 
-    // Reset clientType and page when model or category changes
+    const prevFiltersRef = useRef({ model, effectiveCategory });
+
+    // Reset clientType e page quando model ou category mudam (sem setState síncrono no effect)
     useEffect(() => {
-        setPage(1);
-        if (!isBandaLarga) setClientType("");
+        const prev = prevFiltersRef.current;
+        if (prev.model !== model || prev.effectiveCategory !== effectiveCategory) {
+            prevFiltersRef.current = { model, effectiveCategory };
+            startTransition(() => {
+                setPage(1);
+                if (!isBandaLarga) setClientType("");
+            });
+        }
     }, [model, effectiveCategory, isBandaLarga]);
 
-    const { data, isLoading } = useListEntity({
+    const sharedFilters = {
+        ...(effectiveCategory ? { category: effectiveCategory } : {}),
+        ...(clientType ? { client_type: clientType } : {}),
+    };
+
+    // Rota "all segment": GET /{module}/orders — apenas quando segmento selecionado sem empresa
+    const { data: segmentData, isLoading: segmentLoading } = useAllSegmentOrdersQuery({
+        module: model,
+        filters: sharedFilters,
+        page,
+        per_page: pageSize,
+        enabled: hasSegmentOnly,
+    });
+
+    // Rota normal com operadora: GET /{module}/{operator}/orders — quando empresa selecionada
+    const { data: scopeData, isLoading: scopeLoading } = useListEntity({
         model,
-        filters: {
-            ...(effectiveCategory ? { category: effectiveCategory } : {}),
-            ...(clientType ? { client_type: clientType } : {}),
-        },
+        filters: sharedFilters,
         page,
         per_page: pageSize,
         enabled: hasScope,
     });
+
+    const data = hasSegmentOnly ? segmentData : scopeData;
+    const isLoading = hasSegmentOnly ? segmentLoading : scopeLoading;
 
     const orders = useMemo(() => data?.orders ?? [], [data?.orders]);
     const total = data?.total ?? 0;
@@ -89,10 +118,48 @@ export function OrdersAdminPage() {
         }
         : undefined;
 
-    const columns = getOrderColumnsByModel(model, companiesData?.companies ?? []);
+    // Colunas exclusivas do admin: Empresa e Parceiro no início da tabela
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const adminPrefixColumns: TableColumnsType<any> = [
+        {
+            title: "Empresa",
+            dataIndex: "company_id",
+            width: 110,
+            ellipsis: { showTitle: false },
+            render: (company_id: number | null) => {
+                if (!company_id) return "-";
+                const name = companiesData?.companies.find(c => c.company_id === company_id)?.company_name;
+                return (
+                    <Tooltip placement="topLeft" title={name ?? `#${company_id}`} overlayInnerStyle={{ fontSize: 12 }}>
+                        {name ?? `#${company_id}`}
+                    </Tooltip>
+                );
+            },
+        },
+        {
+            title: "Parceiro",
+            dataIndex: "partner_id",
+            width: 110,
+            ellipsis: { showTitle: false },
+            render: (partner_id: number | null) => {
+                if (!partner_id) return "-";
+                const name = partnersData?.partners?.find(p => p.partner_id === partner_id)?.partner_name;
+                return (
+                    <Tooltip placement="topLeft" title={name ?? `#${partner_id}`} overlayInnerStyle={{ fontSize: 12 }}>
+                        {name ?? `#${partner_id}`}
+                    </Tooltip>
+                );
+            },
+        },
+    ];
+
+    const columns = [
+        ...adminPrefixColumns,
+        ...(getOrderColumnsByModel(model, companiesData?.companies ?? []) ?? []),
+    ];
     const { FormModal: FormModalComponent, ViewModal: ViewModalComponent } = segmentComponents[model];
 
-    const pageTitle = !hasScope
+    const pageTitle = !selectedSegmentId
         ? "Pedidos"
         : hasCategories
             ? `${entityPage.plural} - ${getOrderCategoryLabelByModel(effectiveCategory ?? "", model)}`
@@ -104,7 +171,7 @@ export function OrdersAdminPage() {
                 {pageTitle}
             </Typography.Title>
 
-            {!hasScope ? (
+            {!selectedSegmentId ? (
                 <Card style={{ marginBottom: 16 }}>
                     <Typography.Paragraph>
                         Selecione um segmento usando o seletor "Segmento" no topo da página.
