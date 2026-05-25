@@ -191,6 +191,7 @@ export function OrdersAdminPage() {
                     total={total}
                     onPageChange={setPage}
                     onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
+                    companies={companiesData?.companies ?? []}
                 />
             )}
         </div>

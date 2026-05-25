@@ -82,6 +82,7 @@ export function OrdersPage({ model, category, clientType }: OrdersPageProps) {
         total={data?.total ?? 0}
         onPageChange={setPage}
         onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
+        companies={companiesData?.companies ?? []}
       />
     </div>
   );

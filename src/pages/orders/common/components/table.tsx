@@ -8,6 +8,7 @@ import { entityPage } from "../../config-page.const";
 import { useStyle } from "@/style/tableStyle";
 import { useAuth } from "@/context/auth-provider";
 import { can } from "@/helpers/access-control.helper";
+import type { ICompany } from "@/types/ICompany.type";
 
 type FormModalProps = {
   open: boolean;
@@ -37,6 +38,7 @@ interface CompaniesTableProps {
   total?: number;
   onPageChange?: (page: number) => void;
   onPageSizeChange?: (size: number) => void;
+  companies?: ICompany[];
 }
 
 export function TableMain({
@@ -52,6 +54,7 @@ export function TableMain({
   total,
   onPageChange,
   onPageSizeChange,
+  companies = [],
 }: CompaniesTableProps) {
   const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
   const [searchText, setSearchText] = useState("");
@@ -109,6 +112,27 @@ export function TableMain({
     setViewingEntity(null);
   }
 
+  const rowClassName = (record: any) => {
+    if (record?.status === "fechado" || record?.status === "FECHADO") {
+      const companyName = companies.find(
+        (c) => c.company_id === record?.company_id,
+      )?.company_name;
+      const operatorKey = companyName?.split(" ")[0]?.toLowerCase().trim();
+      const operatorAvailability = operatorKey
+        ? record?.operators_availability?.[operatorKey]
+        : undefined;
+
+      if (operatorAvailability?.available === false) {
+        return "ant-table-row-red";
+      } else if (operatorAvailability?.found_via_range === true || record?.single_zip_code) {
+        return "ant-table-row-yellow";
+      } else if (operatorAvailability?.available === true) {
+        return "ant-table-row-green";
+      }
+    }
+    return "";
+  };
+
   return (
     <>
       <TableToolbar
@@ -124,6 +148,7 @@ export function TableMain({
       <div className="flex overflow-y-auto">
         <Table
           rowKey="id"
+          rowClassName={(record) => rowClassName(record) ?? ""}
           columns={columns}
           dataSource={filteredData}
           className={styles.customTable}
