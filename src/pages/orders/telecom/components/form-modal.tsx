@@ -107,6 +107,7 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
         filters: {
             category: editingEntity?.category ?? undefined,
         },
+        companyId: editingEntity?.company_id ?? undefined,
         enabled: open,
     });
 

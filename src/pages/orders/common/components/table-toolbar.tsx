@@ -1,5 +1,6 @@
-import { Button, Input, Select, Space } from "antd";
-import { DeleteOutlined } from "@ant-design/icons";
+import { Input, Select, Space } from "antd";
+// import { DeleteOutlined } from "@ant-design/icons";
+import type { ReactNode } from "react";
 
 export interface CategorySelectProps {
     options: Array<{ label: string; value: string }>;
@@ -16,17 +17,19 @@ interface TableToolbarProps {
     deleteLabel: string;
     categorySelect?: CategorySelectProps;
     clientTypeSelect?: CategorySelectProps;
+    leftExtra?: ReactNode;
 }
 
 export function TableToolbar({
     searchText,
     onSearchChange,
-    selectedCount,
-    onBulkDelete,
-    canDelete,
-    deleteLabel,
+    // selectedCount,
+    // onBulkDelete,
+    // canDelete,
+    // deleteLabel,
     categorySelect,
     clientTypeSelect,
+    leftExtra,
 }: TableToolbarProps) {
     return (
         <div
@@ -64,12 +67,14 @@ export function TableToolbar({
                         placeholder="PF / PJ"
                     />
                 )}
-                {canDelete && selectedCount > 0 && (
+                {/* {canDelete && selectedCount > 0 && (
                     <Button danger icon={<DeleteOutlined />} onClick={onBulkDelete}>
                         {deleteLabel} {selectedCount}
                     </Button>
-                )}
+                )} */}
+                {leftExtra}
             </Space>
+
         </div>
     );
 }

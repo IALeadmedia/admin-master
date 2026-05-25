@@ -12,12 +12,16 @@ export function useProductQuery({
   enabled = true,
   page = 1,
   per_page = 20,
+  companyId: companyIdOverride,
 }: {
   model?: ProductModel;
   filters?: Omit<IProductFilters, "company_id">;
   enabled?: boolean;
   page?: number;
   per_page?: number;
+  /** Sobrepõe o company_id resolvido internamente. Útil quando se edita um
+   *  pedido de uma empresa diferente da selecionada no scope atual. */
+  companyId?: number;
 } = {}) {
   const entity = dictionaryQueryClient["products"];
   const { user } = useAuth();
@@ -29,25 +33,22 @@ export function useProductQuery({
 
   const companyId = user?.user.company_id;
 
-  const queryFilters: IProductFilters = isAdminDomain
-    ? {
-        ...filters,
-        ...(selectedCompanyId != null ? { company_id: selectedCompanyId } : {}),
-        page,
-        per_page,
-      }
-    : {
-        ...filters,
-        ...(companyId != null ? { company_id: companyId } : {}),
-        page,
-        per_page,
-      };
+  const resolvedCompanyId =
+    companyIdOverride ??
+    (isAdminDomain ? (selectedCompanyId ?? undefined) : companyId);
+
+  const queryFilters: IProductFilters = {
+    ...filters,
+    ...(resolvedCompanyId != null ? { company_id: resolvedCompanyId } : {}),
+    page,
+    per_page,
+  };
 
   return useQuery({
     queryKey: [
       entity.key,
       resolvedModel,
-      queryFilters.company_id ?? null,
+      resolvedCompanyId ?? null,
       queryFilters.category ?? null,
       queryFilters.page ?? null,
       queryFilters.perPage ?? null,

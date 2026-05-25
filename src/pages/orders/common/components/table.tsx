@@ -1,5 +1,6 @@
-import { useMemo, useState, type ComponentType } from "react";
-import { Table } from "antd";
+import { useEffect, useMemo, useState, type ComponentType } from "react";
+import { Button, Checkbox, Dropdown, Table, Tooltip } from "antd";
+import { DownloadOutlined } from "@ant-design/icons";
 import type { Key } from "react";
 import type { TableColumnsType } from "antd";
 import { TableToolbar, type CategorySelectProps } from "./table-toolbar";
@@ -9,6 +10,33 @@ import { useStyle } from "@/style/tableStyle";
 import { useAuth } from "@/context/auth-provider";
 import { can } from "@/helpers/access-control.helper";
 import type { ICompany } from "@/types/ICompany.type";
+import { exportOrdersXLSX } from "../exportOrdersXLSX";
+
+// --------------- helpers de coluna ---------------
+function getColKey(col: TableColumnsType<any>[number]): string {
+  if ("key" in col && col.key) return String(col.key);
+  if ("dataIndex" in col) {
+    const di = (col as { dataIndex?: unknown }).dataIndex;
+    if (Array.isArray(di)) return di.join(".");
+    return String(di ?? "");
+  }
+  return "";
+}
+
+// Colunas sempre visíveis (sem título, identificadores visuais)
+const ALWAYS_VISIBLE_KEYS = ["consultant_observation", "whatsapp"];
+
+function getSelectableKeys(cols: TableColumnsType<any>): string[] {
+  return cols
+    .filter(
+      (col) =>
+        "dataIndex" in col &&
+        !ALWAYS_VISIBLE_KEYS.includes(getColKey(col)),
+    )
+    .map(getColKey)
+    .filter(Boolean);
+}
+// -------------------------------------------------
 
 type FormModalProps = {
   open: boolean;
@@ -67,11 +95,118 @@ export function TableMain({
   const { user } = useAuth();
   const canDeleteOrders = can(user?.user?.role, "orders", "delete");
   const { styles } = useStyle();
+
+  // ----------- seletor de colunas visíveis -----------
+  const allTableColumns = columns ?? [];
+
+  const allColumnOptions = allTableColumns
+    .filter(
+      (col) =>
+        "dataIndex" in col && !ALWAYS_VISIBLE_KEYS.includes(getColKey(col)),
+    )
+    .map((col) => ({
+      label:
+        typeof col.title === "function" || !col.title
+          ? getColKey(col)
+          : String(col.title),
+      value: getColKey(col),
+    }))
+    .filter((opt) => opt.value);
+
+  const [visibleColumns, setVisibleColumns] = useState<string[]>(() =>
+    getSelectableKeys(columns ?? []),
+  );
+
+  // Quando o conjunto de colunas muda (troca de segmento no admin), reseta visibilidade
+  const colSignature = useMemo(
+    () => getSelectableKeys(allTableColumns).join(","),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [allTableColumns.length],
+  );
+
+  useEffect(() => {
+    setVisibleColumns(getSelectableKeys(columns ?? []));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [colSignature]);
+
+  const visibleTableColumns: TableColumnsType<any> = [
+    // Colunas sem dataIndex (ex: Disponibilidade) e sempre visíveis passam direto
+    ...allTableColumns.filter(
+      (col) =>
+        !("dataIndex" in col) || ALWAYS_VISIBLE_KEYS.includes(getColKey(col)),
+    ),
+    // Colunas selecionáveis que o usuário manteve visíveis
+    ...allTableColumns.filter(
+      (col) =>
+        "dataIndex" in col &&
+        !ALWAYS_VISIBLE_KEYS.includes(getColKey(col)) &&
+        visibleColumns.includes(getColKey(col)),
+    ),
+  ];
+
   const filteredData = useMemo(() => {
     if (!searchText) return data;
     const lower = searchText.toLowerCase();
     return data.filter((u) => u.email?.toLowerCase().includes(lower));
   }, [data, searchText]);
+
+  const columnSelectorDropdown = (
+    <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+      <Tooltip
+        title={
+          selectedRowKeys.length > 0
+            ? `Exportar ${selectedRowKeys.length} selecionados`
+            : "Exportar todos os pedidos visíveis"
+        }
+        placement="top"
+      >
+        <Button
+          icon={<DownloadOutlined />}
+          onClick={() => {
+            const exportDataSource =
+              selectedRowKeys.length > 0
+                ? filteredData.filter((r: { id: unknown }) =>
+                  selectedRowKeys.includes(r.id as Key),
+                )
+                : filteredData;
+            exportOrdersXLSX({
+              data: exportDataSource,
+              visibleColumns: visibleTableColumns,
+              filename: "pedidos.xlsx",
+            });
+          }}
+        />
+      </Tooltip>
+      <Dropdown
+        trigger={["click"]}
+        placement="bottomRight"
+        dropdownRender={() => (
+          <div
+            style={{
+              width: 240,
+              background: "#fff",
+              border: "1px solid #e5e7eb",
+              borderRadius: 8,
+              boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+              padding: 12,
+              maxHeight: 320,
+              overflowY: "auto",
+            }}
+          >
+            <Checkbox.Group
+              options={allColumnOptions}
+              value={visibleColumns}
+              onChange={(vals) => setVisibleColumns(vals as string[])}
+              style={{ display: "flex", flexDirection: "column", gap: 8 }}
+            />
+          </div>
+        )}
+      >
+        <Button>Selecionar Colunas</Button>
+      </Dropdown>
+    </div>
+  );
+  // ---------------------------------------------------
 
   function handleEdit(record: any) {
     setEditingEntity(record);
@@ -144,12 +279,13 @@ export function TableMain({
         categorySelect={categorySelect}
         clientTypeSelect={clientTypeSelect}
         deleteLabel={`Deletar ${entityPage.plural.toLowerCase()}`}
+        leftExtra={columnSelectorDropdown}
       />
       <div className="flex overflow-y-auto">
         <Table
           rowKey="id"
           rowClassName={(record) => rowClassName(record) ?? ""}
-          columns={columns}
+          columns={visibleTableColumns}
           dataSource={filteredData}
           className={styles.customTable}
           loading={isLoading}
