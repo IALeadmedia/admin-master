@@ -89,7 +89,7 @@ export function FormModal({ open, editingEntity, category, onClose }: FormModalP
                     entity: {
                         ...entityPayload,
                         category,
-                        company: "",
+
                         company_id: values.company_id ?? null,
                         uf: values.uf ?? [],
                     },

@@ -268,7 +268,7 @@ export function useFormModal({ open, editingEntity, category, onClose }: any) {
           entity: {
             ...entityPayload,
             category,
-            company: "",
+
             company_id: effectiveCompanyId,
             uf: values.uf ?? [],
           },
