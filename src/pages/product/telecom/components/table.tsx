@@ -11,6 +11,7 @@ import { ProductDeleteModal } from "../../common/ProductDeleteModal";
 import { useAuth } from "@/context/auth-provider";
 import type { UserRole } from "@/types/IUser.type";
 import type { ProductModel } from "@/types/IProduct.type";
+import { useCompanyQuery } from "@/hooks/companies/useCompanyQuery";
 
 const canSeeSwitchRoles: UserRole[] = ["ADMIN", "GESTOR", "DIRETOR", "GERENTE"];
 
@@ -46,8 +47,10 @@ export function TableMain({
   const updateMutation = useUpdateEntity();
   const deleteMutation = useDeleteEntity();
   const { user } = useAuth();
+  const { data: companyData } = useCompanyQuery({ per_page: 100 });
+  const companies = companyData?.companies ?? [];
   const canSeeOnlineSwitch = canSeeSwitchRoles.includes(user?.user?.role as UserRole);
-  const columns = getColumns(updateMutation, canSeeOnlineSwitch);
+  const columns = getColumns(updateMutation, canSeeOnlineSwitch, companies);
 
   const {
     selectedRowKeys,

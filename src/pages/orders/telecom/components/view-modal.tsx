@@ -16,6 +16,7 @@ import anonymousAvatar from "@/assets/anonymous_avatar.png";
 import { useUpdateEntity, type EntityType } from "../../config-page.const";
 import { useAuth } from "@/context/auth-provider";
 import { usePartnerQuery } from "@/hooks/partners/usePartnerQuery";
+import { useCompanyQuery } from "@/hooks/companies/useCompanyQuery";
 
 function resolveOperatorKey(companyName?: string | null) {
     return companyName?.split(" ")[0]?.toLowerCase().trim();
@@ -190,7 +191,17 @@ export function ViewModal({
         partnerId: viewingEntity?.partner_id ?? undefined,
         enabled: isAdmin && !!viewingEntity?.partner_id,
     });
-    const partnerName = partnerData?.partners?.[0]?.partner_name;
+    const partnerName = partnerData?.partners?.find(
+        (p) => p.partner_id === viewingEntity?.partner_id,
+    )?.partner_name;
+
+    const { data: companyData } = useCompanyQuery({
+        per_page: 100,
+        enabled: isAdmin && !!viewingEntity?.company_id,
+    });
+    const companyName = companyData?.companies.find(
+        (c) => c.company_id === viewingEntity?.company_id,
+    )?.company_name;
 
     if (!viewingEntity) {
         return null;
@@ -290,14 +301,16 @@ export function ViewModal({
             width={1000}
         >
             <div className="max-h-100 overflow-y-auto scrollbar-thin">
-                <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                     {isAdmin && (
-                        <OrderModalSection title="Empresa / Parceiro">
+                        <OrderModalSection title="">
                             <Row gutter={[16, 16]}>
                                 <Col span={12}>
                                     <ReadonlyField
                                         label="Empresa"
-                                        value={viewingEntity.company || (viewingEntity.company_id ? `#${viewingEntity.company_id}` : "-")}
+                                        value={viewingEntity.company_id
+                                            ? (companyName ?? `#${viewingEntity.company_id}`)
+                                            : "-"}
                                     />
                                 </Col>
                                 <Col span={12}>

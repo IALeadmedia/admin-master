@@ -15,6 +15,7 @@ import { appSetting, isAdminDomain } from "@/constants/app-setting/config.const"
 import { useUpdateOrderStatusMutation } from "@/hooks/orders/useUpdateOrderStatusMutation";
 import { useAuth } from "@/context/auth-provider";
 import { usePartnerQuery } from "@/hooks/partners/usePartnerQuery";
+import { useCompanyQuery } from "@/hooks/companies/useCompanyQuery";
 const financeProductLabelMap = {
     "conta-pj": "Conta PJ",
     "capital-giro-c6": "Capital de Giro",
@@ -58,7 +59,17 @@ export function ViewModal({
         partnerId: viewingEntity?.partner_id ?? undefined,
         enabled: isAdmin && !!viewingEntity?.partner_id,
     });
-    const partnerName = partnerData?.partners?.[0]?.partner_name;
+    const partnerName = partnerData?.partners?.find(
+        (p) => p.partner_id === viewingEntity?.partner_id,
+    )?.partner_name;
+
+    const { data: companyData } = useCompanyQuery({
+        per_page: 100,
+        enabled: isAdmin && !!viewingEntity?.company_id,
+    });
+    const companyName = companyData?.companies.find(
+        (c) => c.company_id === viewingEntity?.company_id,
+    )?.company_name;
 
     const financeData = viewingEntity;
 
@@ -144,18 +155,18 @@ export function ViewModal({
                                         <span className="text-[14px] font-semibold">Tramitação:</span>
                                         <Select placeholder="Selecione o status" size="small" value={viewingEntity?.after_sales_status} style={{ width: 280 }} onChange={(value) => updateMutation.mutate({ id: viewingEntity!.id, payload: { after_sales_status: value } })} options={[]} />
                                     </div>
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-[14px] font-semibold">Equipe:</span>
-                                        <span className="font-normal text-[14px]">{viewingEntity?.team || "-"}</span>
-                                    </div>
+
                                 </div>
-                                <div className="flex gap-4">
+                                <div className="flex flex-wrap gap-4">
 
                                     <div className="flex gap-2">
                                         <span className="text-[14px] font-semibold">Atendimento:</span>
                                         <Select size="small" value={viewingEntity?.service} style={{ width: 180 }} onChange={(value) => updateMutation.mutate({ id: viewingEntity!.id, payload: { service: value } })} options={[{ value: "em_andamento", label: "Em Andamento" }, { value: "concluido", label: "Concluído" }]} />
                                     </div>
-
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-[14px] font-semibold">Equipe:</span>
+                                        <span className="font-normal text-[14px]">{viewingEntity?.team || "-"}</span>
+                                    </div>
                                 </div>
                             </ConfigProvider>
                         </div>
@@ -180,12 +191,14 @@ export function ViewModal({
         >  <div className="max-h-100 overflow-y-auto scrollbar-thin">
                 <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
                     {isAdmin && (
-                        <OrderModalSection title="Empresa / Parceiro">
+                        <OrderModalSection title="">
                             <Row gutter={[16, 16]}>
                                 <Col span={12}>
                                     <ReadonlyField
                                         label="Empresa"
-                                        value={financeData?.company || (financeData?.company_id ? `#${financeData.company_id}` : "-")}
+                                        value={financeData?.company_id
+                                            ? (companyName ?? `#${financeData.company_id}`)
+                                            : "-"}
                                     />
                                 </Col>
                                 <Col span={12}>
