@@ -33,25 +33,52 @@ export function ViewModal({ open, viewingEntity, onClose, onEdit, onDelete }: Vi
             width={910}
         >
             <div style={{ marginTop: 16 }}>
-                <Row gutter={[16, 16]}>
+                <Row gutter={[16, 16]} align="bottom">
                     <Col span={8}>
-
                         <Space orientation="vertical" size={4} style={{ display: "flex" }}>
-                            <Typography.Text type="secondary">Logo</Typography.Text>
+                            {/* <Typography.Text type="secondary">Logo</Typography.Text> */}
                             <div
                                 style={{
                                     minHeight: 30,
                                     padding: "4px 10px",
-                                    border: "1px solid #d9d9d9",
-                                    borderRadius: 8,
-                                    backgroundColor: "rgba(0, 0, 0, 0.015)",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
                                 }}
                             >
-                                <img src={viewingEntity?.logo_url ?? ""} alt="Logo" className="h-6" />
-
+                                {viewingEntity?.logo_url ? (
+                                    <div
+                                        style={{
+                                            width: "100%",
+                                            height: 64,
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            backgroundColor: "#f5f5f5",
+                                            borderRadius: 6,
+                                            padding: 8,
+                                        }}
+                                    >
+                                        <img
+                                            src={viewingEntity.logo_url}
+                                            alt="Logo"
+                                            style={{
+                                                maxHeight: 48,
+                                                maxWidth: "100%",
+                                                width: "auto",
+                                                height: "auto",
+                                                objectFit: "contain",
+                                                filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.15))",
+                                            }}
+                                        />
+                                    </div>
+                                ) : (
+                                    <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                                        Sem logo
+                                    </Typography.Text>
+                                )}
                             </div>
                         </Space>
-
                     </Col>
                     <Col span={8}>
                         <ReadonlyField label="Nome" value={viewingEntity?.partner_name} />

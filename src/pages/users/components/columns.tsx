@@ -1,4 +1,4 @@
-import { Tag } from "antd";
+import { Tag, Tooltip } from "antd";
 import type { TableColumnsType } from "antd";
 import { type EntityType, roleLabelMap } from "../config-page.const";
 import { formatCNPJ, formatCPF } from "@/utils/document.util";
@@ -18,7 +18,15 @@ export function getColumns(): TableColumnsType<EntityType> {
       dataIndex: "email",
       key: "email",
       width: 180,
-      render: (email: string) => email || "-"
+      ellipsis: { showTitle: false },
+      render: (email: string) => {
+        if (!email) return "-";
+        return (
+          <Tooltip placement="topLeft" title={email} overlayInnerStyle={{ fontSize: 12 }}>
+            {email}
+          </Tooltip>
+        );
+      },
     },
     {
       title: "Telefone",
@@ -46,7 +54,9 @@ export function getColumns(): TableColumnsType<EntityType> {
       dataIndex: "company",
       key: "company",
       width: 140,
-      render: (company: { company_name: string }) => company?.company_name || "-"
+      render: (company: { company_name: string }) => company?.company_name || "-",
+      sorter: (a, b) => a.company?.company_name.localeCompare(b.company?.company_name || "") || 0,
+
     },
 
     {
@@ -54,21 +64,38 @@ export function getColumns(): TableColumnsType<EntityType> {
       dataIndex: "partner",
       key: "partner",
       width: 140,
-      render: (partner: { partner_name: string }) => partner?.partner_name || "-"
+      render: (partner: { partner_name: string }) => partner?.partner_name || "-",
+      sorter: (a, b) => a.partner?.partner_name.localeCompare(b.partner?.partner_name || "") || 0,
+
     },
     {
       title: "Tipo",
       dataIndex: "user_type",
       key: "user_type",
       width: 140,
-      render: (user_type: string) => user_type === "EQUIPE" ? "Equipe" : user_type === "SUBCREDENCIADO" ? "Subcredenciado" : "-"
+      render: (user_type: string) => user_type === "EQUIPE" ? "Equipe" : user_type === "SUBCREDENCIADO" ? "Subcredenciado" : "-",
+      filters: [
+        { text: "Equipe", value: "EQUIPE" },
+        { text: "Subcredenciado", value: "SUBCREDENCIADO" },
+      ],
+      onFilter: (value, record) => record.user_type === value,
+
     },
     {
       title: "Responsável",
       dataIndex: "person_responsible",
       key: "person_responsible",
       width: 140,
-      render: (person_responsible: { user_name: string }) => person_responsible?.user_name || "-"
+      ellipsis: { showTitle: false },
+      sorter: (a, b) => a.person_responsible?.user_name.localeCompare(b.person_responsible?.user_name),
+      render: (person_responsible: { user_name: string }) => {
+        if (!person_responsible) return "-";
+        return (
+          <Tooltip placement="topLeft" title={person_responsible?.user_name} overlayInnerStyle={{ fontSize: 12 }}>
+            {person_responsible?.user_name}
+          </Tooltip>
+        );
+      },
     },
     {
       title: "Nível de Acesso",

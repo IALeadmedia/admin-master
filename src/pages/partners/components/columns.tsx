@@ -10,10 +10,18 @@ export function getColumns(): TableColumnsType<EntityType> {
     {
       title: "Logo",
       dataIndex: "logo_url", key: "logo_url",
-      width: 160,
-      render: (logo_url: string) => <div className="flex items-center text-center justify-center">
-        <img src={logo_url} alt="Logo" className="h-8  " />
-      </div>
+      width: 180,
+      render: (logo_url: string) => (
+        <div className="flex items-center justify-center w-full bg-gray-100 p-2  rounded-md">
+          <div className="w-32 h-10 flex items-center justify-center ">
+            <img
+              src={logo_url}
+              alt="Logo"
+              className="max-h-10 max-w-32 w-auto h-auto object-contain drop-shadow-sm"
+            />
+          </div>
+        </div>
+      ),
     },
     {
       title: "Nome",
@@ -27,14 +35,23 @@ export function getColumns(): TableColumnsType<EntityType> {
       dataIndex: "cnpj",
       key: "cnpj",
       width: 140,
-      render: (cnpj: string) => formatCNPJ(cnpj) || "-"
+      render: (cnpj: string) => formatCNPJ(cnpj) || "-",
+
     },
     {
       title: "Email",
       dataIndex: "email",
       key: "email",
       width: 180,
-      render: (email: string) => email || "-"
+      ellipsis: { showTitle: false },
+      render: (email: string) => {
+        if (!email) return "-";
+        return (
+          <Tooltip placement="topLeft" title={email} overlayInnerStyle={{ fontSize: 12 }}>
+            {email}
+          </Tooltip>
+        );
+      },
     },
     {
       title: "Telefone",
@@ -47,15 +64,25 @@ export function getColumns(): TableColumnsType<EntityType> {
       title: "Responsável",
       dataIndex: "manager_name",
       key: "manager_name",
-      width: 140,
-      render: (manager_name: string) => manager_name || "-"
+      width: 160,
+      ellipsis: { showTitle: false },
+      sorter: (a, b) => a.manager_name.localeCompare(b.manager_name),
+      render: (manager_name: string) => {
+        if (!manager_name) return "-";
+        return (
+          <Tooltip placement="topLeft" title={manager_name} overlayInnerStyle={{ fontSize: 12 }}>
+            {manager_name}
+          </Tooltip>
+        );
+      },
     },
     {
       title: "Empresa",
       dataIndex: ["company", "company_name"],
       key: "company_name",
       width: 140,
-      render: (company_name: string) => company_name || "-"
+      render: (company_name: string) => company_name || "-",
+      sorter: (a, b) => a.company?.company_name.localeCompare(b.company?.company_name || "") || 0,
     },
     {
       title: "Tipo de Cliente",
@@ -64,8 +91,25 @@ export function getColumns(): TableColumnsType<EntityType> {
       width: 140,
       render: (client_type: string[]) =>
         client_type?.length
-        && client_type.join(", ")
-
+        && client_type.join(", "),
+      filters: [
+        { text: "PJ", value: "PJ" },
+        { text: "PF", value: "PF" },
+        { text: "Ambos", value: "PF, PJ" },
+      ],
+      onFilter: (value, record) => {
+        if (value === "PF, PJ") {
+          return (
+            record.client_type?.includes("PF") &&
+            record.client_type?.includes("PJ")
+          ) || false;
+        }
+        const other = value === "PF" ? "PJ" : "PF";
+        return (
+          record.client_type?.includes(value as string) &&
+          !record.client_type?.includes(other)
+        ) || false;
+      },
     },
     {
       title: "UF",
@@ -88,7 +132,8 @@ export function getColumns(): TableColumnsType<EntityType> {
           </Tooltip>
         );
       },
-    }, {
+    },
+    {
       title: "Categorias",
       dataIndex: "category",
       key: "category",

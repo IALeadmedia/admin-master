@@ -94,7 +94,7 @@ export function TableMain({ data, isLoading, currentPage,
         onBulkDelete={handleBulkDelete}
         onCreate={handleCreate}
       />
-      <div className="flex overflow-y-auto ">
+      <div className="flex overflow-y-auto">
         <Table
           rowKey="partner_id"
           columns={columns}

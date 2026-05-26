@@ -8,8 +8,18 @@ import { formatCategoryLabel } from "@/utils/text.util";
 export function getColumns(): TableColumnsType<EntityType> {
     return [
         {
-            title: "Segmento", dataIndex: "segment", width: 120, key: "segment"
-            , render: (segment: string) => segment === "telecom" ? "Telecom" : segment === "finances" ? "Financeiro" : segment === "benefits" ? "Benefícios" : "-"
+            title: "Segmento",
+            dataIndex: "segment",
+            width: 120,
+            key: "segment",
+            render: (segment: string) => segment === "telecom" ? "Telecom" : segment === "finances" ? "Financeiro" : segment === "benefits" ? "Benefícios" : "-",
+            filters: [
+                { text: "Telecom", value: "telecom" },
+                { text: "Financeiro", value: "finances" },
+                { text: "Benefícios", value: "benefits" },
+            ],
+            onFilter: (value, record) => record.segment === value,
+
         },
         {
             title: "Nome",
@@ -23,7 +33,31 @@ export function getColumns(): TableColumnsType<EntityType> {
             dataIndex: "cnpj",
             key: "cnpj",
             width: 140,
-            render: (cnpj: string) => formatCNPJ(cnpj) || "-"
+            render: (cnpj: string) => formatCNPJ(cnpj) || "-",
+            filters: [
+                {
+                    text: "Preenchido",
+                    value: "preenchido",
+                },
+                {
+                    text: "Vazio",
+                    value: "vazio",
+                },
+            ],
+            onFilter: (value, record) => {
+                if (value === "preenchido") {
+                    return (
+                        record.cnpj !== null && record.cnpj !== undefined && record.cnpj !== ""
+                    );
+                }
+                if (value === "vazio") {
+                    return (
+                        record.cnpj === null || record.cnpj === undefined || record.cnpj === ""
+                    );
+                }
+                return true;
+            },
+
         },
         {
             title: "Email",

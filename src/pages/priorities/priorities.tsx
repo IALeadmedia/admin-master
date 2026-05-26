@@ -1,7 +1,7 @@
 import { dictionaryQueryClient } from "@/constants/dictionaryQueryClient.const";
 import { useCompanyQuery } from "@/hooks/companies/useCompanyQuery";
 import { useQuery } from "@tanstack/react-query";
-import { Button, Col, Row, Select, Space, Typography } from "antd";
+import { Button, Col, Row, Select, Typography } from "antd";
 import { useMemo, useState } from "react";
 import type { IPartner } from "@/types/IPartner.type";
 import {
@@ -205,70 +205,67 @@ export function PrioritiesPage() {
     const isLoading = isCompaniesLoading || isPartnersLoading || isPrioritiesLoading;
 
     return (
-        <div className="py-6 min-h-[calc(100vh-160px)]">
-            <Space direction="vertical" size={16} style={{ width: "100%" }}>
-                <div>
-                    <Typography.Title level={3} style={{ marginBottom: 4 }}>
-                        {entityPage.name}
-                    </Typography.Title>
-                </div>
+        <div className="flex flex-col gap-3 py-6 min-h-[calc(100vh-160px)]">
+            <div>
+                <Typography.Title level={3} style={{ marginBottom: 4 }}>
+                    {entityPage.name}
+                </Typography.Title>
+            </div>
 
-                <Row gutter={16} align="bottom">
-                    <Col>
-                        <Typography.Text strong>Empresa</Typography.Text>
-                        <Select
-                            allowClear
-                            placeholder="Selecione a empresa"
-                            style={{ width: "100%", marginTop: 8 }}
-                            options={companyOptions}
-                            value={companyId}
-                            onChange={handleChangeCompany}
-                        />
-                    </Col>
-                    <Col>
-                        <Typography.Text strong>Categoria</Typography.Text>
-                        <Select
-                            allowClear
-                            placeholder="Selecione a categoria"
-                            style={{ width: "100%", marginTop: 8 }}
-                            options={formattedCategoryOptions}
-                            value={category}
-                            onChange={setCategory}
-                            disabled={!companyId || categoryOptions.length === 0}
-                        />
-                    </Col>
-                    <Col>
-                        <Button
-                            type="primary"
-                            block
-                            disabled={!companyId || !category}
-                            onClick={handleSearch}
-                        >
-                            Buscar Estados
-                        </Button>
-                    </Col>
-                    <Col>
-                        <Button
-                            type="default"
-                            block
-                            disabled={!appliedFilters || updateMutation.isPending}
-                            loading={updateMutation.isPending}
-                            onClick={handleSave}
-                        >
-                            Salvar Prioridades
-                        </Button>
-                    </Col>
-                </Row>
-
-                <div className="flex overflow-y-auto">
-                    <PriorityTable
-                        rows={rows}
-                        isLoading={isLoading}
-                        selectedByType={selectedPriorityByType}
-                        onChangePriority={handleChangePriority}
+            <Row gutter={16} align="bottom">
+                <Col>
+                    <Typography.Text strong>Empresa</Typography.Text>
+                    <Select
+                        allowClear
+                        placeholder="Selecione a empresa"
+                        style={{ width: "100%", marginTop: 8 }}
+                        options={companyOptions}
+                        value={companyId}
+                        onChange={handleChangeCompany}
                     />
-                </div>
-            </Space>
+                </Col>
+                <Col>
+                    <Typography.Text strong>Categoria</Typography.Text>
+                    <Select
+                        allowClear
+                        placeholder="Selecione a categoria"
+                        style={{ width: "100%", marginTop: 8 }}
+                        options={formattedCategoryOptions}
+                        value={category}
+                        onChange={setCategory}
+                        disabled={!companyId || categoryOptions.length === 0}
+                    />
+                </Col>
+                <Col>
+                    <Button
+                        type="primary"
+                        block
+                        disabled={!companyId || !category}
+                        onClick={handleSearch}
+                    >
+                        Buscar Estados
+                    </Button>
+                </Col>
+                <Col>
+                    <Button
+                        type="default"
+                        block
+                        disabled={!appliedFilters || updateMutation.isPending}
+                        loading={updateMutation.isPending}
+                        onClick={handleSave}
+                    >
+                        Salvar Prioridades
+                    </Button>
+                </Col>
+            </Row>
+
+            <PriorityTable
+                rows={rows}
+                isLoading={isLoading}
+                selectedByType={selectedPriorityByType}
+                onChangePriority={handleChangePriority}
+            />
+
         </div>
     );
 }

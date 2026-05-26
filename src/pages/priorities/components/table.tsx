@@ -186,16 +186,18 @@ export function PriorityTable({
 
     ];
 
-    return (<div className="flex overflow-y-auto ">
-        <Table
-            rowKey="uf"
-            scroll={{ y: 800 }}
-            columns={columns}
-            dataSource={dataSourceByRegion}
-            className={styles.customTable}
-            loading={isLoading}
-            pagination={false}
-            locale={{ emptyText: "Nenhum estado encontrado para os filtros" }}
-        /></div>
+    return (<>
+        <div className="flex overflow-y-auto ">
+            <Table
+                rowKey="uf"
+                scroll={{ y: 800 }}
+                columns={columns}
+                dataSource={dataSourceByRegion}
+                className={styles.customTable}
+                loading={isLoading}
+                pagination={false}
+                locale={{ emptyText: "Nenhum estado encontrado para os filtros" }}
+            />
+        </div></>
     );
 }
