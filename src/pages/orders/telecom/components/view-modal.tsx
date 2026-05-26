@@ -1,4 +1,4 @@
-import { Col, Row, Button, Form, ConfigProvider, Input, Select, Tooltip, } from "antd";
+import { App, Col, Row, Button, Form, ConfigProvider, Input, Select, Tooltip } from "antd";
 
 import { OrderModalShell } from "../../common/components/order-modal-shell";
 import { OrderModalSection } from "../../common/components/order-modal-section";
@@ -17,6 +17,7 @@ import { useUpdateEntity, type EntityType } from "../../config-page.const";
 import { useAuth } from "@/context/auth-provider";
 import { usePartnerQuery } from "@/hooks/partners/usePartnerQuery";
 import { useCompanyQuery } from "@/hooks/companies/useCompanyQuery";
+import { generateOrderPdf } from "@/utils/order-pdf.util";
 
 function resolveOperatorKey(companyName?: string | null) {
     return companyName?.split(" ")[0]?.toLowerCase().trim();
@@ -154,6 +155,7 @@ export function ViewModal({
     onDelete,
     canDelete = false,
 }: ViewModalProps) {
+    const { message } = App.useApp();
     const [observationForm] = Form.useForm();
     const updateMutation = useUpdateEntity();
     const statusMutation = useUpdateOrderStatusMutation();
@@ -162,6 +164,7 @@ export function ViewModal({
     const [idCRM, setIdCRM] = useState("");
     const [idCORP, setIdCORP] = useState("");
     const [credito, setCredito] = useState("");
+    const [isExportingPdf, setIsExportingPdf] = useState(false);
 
     const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
@@ -191,17 +194,19 @@ export function ViewModal({
         partnerId: viewingEntity?.partner_id ?? undefined,
         enabled: isAdmin && !!viewingEntity?.partner_id,
     });
-    const partnerName = partnerData?.partners?.find(
+    const selectedPartner = partnerData?.partners?.find(
         (p) => p.partner_id === viewingEntity?.partner_id,
-    )?.partner_name;
+    );
+    const partnerName = selectedPartner?.partner_name;
 
     const { data: companyData } = useCompanyQuery({
         per_page: 100,
         enabled: isAdmin && !!viewingEntity?.company_id,
     });
-    const companyName = companyData?.companies.find(
+    const selectedCompany = companyData?.companies.find(
         (c) => c.company_id === viewingEntity?.company_id,
-    )?.company_name;
+    );
+    const companyName = selectedCompany?.company_name;
 
     if (!viewingEntity) {
         return null;
@@ -218,6 +223,25 @@ export function ViewModal({
             });
         }
     };
+
+    const handleExportPdf = async () => {
+        if (!viewingEntity) return;
+
+        setIsExportingPdf(true);
+        try {
+            await generateOrderPdf({
+                order: viewingEntity,
+                segmentLabel: "telecom",
+                companyName,
+                partnerName,
+            });
+        } catch {
+            message.error("Nao foi possivel exportar o PDF do pedido.");
+        } finally {
+            setIsExportingPdf(false);
+        }
+    };
+
     const color = appSetting.primaryColor;
     return (
         <OrderModalShell
@@ -286,6 +310,9 @@ export function ViewModal({
             }
             footer={
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+                    <Button onClick={handleExportPdf} loading={isExportingPdf}>
+                        Exportar PDF
+                    </Button>
                     <Button type="primary" onClick={() => viewingEntity && onEdit?.(viewingEntity)}>
                         Editar
                     </Button>

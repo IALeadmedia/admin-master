@@ -1,5 +1,5 @@
 import { ExclamationOutlined } from "@ant-design/icons";
-import { Button, Col, ConfigProvider, Form, Input, Row, Select, } from "antd";
+import { App, Button, Col, ConfigProvider, Form, Input, Row, Select } from "antd";
 import { useEffect, useState, } from "react";
 import { OrderModalSection } from "../../common/components/order-modal-section";
 import { OrderModalShell } from "../../common/components/order-modal-shell";
@@ -16,6 +16,7 @@ import { useUpdateOrderStatusMutation } from "@/hooks/orders/useUpdateOrderStatu
 import { useAuth } from "@/context/auth-provider";
 import { usePartnerQuery } from "@/hooks/partners/usePartnerQuery";
 import { useCompanyQuery } from "@/hooks/companies/useCompanyQuery";
+import { generateOrderPdf } from "@/utils/order-pdf.util";
 const financeProductLabelMap = {
     "conta-pj": "Conta PJ",
     "capital-giro-c6": "Capital de Giro",
@@ -46,11 +47,13 @@ export function ViewModal({
     onDelete,
     canDelete = false,
 }: ViewModalProps) {
+    const { message } = App.useApp();
     const [form] = Form.useForm();
     const updateMutation = useUpdateEntity(); const statusMutation = useUpdateOrderStatusMutation();
     const [consultor, setConsultor] = useState("");
     const [idCRM, setIdCRM] = useState("");
     const [idCORP, setIdCORP] = useState("");
+    const [isExportingPdf, setIsExportingPdf] = useState(false);
 
     const { isGlobalAdmin } = useAuth();
     const isAdmin = isAdminDomain && isGlobalAdmin;
@@ -59,17 +62,19 @@ export function ViewModal({
         partnerId: viewingEntity?.partner_id ?? undefined,
         enabled: isAdmin && !!viewingEntity?.partner_id,
     });
-    const partnerName = partnerData?.partners?.find(
+    const selectedPartner = partnerData?.partners?.find(
         (p) => p.partner_id === viewingEntity?.partner_id,
-    )?.partner_name;
+    );
+    const partnerName = selectedPartner?.partner_name;
 
     const { data: companyData } = useCompanyQuery({
         per_page: 100,
         enabled: isAdmin && !!viewingEntity?.company_id,
     });
-    const companyName = companyData?.companies.find(
+    const selectedCompany = companyData?.companies.find(
         (c) => c.company_id === viewingEntity?.company_id,
-    )?.company_name;
+    );
+    const companyName = selectedCompany?.company_name;
 
     const financeData = viewingEntity;
 
@@ -90,6 +95,24 @@ export function ViewModal({
                 id: financeData.id,
                 payload: { consultant_observation: values.consultant_observation },
             });
+        }
+    };
+
+    const handleExportPdf = async () => {
+        if (!financeData) return;
+
+        setIsExportingPdf(true);
+        try {
+            await generateOrderPdf({
+                order: financeData,
+                segmentLabel: "financas",
+                companyName,
+                partnerName,
+            });
+        } catch {
+            message.error("Nao foi possivel exportar o PDF do pedido.");
+        } finally {
+            setIsExportingPdf(false);
         }
     };
 
@@ -175,6 +198,9 @@ export function ViewModal({
             }
             footer={
                 <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
+                    <Button onClick={handleExportPdf} loading={isExportingPdf}>
+                        Exportar PDF
+                    </Button>
                     <Button type="primary" onClick={() => financeData && onEdit?.(financeData)}>
                         Editar
                     </Button>
