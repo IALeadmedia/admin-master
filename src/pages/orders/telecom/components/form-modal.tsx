@@ -9,6 +9,7 @@ import { useResolvedOrderScope } from "@/hooks/orders/useResolvedOrderScope";
 import type { OrderPriceSummary, OrderSelectedExtra } from "@/types/orders/base.type";
 import type { IProduct } from "@/types/IProduct.type";
 import { OrderModalSection } from "../../common/components/order-modal-section";
+import { formatBRL } from "@/utils/number.utils";
 
 type PlanSelectedExtraOption = {
     id: string;
@@ -122,7 +123,7 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
 
     const planOptions = useMemo<PlanOption[]>(
         () => (productsData?.products ?? []).map((product) => ({
-            label: product.name,
+            label: product.name + " - " + formatBRL(product.pricing.base_monthly.current_price),
             value: product.id,
             plan: product,
         })),
@@ -232,6 +233,12 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
                         : undefined,
                 installation_preferred_period_two:
                     editingEntity.installation_preferred_period_two ?? undefined,
+                installation_preferred_date_three:
+                    editingEntity.installation_preferred_date_three
+                        ? dayjs(editingEntity.installation_preferred_date_three)
+                        : undefined,
+                installation_preferred_period_three:
+                    editingEntity.installation_preferred_period_three ?? undefined,
                 full_name: editingEntity.full_name ?? undefined,
                 cpf: editingEntity.cpf ?? undefined,
                 birth_date: editingEntity.birth_date ?? undefined,
@@ -278,6 +285,9 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
             const installationPreferredDateTwo = dayjs.isDayjs(values.installation_preferred_date_two)
                 ? values.installation_preferred_date_two.format("YYYY-MM-DD")
                 : values.installation_preferred_date_two ?? null;
+            const installationPreferredDateThree = dayjs.isDayjs(values.installation_preferred_date_three)
+                ? values.installation_preferred_date_three.format("YYYY-MM-DD")
+                : values.installation_preferred_date_three ?? null;
 
             const normalizedAddressComplement = {
                 lot: values.address_complement?.lot ?? null,
@@ -301,6 +311,7 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
                         selected_extras: selectedExtrasSnapshot,
                         installation_preferred_date_one: installationPreferredDateOne,
                         installation_preferred_date_two: installationPreferredDateTwo,
+                        installation_preferred_date_three: installationPreferredDateThree,
                         cnpj: values.cnpj ?? null,
                         due_day: values.due_day ?? null,
                         address_complement: normalizedAddressComplement,
@@ -325,33 +336,34 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
             onCancel={onClose}
             confirmLoading={isPending}
             destroyOnHidden
-            width={960}
+            width={1100}
         >
-            <Form form={form} layout="vertical" style={{ marginTop: 8 }} className="max-h-110 overflow-y-auto scrollbar-thin">
+            <Form form={form} layout="vertical" className="max-h-110 overflow-y-auto scrollbar-thin mt-2">
                 <OrderModalSection title="Detalhes do Plano">
-                    <div className="flex flex-col bg-neutral-100 mb-3 rounded-sm p-3">
-
+                    <div className="flex flex-col bg-neutral-100 mb-3 rounded-sm p-3 px-1">
 
                         <div className="mt-4 flex w-full flex-col text-neutral-700">
                             <div className="flex items-center px-2 justify-between font-semibold text-[#666666] text-[14px]">
-                                <p className="w-72 text-center">Plano</p>
+                                <p className="w-60 text-center">Plano</p>
                                 <p className="w-28 text-center">Data Instalação 1</p>
                                 <p className="w-20 text-center">Período 1</p>
                                 <p className="w-28 text-center">Data Instalação 2</p>
                                 <p className="w-20 text-center">Período 2</p>
+                                <p className="w-28 text-center">Data Instalação 3</p>
+                                <p className="w-20 text-center">Período 3</p>
                                 <p className="w-20 text-center">Vencimento</p>
                             </div>
                             <hr className="border-t border-neutral-300" />
 
                             <div className="flex px-2 items-center justify-between gap-4 py-4 pb-0 text-[14px]">
-                                <div className="w-72 flex justify-center">
+                                <div className="w-60 flex justify-center">
                                     <Form.Item name="plan_id" className="mb-0">
                                         <Select
                                             size="small"
                                             showSearch
                                             allowClear
                                             placeholder="Selecione o plano"
-                                            className="min-w-72"
+                                            className="min-w-60 max-w-64"
                                             onChange={handlePlanChange}
                                             options={planOptions}
                                             optionFilterProp="label"
@@ -404,6 +416,33 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
                                         <Select
                                             size="small"
                                             placeholder="Período 2"
+                                            className="min-w-22"
+                                            options={[
+                                                { label: "MANHÃ", value: "MANHA" },
+                                                { label: "TARDE", value: "TARDE" },
+                                                { label: "NOITE", value: "NOITE" },
+                                            ]}
+                                        />
+                                    </Form.Item>
+                                </div>
+
+                                <div className="w-28 flex justify-center">
+                                    <Form.Item name="installation_preferred_date_three" className="mb-0">
+                                        <DatePicker
+                                            format="DD/MM/YYYY"
+                                            placeholder="Data 3"
+                                            className="min-w-28 text-center"
+                                            size="small"
+                                            allowClear
+                                        />
+                                    </Form.Item>
+                                </div>
+
+                                <div className="w-20 flex justify-center">
+                                    <Form.Item name="installation_preferred_period_three" className="mb-0">
+                                        <Select
+                                            size="small"
+                                            placeholder="Período 3"
                                             className="min-w-22"
                                             options={[
                                                 { label: "MANHÃ", value: "MANHA" },

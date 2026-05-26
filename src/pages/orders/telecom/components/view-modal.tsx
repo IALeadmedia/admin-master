@@ -357,6 +357,7 @@ export function ViewModal({
                                 <p className="w-72 text-center">Plano</p>
                                 <p className="w-50 text-center">Data de Instalação 1</p>
                                 <p className="w-50 text-center">Data de Instalação 2</p>
+                                <p className="w-50 text-center">Data de Instalação 3</p>
                                 <p className="w-32 text-center">Vencimento</p>
                                 <p className="w-46 text-center">Total</p>
                                 <p className="w-12 text-center">Extras</p>
@@ -378,6 +379,12 @@ export function ViewModal({
                                         <p className="text-[14px] w-50 text-center">
                                             {viewingEntity.installation_preferred_date_two
                                                 ? `${organizeDateFormat(viewingEntity.installation_preferred_date_two)} - ${viewingEntity.installation_preferred_period_two || "-"}`
+
+                                                : "-"}
+                                        </p>
+                                        <p className="text-[14px] w-50 text-center">
+                                            {viewingEntity.installation_preferred_date_three
+                                                ? `${organizeDateFormat(viewingEntity.installation_preferred_date_three)} - ${viewingEntity.installation_preferred_period_three || "-"}`
 
                                                 : "-"}
                                         </p>

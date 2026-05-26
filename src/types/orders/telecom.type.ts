@@ -192,6 +192,8 @@ export type FormValues = {
   installation_preferred_period_one?: string;
   installation_preferred_date_two?: string | Dayjs;
   installation_preferred_period_two?: string;
+  installation_preferred_date_three?: string | Dayjs;
+  installation_preferred_period_three?: string;
   due_day?: string | number;
   availability_pap?: boolean;
   full_name?: string;
