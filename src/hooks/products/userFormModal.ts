@@ -10,6 +10,7 @@ import {
   mapExistingImagesToUploadFiles,
   prepareExtrasGroup,
   resolveConditionUrl,
+  resolveImageUrl,
   toExtraTemplate,
 } from "@/utils/products.utils";
 import { parseDecimalValue } from "@/utils/number.utils";
@@ -130,6 +131,10 @@ export function useFormModal({ open, editingEntity, category, onClose }: any) {
         offer_conditions: mapExistingConditionsToUploadFiles(
           editingEntity.offer_conditions,
         ),
+        details: (editingEntity.details ?? []).map((detail: any) => ({
+          ...detail,
+          images: mapExistingImagesToUploadFiles(detail.images),
+        })),
         extras_non_client: (editingEntity.extras?.non_client ?? []).map(
           (group: any) => ({
             ...group,
@@ -165,7 +170,7 @@ export function useFormModal({ open, editingEntity, category, onClose }: any) {
       .map((f) => f.originFileObj as File);
 
     const persistedOfferConditions = (values.offer_conditions ?? [])
-      .filter((f) => !f.originFileObj && f.status === "done")
+      .filter((f) => !f.originFileObj)
       .map((f) => ({
         url: resolveConditionUrl(f)!,
         type: f.type ?? "file",
@@ -235,10 +240,14 @@ export function useFormModal({ open, editingEntity, category, onClose }: any) {
       },
       details: (values.details ?? []).map((detail) => ({
         ...detail,
-        images: (detail.images ?? [])
-          .filter((f): f is UploadFile => typeof f !== "string")
-          .filter((f) => !f.originFileObj && f.status === "done" && !!f.url)
-          .map((f) => f.url!),
+        images: (detail.images ?? []).flatMap((image) => {
+          if (typeof image !== "string" && image.originFileObj) {
+            return [];
+          }
+
+          const imageUrl = resolveImageUrl(image);
+          return imageUrl ? [imageUrl] : [];
+        }),
       })),
       extras: {
         non_client: normalizedExtrasNonClient.map((extra) => extra.payload),

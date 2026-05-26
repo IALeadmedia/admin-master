@@ -94,10 +94,14 @@ export function prepareExtrasGroup(
           extra.input_type && extra.input_type !== "select"
             ? extra.input_type
             : "checkbox_group",
-        images: (extra.images ?? [])
-          .filter((f): f is UploadFile => typeof f !== "string")
-          .filter((f) => !f.originFileObj && f.status === "done" && !!f.url)
-          .map((f) => f.url!),
+        images: (extra.images ?? []).flatMap((image) => {
+          if (typeof image !== "string" && image.originFileObj) {
+            return [];
+          }
+
+          const imageUrl = resolveImageUrl(image);
+          return imageUrl ? [imageUrl] : [];
+        }),
         options: (extra.options ?? []).map((option, optionIdx) => ({
           ...option,
           id: String(option.id ?? `option_${prefix}_${idx}_${optionIdx}`),
@@ -116,16 +120,21 @@ export function prepareExtrasGroup(
 }
 
 export function mapExistingImagesToUploadFiles(
-  images?: string[],
+  images?: unknown[],
 ): UploadFile[] {
   if (!images?.length) return [];
 
-  return images.map((url, idx) => ({
-    uid: `${url}-${idx}`,
-    name: url.split("/").pop() || `imagem_${idx + 1}`,
-    status: "done",
-    url,
-  }));
+  return images.flatMap((image, idx) => {
+    const url = resolveImageUrl(image);
+    if (!url) return [];
+
+    return {
+      uid: `${url}-${idx}`,
+      name: url.split("/").pop() || `imagem_${idx + 1}`,
+      status: "done",
+      url,
+    } satisfies UploadFile;
+  });
 }
 
 export function resolveConditionUrl(condition: unknown): string | undefined {

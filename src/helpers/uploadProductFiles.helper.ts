@@ -18,18 +18,14 @@ export async function uploadProductFiles(
   }
 
   if (detailsImages?.length) {
-    await Promise.all(
-      detailsImages.map(({ detailIndex, files }) =>
-        service.uploadDetails(id, detailIndex, files, model),
-      ),
-    );
+    for (const { detailIndex, files } of detailsImages) {
+      await service.uploadDetails(id, detailIndex, files, model);
+    }
   }
 
   if (extrasImages?.length) {
-    await Promise.all(
-      extrasImages.map(({ extraId, files }) =>
-        service.uploadExtras(id, extraId, files, model),
-      ),
-    );
+    for (const { extraId, files } of extrasImages) {
+      await service.uploadExtras(id, extraId, files, model);
+    }
   }
 }
