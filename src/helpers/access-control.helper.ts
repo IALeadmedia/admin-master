@@ -9,6 +9,7 @@ export type PermissionResource =
   | "priorities"
   | "products"
   | "orders";
+
 export type PermissionAction = "view" | "create" | "edit" | "delete";
 
 type RestrictedRoute =

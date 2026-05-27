@@ -20,7 +20,7 @@ export const Route = createFileRoute("/app/order/$model")({
 
         const model = resolveOrderModel(params.model);
 
-        if (model === "finances") {
+        if (model === "finances" || model === "benefits") {
             return;
         }
 

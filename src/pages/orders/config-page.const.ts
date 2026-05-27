@@ -15,6 +15,9 @@ import { FormModal as TelecomFormModal } from "./telecom/components/form-modal";
 import { ViewModal as TelecomViewModal } from "./telecom/components/view-modal";
 import { FormModal as FinanceFormModal } from "./finances/components/form-modal";
 import { ViewModal as FinanceViewModal } from "./finances/components/view-modal";
+import { FormModal as BenefitsFormModal } from "./benefits/components/form-modal";
+import { ViewModal as BenefitsViewModal } from "./benefits/components/view-modal";
+import { getBenefitsOrderColumns } from "./benefits/components/columns";
 
 export type {
   OrderCategory,
@@ -142,6 +145,10 @@ export function getOrderColumnsByModel(
     return getFinanceOrderColumns() as TableColumnsType<EntityType>;
   }
 
+  if (model === "benefits") {
+    return getBenefitsOrderColumns() as TableColumnsType<EntityType>;
+  }
+
   return undefined;
 }
 
@@ -151,7 +158,7 @@ export const segmentComponents: Record<
 > = {
   telecom: { FormModal: TelecomFormModal, ViewModal: TelecomViewModal },
   finances: { FormModal: FinanceFormModal, ViewModal: FinanceViewModal },
-  benefits: { FormModal: TelecomFormModal, ViewModal: TelecomViewModal },
+  benefits: { FormModal: BenefitsFormModal, ViewModal: BenefitsViewModal },
 };
 
 export type { TelecomFormValues } from "@/types/orders";

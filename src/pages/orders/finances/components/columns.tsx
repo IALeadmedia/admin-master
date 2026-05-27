@@ -4,7 +4,6 @@ import {
     getSharedOrderColumnsAfter,
     getSharedOrderColumnsBefore,
 } from "../../common/components/columns";
-import { formatBRL } from "@/utils/number.utils";
 
 type UseAllTableColumnsProps = {
     columns?: TableColumnsType<FinanceOrder>;
@@ -14,7 +13,6 @@ type FinanceOrderRecord = FinanceOrder & {
     pf_temperature?: number | null;
     products_of_interest?: string | string[] | null;
     landing_page?: string | null;
-    price_summary?: { total_monthly?: number | null } | null;
 };
 
 function getFinanceHeaderColumns(): TableColumnsType<FinanceOrderRecord> {
@@ -57,15 +55,7 @@ function getFinanceHeaderColumns(): TableColumnsType<FinanceOrderRecord> {
                 return values.map((item) => labelMap[item] ?? item).join(", ");
             },
         },
-        {
-            title: "Total",
-            dataIndex: ["price_summary", "total_monthly"],
-            width: 120,
-            render: (_, record) =>
-                record.price_summary?.total_monthly != null
-                    ? formatBRL(record.price_summary.total_monthly)
-                    : "-",
-        },
+
     ];
 }
 

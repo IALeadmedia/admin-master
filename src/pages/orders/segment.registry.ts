@@ -51,7 +51,7 @@ export const segmentRegistry: Record<OrderModule, SegmentConfig> = {
   },
   benefits: {
     label: "Benefícios",
-    hasCategories: true,
+    hasCategories: false,
     defaultCategory: "beneficios",
     categories: ["beneficios"],
     categoryLabelMap: {

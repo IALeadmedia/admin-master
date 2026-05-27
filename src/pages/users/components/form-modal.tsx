@@ -189,11 +189,11 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
       createMutation.mutate(
         {
           ...values,
-          company_id: values.company_id ?? 0,
+          company_id: values.company_id ?? null,
           allow_email_notifications: values.allow_email_notifications ?? false,
           allow_sms_notifications: values.allow_sms_notifications ?? false,
           allow_wpp_notifications: values.allow_wpp_notifications ?? false,
-          partner_id: values.partner_id ?? 0,
+          partner_id: values.partner_id ?? null,
           person_responsible_id: values.person_responsible_id ?? null,
           password: values.password!,
           user_type: values.user_type ?? "",

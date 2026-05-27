@@ -1,4 +1,4 @@
-import type { OrderBase } from "./base.type";
+import type { OrderAddressComplement, OrderBase } from "./base.type";
 
 export interface BenefitsOrderResponse {
   orders: BenefitsOrder[];
@@ -40,4 +40,16 @@ export interface BenefitsOrderFormValues {
   contact_objective?: string;
   full_name?: string;
   phone?: string;
+  cpf?: string;
+  cnpj?: string;
+  email?: string;
+  address?: string;
+  address_complement?: Partial<OrderAddressComplement>;
+  address_number?: string;
+  district?: string;
+  state?: string;
+  zip_code?: string;
+  single_zip_code?: boolean;
+  consultant_observation?: string;
+  city?: string;
 }

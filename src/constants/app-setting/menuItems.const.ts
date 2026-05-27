@@ -144,7 +144,13 @@ export const menuOptionsVivo: MenuItem[] = [
   },
 ];
 
-export const menuOptionsVR: MenuItem[] = [...menuOptionsCommon];
+export const menuOptionsVR: MenuItem[] = [
+  ...menuOptionsCommon,
+  {
+    label: "Pedidos",
+    to: "/app/order/benefits",
+  },
+];
 
 export const menuOptionsC6: MenuItem[] = [
   ...menuOptionsCommon,

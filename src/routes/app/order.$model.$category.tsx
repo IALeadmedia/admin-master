@@ -19,7 +19,7 @@ export const Route = createFileRoute("/app/order/$model/$category")({
     }
 
     const model = resolveOrderModel(params.model);
-    if (model === "finances") {
+    if (model === "finances" || model === "benefits") {
       throw redirect({ to: "/app/order/$model", params: { model } });
     }
 

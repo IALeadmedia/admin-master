@@ -1,4 +1,3 @@
-
 import { App, Button, Col, ConfigProvider, Form, Input, Row, Select } from "antd";
 import { useEffect, useState, } from "react";
 import { OrderModalSection } from "../../common/components/order-modal-section";
@@ -8,7 +7,7 @@ import { formatCEP, formatCPF } from "@/utils/document.util";
 import { formatPhoneNumber } from "@/utils/number.utils";
 import { formatBrowserDisplay, formatDevice, formatOSDisplay, formatResolution } from "@/utils/orders.util";
 import { useUpdateEntity } from "../../config-page.const";
-import type { FinanceOrder } from "@/types/orders";
+import type { BenefitsOrder, } from "@/types/orders";
 import anonymousAvatar from "@/assets/anonymous_avatar.png";
 import { EmpresasDisplay } from "../../common/components/companiesDisplay";
 import { appSetting, isAdminDomain } from "@/constants/app-setting/config.const";
@@ -17,25 +16,13 @@ import { useAuth } from "@/context/auth-provider";
 import { usePartnerQuery } from "@/hooks/partners/usePartnerQuery";
 import { useCompanyQuery } from "@/hooks/companies/useCompanyQuery";
 import { generateOrderPdf } from "@/utils/order-pdf.util";
-const financeProductLabelMap = {
-    "conta-pj": "Conta PJ",
-    "capital-giro-c6": "Capital de Giro",
-    "maquinha-cartao": "Maquininha",
-    investimentos: "Investimentos",
-    "cartao-credito": "Cartão de Crédito",
-    "reducao-dividas": "Redução de Dívidas",
-    outro: "Outro",
-} as const;
-
-type FinanceProductKey = keyof typeof financeProductLabelMap;
-
 
 interface ViewModalProps {
     open: boolean;
-    viewingEntity: FinanceOrder | null;
+    viewingEntity: BenefitsOrder | null;
     onClose: () => void;
-    onEdit?: (entity: FinanceOrder) => void;
-    onDelete?: (entity: FinanceOrder) => void;
+    onEdit?: (entity: BenefitsOrder) => void;
+    onDelete?: (entity: BenefitsOrder) => void;
     canDelete?: boolean;
 }
 
@@ -76,36 +63,36 @@ export function ViewModal({
     );
     const companyName = selectedCompany?.company_name;
 
-    const financeData = viewingEntity;
+    const benefitsData = viewingEntity;
 
     useEffect(() => {
-        if (open && financeData) {
+        if (open && benefitsData) {
             form.setFieldsValue({
-                consultant_observation: financeData.consultant_observation || "",
+                consultant_observation: benefitsData.consultant_observation || "",
             });
         }
-    }, [financeData, form, open]);
+    }, [benefitsData, form, open]);
 
 
 
     const handleSaveObservacao = async () => {
         const values = await form.validateFields();
-        if (values.consultant_observation?.trim() !== "" && financeData) {
+        if (values.consultant_observation?.trim() !== "" && benefitsData) {
             updateMutation.mutate({
-                id: financeData.id,
+                id: benefitsData.id,
                 payload: { consultant_observation: values.consultant_observation },
             });
         }
     };
 
     const handleExportPdf = async () => {
-        if (!financeData) return;
+        if (!benefitsData) return;
 
         setIsExportingPdf(true);
         try {
             await generateOrderPdf({
-                order: financeData,
-                segmentLabel: "financas",
+                order: benefitsData,
+                segmentLabel: "beneficios",
                 companyName,
                 partnerName,
             });
@@ -117,25 +104,42 @@ export function ViewModal({
     };
 
     const produtoPrincipal =
-        financeData?.landing_page === "conta-pj"
-            ? "Conta PJ"
-            : financeData?.landing_page === "cartao-pj-c6"
-                ? "Cartão PJ"
-                : financeData?.landing_page === "maquinha-cartao-c6-empresas"
-                    ? "Maquininha"
+        benefitsData?.category === "vale-refeicao"
+            ? "Vale Refeição"
+            : benefitsData?.category === "vale-alimentacao"
+                ? "Vale Alimentação"
+                : benefitsData?.category === "vale-auto"
+                    ? "Vale Auto"
                     : "-";
 
-    const outrosProdutos = (() => {
-        if (!financeData?.products_of_interest) return "-";
-
-        const products = Array.isArray(financeData.products_of_interest)
-            ? financeData.products_of_interest
-            : [financeData.products_of_interest];
-
-        return products.length
-            ? products.map((product: string) => financeProductLabelMap[product as FinanceProductKey] ?? product).join(", ")
-            : "-";
+    const contactObjectiveLabel = (() => {
+        if (!benefitsData?.contact_objective) return "-";
+        return benefitsData.contact_objective === "rh_contratar_vr" ? "Sou RH/Empregador e quero contratar a VR na minha empresa" :
+            benefitsData.contact_objective === "estabelecimento_aceitar_vr" ? "Sou Estabelecimento e quero aceitar VR" :
+                benefitsData.contact_objective === "cliente_mais_info" ? "Já sou cliente VR e quero mais informações" :
+                    benefitsData.contact_objective === "trabalhador_consultar_saldo" ? "Sou Trabalhador e quero consultar meu saldo VR" :
+                        "-";
     })();
+
+
+
+    const numberOfEmployees = (() => {
+        if (!benefitsData?.company_size_range) return "-";
+        return benefitsData?.company_size_range === "1_a_10"
+            ? "1 a 10"
+            : benefitsData?.company_size_range === "11_a_25"
+                ? "11 a 25"
+                : benefitsData?.company_size_range === "26_a_50"
+                    ? "26 a 50"
+                    : benefitsData?.company_size_range === "51_a_100"
+                        ? "51 a 100"
+                        : benefitsData?.company_size_range === "101_a_999"
+                            ? "101 a 999"
+                            : benefitsData?.company_size_range === "mais_de_1000"
+                                ? "Mais de 1000"
+                                : "-";
+    })();
+
     const color = appSetting.primaryColor;
     return (
         <OrderModalShell
@@ -201,11 +205,11 @@ export function ViewModal({
                     <Button onClick={handleExportPdf} loading={isExportingPdf}>
                         Exportar PDF
                     </Button>
-                    <Button type="primary" onClick={() => financeData && onEdit?.(financeData)}>
+                    <Button type="primary" onClick={() => benefitsData && onEdit?.(benefitsData)}>
                         Editar
                     </Button>
                     {canDelete && (
-                        <Button danger onClick={() => financeData && onDelete?.(financeData)}>
+                        <Button danger onClick={() => benefitsData && onDelete?.(benefitsData)}>
                             Deletar
                         </Button>
                     )}
@@ -222,61 +226,37 @@ export function ViewModal({
                                 <Col span={12}>
                                     <ReadonlyField
                                         label="Empresa"
-                                        value={financeData?.company_id
-                                            ? (companyName ?? `#${financeData.company_id}`)
+                                        value={benefitsData?.company_id
+                                            ? (companyName ?? `#${benefitsData.company_id}`)
                                             : "-"}
                                     />
                                 </Col>
-                                <Col span={12}>
+                                {/* <Col span={12}>
                                     <ReadonlyField
                                         label="Parceiro"
-                                        value={financeData?.partner_id
-                                            ? (partnerName ?? `#${financeData.partner_id}`)
+                                        value={benefitsData?.partner_id
+                                            ? (partnerName ?? `#${benefitsData.partner_id}`)
                                             : "-"}
                                     />
-                                </Col>
+                                </Col> */}
                             </Row>
                         </OrderModalSection>
                     )}
                     <OrderModalSection title="Produtos de Interesse">
                         <Row gutter={[16, 16]}>
                             <Col span={12}>
-                                <ReadonlyField label="Produto Principal" value={produtoPrincipal} />
+                                <ReadonlyField label="Produto" value={produtoPrincipal} />
                             </Col>
                             <Col span={12}>
-                                <ReadonlyField label="Outros Produtos" value={outrosProdutos} />
+                                <ReadonlyField label="Objetivo de Contato" value={contactObjectiveLabel} />
+                            </Col>
+                            <Col span={12}>
+                                <ReadonlyField label="Número de Colaboradores" value={numberOfEmployees} />
                             </Col>
                         </Row>
                     </OrderModalSection>
 
-                    <OrderModalSection title="App C6 Bank">
-                        <Row gutter={[16, 16]}>
-                            <Col span={12}>
-                                <ReadonlyField
-                                    label="Click App"
-                                    value={financeData?.app_click == null ? "-" : financeData.app_click ? "Sim" : "Não"}
-                                />
-                            </Col>
-                            <Col span={12}>
-                                <ReadonlyField
-                                    label="Data/Hora Click"
-                                    value={financeData?.app_click_at ? new Date(financeData.app_click_at).toLocaleString("pt-BR") : "-"}
-                                />
-                            </Col>
-                            <Col span={12}>
-                                <ReadonlyField
-                                    label="Cadastro App"
-                                    value={financeData?.app_register == null ? "-" : financeData.app_register ? "Sim" : "Não"}
-                                />
-                            </Col>
-                            <Col span={12}>
-                                <ReadonlyField
-                                    label="Data/Hora Cadastro"
-                                    value={financeData?.app_register_at ? new Date(financeData.app_register_at).toLocaleString("pt-BR") : "-"}
-                                />
-                            </Col>
-                        </Row>
-                    </OrderModalSection>
+
 
                     <OrderModalSection title="Informações do Cliente">
                         <Row gutter={[16, 16]}>
@@ -284,43 +264,43 @@ export function ViewModal({
                                 <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
                                     <div style={{ position: "relative" }}>
                                         <img
-                                            src={financeData?.whatsapp?.avatar || anonymousAvatar}
+                                            src={benefitsData?.whatsapp?.avatar || anonymousAvatar}
                                             style={{
                                                 width: 40,
                                                 height: 40,
                                                 borderRadius: "50%",
-                                                outline: financeData?.pf_temperature === 10 ? "2px solid #d63535" : "none",
+                                                outline: benefitsData?.pf_temperature === 10 ? "2px solid #d63535" : "none",
                                             }}
                                         />
-                                        {financeData?.pf_temperature === 10 && (
+                                        {benefitsData?.pf_temperature === 10 && (
                                             <span style={{ position: "absolute", top: -4, right: -4, fontSize: 12 }}>🔥</span>
                                         )}
                                     </div>
                                 </div>
                             </Col>
                             <Col span={12}>
-                                <ReadonlyField label="Nome" value={financeData?.full_name} copyable />
+                                <ReadonlyField label="Nome" value={benefitsData?.full_name} copyable />
                             </Col>
                             <Col span={12}>
-                                <ReadonlyField label="Nome (RFB)" value={financeData?.rfb_name} copyable />
+                                <ReadonlyField label="Nome (RFB)" value={benefitsData?.rfb_name} copyable />
                             </Col>
                             <Col span={8}>
-                                <ReadonlyField label="CPF" value={formatCPF(financeData?.cpf || "")} copyable />
+                                <ReadonlyField label="CPF" value={formatCPF(benefitsData?.cpf || "")} copyable />
                             </Col>
                             <Col span={8}>
                                 <ReadonlyField
                                     label="Gênero (RFB)"
-                                    value={financeData?.rfb_gender === "M" ? "Masculino" : financeData?.rfb_gender === "F" ? "Feminino" : "-"}
+                                    value={benefitsData?.rfb_gender === "M" ? "Masculino" : benefitsData?.rfb_gender === "F" ? "Feminino" : "-"}
                                 />
                             </Col>
                             <Col span={8}>
-                                <ReadonlyField label="Data Nascimento (RFB)" value={financeData?.rfb_birth_date} copyable />
+                                <ReadonlyField label="Data Nascimento (RFB)" value={benefitsData?.rfb_birth_date} copyable />
                             </Col>
                             <Col span={12}>
-                                <ReadonlyField label="Nome Mãe (RFB)" value={financeData?.rfb_mother_name} copyable />
+                                <ReadonlyField label="Nome Mãe (RFB)" value={benefitsData?.rfb_mother_name} copyable />
                             </Col>
                             <Col span={12}>
-                                <ReadonlyField label="Email" value={financeData?.email} copyable />
+                                <ReadonlyField label="Email" value={benefitsData?.email} copyable />
                             </Col>
                         </Row>
                     </OrderModalSection>
@@ -331,16 +311,16 @@ export function ViewModal({
                                 <p style={{ fontSize: 12, fontWeight: 500, color: "#888", marginBottom: 8 }}>Telefone Principal</p>
                                 <Row gutter={[8, 8]}>
                                     <Col span={24}>
-                                        <ReadonlyField label="Número" value={formatPhoneNumber(financeData?.phone || "")} copyable />
+                                        <ReadonlyField label="Número" value={formatPhoneNumber(benefitsData?.phone || "")} copyable />
                                     </Col>
                                     <Col span={12}>
                                         <ReadonlyField
                                             label="Anatel"
-                                            value={financeData?.phone_valid == null ? "-" : financeData.phone_valid ? "Sim" : "Não"}
+                                            value={benefitsData?.phone_valid == null ? "-" : benefitsData.phone_valid ? "Sim" : "Não"}
                                         />
                                     </Col>
                                     <Col span={12}>
-                                        <ReadonlyField label="Portado" value={financeData?.portability} />
+                                        <ReadonlyField label="Portado" value={benefitsData?.portability} />
                                     </Col>
                                 </Row>
                             </Col>
@@ -350,13 +330,13 @@ export function ViewModal({
                     <OrderModalSection title="Informações Empresariais">
                         <Row gutter={[16, 16]}>
                             <Col span={8}>
-                                <ReadonlyField label="Sócio" value={financeData?.is_socio ? "Sim" : "Não"} />
+                                <ReadonlyField label="Sócio" value={benefitsData?.is_socio ? "Sim" : "Não"} />
                             </Col>
                             <Col span={8}>
-                                <ReadonlyField label="MEI" value={financeData?.is_mei ? "Sim" : "Não"} />
+                                <ReadonlyField label="MEI" value={benefitsData?.is_mei ? "Sim" : "Não"} />
                             </Col>
                             <Col span={12}>
-                                <EmpresasDisplay empresas={financeData?.company_partners} />
+                                <EmpresasDisplay empresas={benefitsData?.company_partners} />
                             </Col>
                         </Row>
                     </OrderModalSection>
@@ -364,74 +344,74 @@ export function ViewModal({
                     <OrderModalSection title="Endereço">
                         <Row gutter={[16, 16]}>
                             <Col span={12}>
-                                <ReadonlyField label="Rua" value={financeData?.address || "-"} copyable />
+                                <ReadonlyField label="Rua" value={benefitsData?.address || "-"} copyable />
                             </Col>
                             <Col span={6}>
-                                <ReadonlyField label="Número" value={financeData?.address_number || "-"} copyable />
+                                <ReadonlyField label="Número" value={benefitsData?.address_number || "-"} copyable />
                             </Col>
                             <Col span={6}>
                                 <ReadonlyField
                                     label="Complemento"
                                     value={
-                                        financeData?.address_complement?.building_or_house === "house"
-                                            ? financeData?.address_complement?.home_complement || "-"
-                                            : financeData?.address_complement?.building_or_house === "building"
-                                                ? `${financeData?.address_complement?.unit_type || "-"} ${financeData?.address_complement?.unit_number || "-"}`
+                                        benefitsData?.address_complement?.building_or_house === "house"
+                                            ? benefitsData?.address_complement?.home_complement || "-"
+                                            : benefitsData?.address_complement?.building_or_house === "building"
+                                                ? `${benefitsData?.address_complement?.unit_type || "-"} ${benefitsData?.address_complement?.unit_number || "-"}`
                                                 : "-"
                                     }
                                     copyable
                                 />
                             </Col>
                             <Col span={8}>
-                                <ReadonlyField label="Bairro" value={financeData?.district || "-"} copyable />
+                                <ReadonlyField label="Bairro" value={benefitsData?.district || "-"} copyable />
                             </Col>
                             <Col span={8}>
-                                <ReadonlyField label="Cidade" value={financeData?.city || "-"} copyable />
+                                <ReadonlyField label="Cidade" value={benefitsData?.city || "-"} copyable />
                             </Col>
                             <Col span={8}>
-                                <ReadonlyField label="UF" value={financeData?.state || "-"} copyable />
+                                <ReadonlyField label="UF" value={benefitsData?.state || "-"} copyable />
                             </Col>
                             <Col span={6}>
-                                <ReadonlyField label="CEP" value={formatCEP(financeData?.zip_code || "")} copyable />
+                                <ReadonlyField label="CEP" value={formatCEP(benefitsData?.zip_code || "")} copyable />
                             </Col>
                             <Col span={6}>
-                                <ReadonlyField label="CEP Único" value={financeData?.single_zip_code ? "Sim" : "Não"} />
+                                <ReadonlyField label="CEP Único" value={benefitsData?.single_zip_code ? "Sim" : "Não"} />
                             </Col>
                             <Col span={6}>
-                                <ReadonlyField label="Quadra" value={financeData?.address_complement?.square || "-"} copyable />
+                                <ReadonlyField label="Quadra" value={benefitsData?.address_complement?.square || "-"} copyable />
                             </Col>
                             <Col span={6}>
-                                <ReadonlyField label="Lote" value={financeData?.address_complement?.lot || "-"} copyable />
+                                <ReadonlyField label="Lote" value={benefitsData?.address_complement?.lot || "-"} copyable />
                             </Col>
                             <Col span={8}>
                                 <ReadonlyField
                                     label="Tipo"
-                                    value={financeData?.address_complement?.building_or_house === "building" ? "Edifício" : "Casa"}
+                                    value={benefitsData?.address_complement?.building_or_house === "building" ? "Edifício" : "Casa"}
                                 />
                             </Col>
                             <Col span={8}>
-                                <ReadonlyField label="Andar" value={financeData?.address_complement?.floor || "-"} copyable />
+                                <ReadonlyField label="Andar" value={benefitsData?.address_complement?.floor || "-"} copyable />
                             </Col>
                             <Col span={8}>
-                                <ReadonlyField label="Ponto de Referência" value={financeData?.address_complement?.reference_point || "-"} copyable />
+                                <ReadonlyField label="Ponto de Referência" value={benefitsData?.address_complement?.reference_point || "-"} copyable />
                             </Col>
                             <Col span={12}>
                                 <ReadonlyField
                                     label="Coordenadas"
                                     value={
-                                        financeData?.geolocation?.latitude && financeData?.geolocation?.longitude
-                                            ? `${financeData.geolocation.latitude}, ${financeData.geolocation.longitude}`
+                                        benefitsData?.geolocation?.latitude && benefitsData?.geolocation?.longitude
+                                            ? `${benefitsData.geolocation.latitude}, ${benefitsData.geolocation.longitude}`
                                             : "-"
                                     }
                                 />
                             </Col>
                             <Col span={6} style={{ display: "flex", alignItems: "flex-end" }}>
-                                <a href={financeData?.geolocation?.maps_link} target="_blank" rel="noopener noreferrer" style={{ color: "#242424", textDecoration: "underline" }}>
+                                <a href={benefitsData?.geolocation?.maps_link} target="_blank" rel="noopener noreferrer" style={{ color: "#242424", textDecoration: "underline" }}>
                                     Ver no Google Maps
                                 </a>
                             </Col>
                             <Col span={6} style={{ display: "flex", alignItems: "flex-end" }}>
-                                <a href={financeData?.geolocation?.street_view_link} target="_blank" rel="noopener noreferrer" style={{ color: "#242424", textDecoration: "underline" }}>
+                                <a href={benefitsData?.geolocation?.street_view_link} target="_blank" rel="noopener noreferrer" style={{ color: "#242424", textDecoration: "underline" }}>
                                     Ver no Street View
                                 </a>
                             </Col>
@@ -441,10 +421,10 @@ export function ViewModal({
                     <OrderModalSection title="Dados do Tráfego">
                         <Row gutter={[16, 16]}>
                             <Col span={12}>
-                                <ReadonlyField label="IP" value={financeData?.client_ip} copyable />
+                                <ReadonlyField label="IP" value={benefitsData?.client_ip} copyable />
                             </Col>
                             <Col span={12}>
-                                <ReadonlyField label="Provedor" value={financeData?.ip_isp} />
+                                <ReadonlyField label="Provedor" value={benefitsData?.ip_isp} />
                             </Col>
                             <Col span={12}>
                                 <ReadonlyField
@@ -459,28 +439,28 @@ export function ViewModal({
                                             desconhecido: "Desconhecido",
                                         };
 
-                                        return accessTypeMap[String(financeData?.ip_access_type ?? "")] ?? "-";
+                                        return accessTypeMap[String(benefitsData?.ip_access_type ?? "")] ?? "-";
                                     })()}
                                 />
                             </Col>
                             <Col span={12}>
-                                <ReadonlyField label="URL" value={financeData?.url} copyable />
+                                <ReadonlyField label="URL" value={benefitsData?.url} copyable />
                             </Col>
                             <Col span={12}>
-                                <ReadonlyField label="Plataforma" value={formatOSDisplay(financeData?.fingerprint?.os)} copyable />
+                                <ReadonlyField label="Plataforma" value={formatOSDisplay(benefitsData?.fingerprint?.os)} copyable />
                             </Col>
                             <Col span={12}>
-                                <ReadonlyField label="Dispositivo" value={formatDevice(financeData?.fingerprint?.device || "-")} copyable />
+                                <ReadonlyField label="Dispositivo" value={formatDevice(benefitsData?.fingerprint?.device || "-")} copyable />
                             </Col>
                             <Col span={12}>
-                                <ReadonlyField label="Browser" value={formatBrowserDisplay(financeData?.fingerprint?.browser)} copyable />
+                                <ReadonlyField label="Browser" value={formatBrowserDisplay(benefitsData?.fingerprint?.browser)} copyable />
                             </Col>
                             <Col span={12}>
                                 <ReadonlyField
                                     label="TimeZone"
                                     value={[
-                                        financeData?.fingerprint?.timezone,
-                                        financeData?.fingerprint?.timezone_name,
+                                        benefitsData?.fingerprint?.timezone,
+                                        benefitsData?.fingerprint?.timezone_name,
                                     ]
                                         .filter(Boolean)
                                         .join(" - ") || "-"}
@@ -488,16 +468,16 @@ export function ViewModal({
                                 />
                             </Col>
                             <Col span={12}>
-                                <ReadonlyField label="Resolução" value={formatResolution(financeData?.fingerprint?.resolution || "-")} copyable />
+                                <ReadonlyField label="Resolução" value={formatResolution(benefitsData?.fingerprint?.resolution || "-")} copyable />
                             </Col>
                             <Col span={12}>
-                                <ReadonlyField label="ID Fingerprint" value={financeData?.fingerprint_id || "-"} copyable />
+                                <ReadonlyField label="ID Fingerprint" value={benefitsData?.fingerprint_id || "-"} copyable />
                             </Col>
                         </Row>
                     </OrderModalSection>
 
-                    {/* {(financeData?.status === "FECHADO" || financeData?.status === "fechado") &&
-                        getAlertScenarios({ single_zip_code: financeData?.single_zip_code, status: financeData?.status }).map((scenario, idx) => (
+                    {/* {(benefitsData?.status === "FECHADO" || benefitsData?.status === "fechado") &&
+                        getAlertScenarios({ single_zip_code: benefitsData?.single_zip_code, status: benefitsData?.status }).map((scenario, idx) => (
                             <div
                                 key={idx}
                                 className="flex flex-col gap-2 mb-3 rounded-sm p-3 w-full"
