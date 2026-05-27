@@ -9,19 +9,16 @@ import {
   Upload,
   Tooltip,
   Checkbox,
-  Dropdown,
   ConfigProvider,
   Typography,
   Segmented,
 } from "antd";
-import type { CheckboxChangeEvent } from "antd/es/checkbox";
 import ptBR from "antd/locale/pt_BR";
 import {
   FilePdfOutlined,
   FileZipOutlined,
   UploadOutlined,
   ExclamationCircleOutlined,
-  DownOutlined,
 } from "@ant-design/icons";
 import {
   entityPage,
@@ -30,7 +27,8 @@ import {
 import { ExtrasGroupList } from "./form-extras";
 import { useFormModal } from "@/hooks/products/userFormModal";
 import { appSetting } from "@/constants/app-setting/config.const";
-import { UF_OPTIONS } from "@/utils/ufOptions";
+import { CoverageField } from "./form-coverage";
+
 
 interface FormModalProps {
   open: boolean;
@@ -61,24 +59,6 @@ export function FormModal({ open, editingEntity, category, onClose }: FormModalP
     handleSubmit,
     handleClose,
   } = useFormModal({ open, editingEntity, category, onClose });
-  const selectedUFs = (Form.useWatch("uf", form) ?? []) as string[];
-  const isAllSelected = selectedUFs.length === UF_OPTIONS.length && UF_OPTIONS.length > 0;
-
-  function handleUFChange(checkedValues: Array<string | number>) {
-    form.setFieldValue("uf", checkedValues as string[]);
-  }
-
-  function handleSelectAll(event: CheckboxChangeEvent) {
-    if (event.target.checked) {
-      form.setFieldValue(
-        "uf",
-        UF_OPTIONS.map((option) => String(option.value)),
-      );
-      return;
-    }
-
-    form.setFieldValue("uf", []);
-  }
 
   return (
     <Modal
@@ -98,9 +78,10 @@ export function FormModal({ open, editingEntity, category, onClose }: FormModalP
         form={form}
         layout="vertical"
         style={{ marginTop: 16 }}
-      // requiredMark="optional"
       >
         <div className="max-h-115 overflow-y-auto scrollbar-thin">
+
+          {/* Empresa (Global Admin) */}
           {isGlobalAdmin && (
             <Row gutter={16}>
               <Col span={24}>
@@ -121,7 +102,6 @@ export function FormModal({ open, editingEntity, category, onClose }: FormModalP
               </Col>
             </Row>
           )}
-
 
           {/* Nome e Badge */}
           <Row gutter={16}>
@@ -159,9 +139,9 @@ export function FormModal({ open, editingEntity, category, onClose }: FormModalP
             </Col>
           </Row>
 
-          {/* Tipo de Cliente, UF e Condições */}
+          {/* Tipo de Cliente e Condições */}
           <Row gutter={16}>
-            <Col span={8}>
+            <Col span={12}>
               <Form.Item
                 label="Tipo de Cliente"
                 name="client_type"
@@ -174,61 +154,7 @@ export function FormModal({ open, editingEntity, category, onClose }: FormModalP
               </Form.Item>
             </Col>
 
-            <Col span={8}>
-              <Form.Item
-                label="UF"
-                name="uf"
-                rules={[{ required: true, message: "Selecione ao menos uma UF" }]}
-              >
-                <Dropdown
-                  popupRender={() => (
-                    <div
-                      style={{
-                        width: 280,
-                        background: "#fff",
-                        border: "1px solid #e5e7eb",
-                        borderRadius: 8,
-                        boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-                        padding: 12,
-                        maxHeight: 200,
-                        overflowY: "auto",
-                        scrollbarWidth: "none",
-                        msOverflowStyle: "none",
-                      }}
-                    >
-                      <div className="hide-scrollbar-uf">
-                        <div style={{ marginBottom: 12, paddingBottom: 12, borderBottom: "1px solid #e5e7eb" }}>
-                          <Checkbox
-                            checked={isAllSelected}
-                            onChange={handleSelectAll}
-                            style={{ fontWeight: 500 }}
-                          >
-                            Selecionar Todos
-                          </Checkbox>
-                        </div>
-                        <Checkbox.Group
-                          options={UF_OPTIONS}
-                          value={selectedUFs}
-                          onChange={handleUFChange}
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: 8,
-                          }}
-                        />
-                      </div>
-                    </div>
-                  )}
-                  trigger={["click"]}
-                >
-                  <Button style={{ width: "100%" }}>
-                    {selectedUFs.length ? `${selectedUFs.length} UF(s) selecionada(s)` : "Selecionar UF"} <DownOutlined />
-                  </Button>
-                </Dropdown>
-              </Form.Item>
-            </Col>
-
-            <Col span={8}>
+            <Col span={12}>
               <Form.Item
                 label={
                   <>
@@ -264,6 +190,19 @@ export function FormModal({ open, editingEntity, category, onClose }: FormModalP
                 >
                   <Button icon={<UploadOutlined />}>Selecionar Arquivos</Button>
                 </Upload>
+              </Form.Item>
+            </Col>
+          </Row>
+
+          {/* Cobertura */}
+          <Row gutter={16}>
+            <Col span={24}>
+              <Form.Item
+                label="Cobertura (UF / Cidades)"
+                name="coverage"
+                rules={[{ required: true, message: "Selecione ao menos uma UF de cobertura" }]}
+              >
+                <CoverageField />
               </Form.Item>
             </Col>
           </Row>
@@ -470,6 +409,6 @@ export function FormModal({ open, editingEntity, category, onClose }: FormModalP
 
         </div>
       </Form>
-    </Modal >
+    </Modal>
   );
 }

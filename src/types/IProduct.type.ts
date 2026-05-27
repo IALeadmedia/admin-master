@@ -17,9 +17,13 @@ export interface Extra {
   }[];
   input_type: "radio" | "checkbox" | "checkbox_group";
 }
-
+export interface Coverage {
+  uf: string;
+  cities: string[];
+}
 export interface IProduct {
   id: number;
+  coverage: Coverage[];
   company: string;
   company_id: number;
   category: string;
@@ -91,6 +95,7 @@ export interface ICreateProductPayload {
   category?: string;
   city?: string[];
   uf?: string[];
+  coverage?: Coverage[];
 }
 export interface UploadedProductDetailImageResponse {
   success?: boolean;
