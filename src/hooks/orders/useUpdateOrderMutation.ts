@@ -1,8 +1,8 @@
 ﻿import { dictionaryQueryClient } from "@/constants/dictionaryQueryClient.const";
 import { messageQueryFeedback as fb } from "@/helpers/MessageQueryFeedback.helper";
-import type { TelecomOrder, TelecomOrderResponse } from "@/types/orders";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useResolvedOrderScope } from "./useResolvedOrderScope";
+import type { AnyOrder, AnyOrderResponse } from "@/types/orders";
 
 type UpdateOrderMutationVariables = {
   id: number;
@@ -20,21 +20,19 @@ export function useUpdateOrderMutation() {
     onMutate: async ({ id, payload }: UpdateOrderMutationVariables) => {
       await queryClient.cancelQueries({ queryKey: [entity.key] });
 
-      const previousQueries = queryClient.getQueriesData<TelecomOrderResponse>({
+      const previousQueries = queryClient.getQueriesData<AnyOrderResponse>({
         queryKey: [entity.key],
       });
 
-      queryClient.setQueriesData<TelecomOrderResponse>(
+      queryClient.setQueriesData<AnyOrderResponse>(
         { queryKey: [entity.key] },
         (old) => {
           if (!old) return old;
 
           return {
             ...old,
-            orders: old.orders.map((order: TelecomOrder) =>
-              order.id !== id
-                ? order
-                : ({ ...order, ...payload } as TelecomOrder),
+            orders: old.orders.map((order: AnyOrder) =>
+              order.id !== id ? order : ({ ...order, ...payload } as AnyOrder),
             ),
           };
         },

@@ -3,8 +3,11 @@ import type { TelecomOrderFilters, TelecomOrderResponse } from "@/types/orders";
 import { useQuery } from "@tanstack/react-query";
 import { useResolvedOrderScope } from "./useResolvedOrderScope";
 import type { OrderModule } from "@/services/orders.service";
-
-export function useOrderQuery({
+import type { AnyOrderFilters, AnyOrderResponse } from "@/types/orders";
+export function useOrderQuery<
+  TFilters extends AnyOrderFilters = TelecomOrderFilters,
+  TResponse extends AnyOrderResponse = TelecomOrderResponse,
+>({
   model,
   filters,
   enabled = true,
@@ -12,7 +15,7 @@ export function useOrderQuery({
   per_page = 20,
 }: {
   model?: OrderModule;
-  filters?: Omit<TelecomOrderFilters, "company_id" | "partner_id">;
+  filters?: TFilters;
   enabled?: boolean;
   page?: number;
   per_page?: number;
@@ -25,13 +28,13 @@ export function useOrderQuery({
     resolvedPartnerId,
   } = useResolvedOrderScope(model);
 
-  const resolvedFilters: TelecomOrderFilters = {
+  const resolvedFilters = {
     ...filters,
     ...(resolvedCompanyId != null ? { company_id: resolvedCompanyId } : {}),
     ...(resolvedPartnerId != null ? { partner_id: resolvedPartnerId } : {}),
     page,
     per_page,
-  };
+  } as TFilters;
 
   return useQuery({
     queryKey: [
@@ -45,7 +48,7 @@ export function useOrderQuery({
       per_page,
     ],
     queryFn: () =>
-      entity.service.getAll<TelecomOrderResponse>(
+      entity.service.getAll<TResponse>(
         resolvedModule,
         resolvedOperator,
         resolvedFilters,

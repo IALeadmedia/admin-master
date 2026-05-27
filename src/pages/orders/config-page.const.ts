@@ -154,4 +154,4 @@ export const segmentComponents: Record<
   benefits: { FormModal: TelecomFormModal, ViewModal: TelecomViewModal },
 };
 
-export type { FormValues } from "@/types/orders";
+export type { TelecomFormValues } from "@/types/orders";

@@ -10,7 +10,7 @@ import { ExclamationOutlined } from "@ant-design/icons";
 import React, { useEffect, useState } from "react";
 import { useUpdateOrderStatusMutation } from "@/hooks/orders/useUpdateOrderStatusMutation";
 import { EmpresasDisplay } from "../../common/components/companiesDisplay";
-import type { OrderOperatorsAvailability } from "@/types/orders/base.type";
+
 import { appSetting, isAdminDomain } from "@/constants/app-setting/config.const";
 import anonymousAvatar from "@/assets/anonymous_avatar.png";
 import { useUpdateEntity, type EntityType } from "../../config-page.const";
@@ -18,6 +18,7 @@ import { useAuth } from "@/context/auth-provider";
 import { usePartnerQuery } from "@/hooks/partners/usePartnerQuery";
 import { useCompanyQuery } from "@/hooks/companies/useCompanyQuery";
 import { generateOrderPdf } from "@/utils/order-pdf.util";
+import type { OrderOperatorsAvailability } from "@/types/orders";
 
 function resolveOperatorKey(companyName?: string | null) {
     return companyName?.split(" ")[0]?.toLowerCase().trim();

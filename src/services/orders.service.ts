@@ -1,5 +1,19 @@
 import { httpClientAxios } from "@/http/api";
+import type {
+  TelecomOrderFilters,
+  FinanceOrderFilters,
+  BenefitsOrderFilters,
+} from "@/types/orders";
+import type {
+  TelecomFormValues,
+  FinanceOrderFormValues,
+  BenefitsOrderFormValues,
+} from "@/types/orders";
 
+type OrderFilters =
+  | TelecomOrderFilters
+  | FinanceOrderFilters
+  | BenefitsOrderFilters;
 export type OrderModule = "telecom" | "finances" | "benefits";
 
 function resolveOrdersBasePath(module: OrderModule, operator: string): string {
@@ -10,7 +24,7 @@ export class OrdersService {
   static async getAll<T = Record<string, unknown>>(
     module: OrderModule,
     operator: string,
-    filters?: object,
+    filters?: OrderFilters,
   ): Promise<T> {
     const { data } = await httpClientAxios.get<T>(
       resolveOrdersBasePath(module, operator),
@@ -19,13 +33,11 @@ export class OrdersService {
     return data;
   }
 
-  /** Busca todos os pedidos de um segmento sem filtrar por operadora/empresa.
-   *  Rota: GET /{module}/orders
-   *  Exclusivo para admin quando apenas o segmento está selecionado.
-   */
+  // Busca todos os pedidos de um segmento sem filtrar por operadora/empresa.
+  // usado apenas na versão admin
   static async getAllBySegment<T = Record<string, unknown>>(
     module: OrderModule,
-    filters?: object,
+    filters?: OrderFilters,
   ): Promise<T> {
     const { data } = await httpClientAxios.get<T>(`/${module}/orders`, {
       params: filters,
@@ -37,7 +49,11 @@ export class OrdersService {
     id: number,
     module: OrderModule,
     operator: string,
-    payload: Record<string, unknown>,
+    payload:
+      | TelecomFormValues
+      | FinanceOrderFormValues
+      | BenefitsOrderFormValues
+      | Record<string, unknown>,
   ): Promise<unknown> {
     const { data } = await httpClientAxios.put<unknown>(
       `${resolveOrdersBasePath(module, operator)}/${id}`,

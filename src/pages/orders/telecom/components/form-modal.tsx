@@ -2,7 +2,7 @@ import { useEffect, useMemo } from "react";
 import { Form, Input, Row, Col, Select, Checkbox, DatePicker } from "antd";
 import dayjs from "dayjs";
 
-import { entityPage, useUpdateEntity, type EntityType, type FormValues } from "../../config-page.const";
+import { entityPage, useUpdateEntity, type EntityType, type TelecomFormValues } from "../../config-page.const";
 import { OrderModalShell } from "../../common/components/order-modal-shell";
 import { useProductQuery } from "@/hooks/products/useProductQuery";
 import { useResolvedOrderScope } from "@/hooks/orders/useResolvedOrderScope";
@@ -99,7 +99,7 @@ interface FormModalProps {
 }
 
 export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
-    const [form] = Form.useForm<FormValues>();
+    const [form] = Form.useForm<TelecomFormValues>();
 
     const updateMutation = useUpdateEntity();
     const { resolvedModule } = useResolvedOrderScope();
@@ -214,7 +214,7 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
                 home_complement: editingEntity.address_complement?.home_complement ?? null,
                 reference_point:
                     editingEntity.address_complement?.reference_point ??
-                    editingEntity.address_reference_point ??
+
                     null,
                 building_or_house: editingEntity.address_complement?.building_or_house ?? "house",
             };
