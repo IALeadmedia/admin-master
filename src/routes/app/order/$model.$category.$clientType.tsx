@@ -6,7 +6,7 @@ import {
     resolveOrderClientType,
     resolveOrderModel,
 } from "@/pages/orders/config-page.const";
-import { OrderModelCategoryClientTypeComponent } from "./order.$model.$category.$clientType.component";
+import { OrderModelCategoryClientTypeComponent } from "./$model.$category.$clientType.component";
 
 export const Route = createFileRoute("/app/order/$model/$category/$clientType")({
     component: OrderModelCategoryClientTypeComponent,

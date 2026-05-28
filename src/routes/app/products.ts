@@ -8,3 +8,6 @@ export const Route = createFileRoute("/app/products")({
     }
   },
 });
+
+// protege a rota base da tela products, verifica permissão do usuario
+// se não tiver permissão redireciona pra app

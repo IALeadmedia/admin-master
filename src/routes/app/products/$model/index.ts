@@ -14,3 +14,5 @@ export const Route = createFileRoute("/app/products/$model/")({
     });
   },
 });
+
+// faz tratamento de url por categoria/segmento/modelo

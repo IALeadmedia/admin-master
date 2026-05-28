@@ -25,3 +25,5 @@ export const Route = createFileRoute("/app/products/$model/$category")({
         }
     },
 });
+// rota da tela real, renderiza o productspage
+// valida permissão e o corrige o modelo de vier invalido

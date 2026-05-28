@@ -10,8 +10,25 @@ export function MenuOptions(): JSX.Element {
   const { user } = useAuth();
   const currentRole = user?.user?.role;
   const color = appSetting?.primaryColor;
+
   function navigeteTo(to?: string) {
     if (to) navigate({ to });
+  }
+
+  function renderLinkLabel(
+    label: string,
+    to?: string,
+    href?: string,
+  ): JSX.Element {
+    if (href) {
+      return (
+        <a href={href} target="_blank" rel="noopener noreferrer">
+          {label}
+        </a>
+      );
+    }
+
+    return <a onClick={() => navigeteTo(to)}>{label}</a>;
   }
 
 
@@ -31,7 +48,7 @@ export function MenuOptions(): JSX.Element {
             .filter((subItem) => canAccessRoute(currentRole, subItem.to))
             .map((subItem, idx) => ({
               key: `${index}-${idx}`,
-              label: <a onClick={() => navigeteTo(subItem.to)}>{subItem.label}</a>,
+              label: renderLinkLabel(subItem.label, subItem.to, subItem.href),
             }));
 
           if (subItems.length > 0)
@@ -51,6 +68,20 @@ export function MenuOptions(): JSX.Element {
                 </a>
               </Dropdown>
             );
+
+          if (item.href) {
+            return (
+              <a
+                key={index}
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="logout-btn dark cursor-pointer text-[14px] "
+              >
+                {item.label}
+              </a>
+            );
+          }
 
           if (!item.to || !canAccessRoute(currentRole, item.to)) return null;
 

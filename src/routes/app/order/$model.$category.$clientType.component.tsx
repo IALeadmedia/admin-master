@@ -1,4 +1,4 @@
-import { Route } from "./order.$model.$category.$clientType";
+import { Route } from "./$model.$category.$clientType";
 
 import { OrdersPage } from "@/pages/orders/orders";
 

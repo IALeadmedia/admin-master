@@ -2,7 +2,7 @@ import { useLocation } from "@tanstack/react-router";
 
 import { resolveOrderClientType } from "@/pages/orders/config-page.const";
 import { OrdersPage } from "@/pages/orders/orders";
-import { Route } from "./order.$model.$category";
+import { Route } from "./$model.$category";
 
 export function OrderModelCategoryComponent() {
     const { model, category } = Route.useParams();

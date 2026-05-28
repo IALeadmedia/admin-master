@@ -25,3 +25,7 @@ export const Route = createFileRoute("/app/products/")({
     }
   },
 });
+
+// protege a rota com /.. e faz a tela inicial de products
+// também checa permissão do usuario
+// direciona para onde ir: versão admin ou ususario regular

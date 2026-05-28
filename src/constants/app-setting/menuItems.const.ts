@@ -2,6 +2,7 @@ interface MenuItem {
   label: string;
   to?: string;
   items?: MenuItem[];
+  href?: string;
 }
 
 // telas do menu comum a todas as empresas
@@ -68,10 +69,19 @@ export const menuOptionsTim: MenuItem[] = [
         label: "Banda Larga PJ",
         to: "/app/order/telecom/banda-larga/pj",
       },
-      // {
-      //   label: "Telefonia Móvel",
-      //   to: "/app/order/telecom/telefonia-movel",
-      // },
+    ],
+  },
+  {
+    label: "LPs",
+    items: [
+      {
+        label: "Banda Larga PF",
+        href: "https://timfibra.promo/",
+      },
+      {
+        label: "Banda Larga PJ",
+        href: "https://timfibra.promo/pj",
+      },
     ],
   },
 ];
@@ -106,6 +116,15 @@ export const menuOptionsClaro: MenuItem[] = [
       //   label: "Telefonia Móvel",
       //   to: "/app/order/telecom/telefonia-movel",
       // },
+    ],
+  },
+  {
+    label: "LPs",
+    items: [
+      {
+        label: "Banda Larga PJ",
+        href: "https://clarofibra.promo/pj",
+      },
     ],
   },
 ];
@@ -150,6 +169,27 @@ export const menuOptionsVR: MenuItem[] = [
     label: "Pedidos",
     to: "/app/order/benefits",
   },
+  {
+    label: "LPs",
+    items: [
+      {
+        label: "VR",
+        href: "https://getempresas.com.br/vr/",
+      },
+      {
+        label: "Vale Refeição",
+        href: "https://getempresas.com.br/vr/vale-refeicao/index.html",
+      },
+      {
+        label: "Vale Alimentação",
+        href: "https://getempresas.com.br/vr/vale-alimentacao/index.html",
+      },
+      {
+        label: "Vale Auto",
+        href: "https://getempresas.com.br/vr/vale-auto/index.html",
+      },
+    ],
+  },
 ];
 
 export const menuOptionsC6: MenuItem[] = [
@@ -157,6 +197,27 @@ export const menuOptionsC6: MenuItem[] = [
   {
     label: "Pedidos",
     to: "/app/order/finances",
+  },
+  {
+    label: "LPs",
+    items: [
+      {
+        label: "Conta PJ",
+        href: "https://c6.business/conta-pj",
+      },
+      {
+        label: "Capital de Giro",
+        href: "https://c6.business/capital-giro-c6",
+      },
+      {
+        label: "Cartão PJ ",
+        href: "https://c6.business/cartao-pj-c6",
+      },
+      {
+        label: "Maquininha",
+        href: "https://c6.business/maquininha-c6-empresas",
+      },
+    ],
   },
 ];
 
@@ -192,6 +253,19 @@ export const menuOptionsBrisanet: MenuItem[] = [
       // },
     ],
   },
+  {
+    label: "LPs",
+    items: [
+      {
+        label: "Banda Larga PF",
+        href: "https://brisanet.promo/",
+      },
+      {
+        label: "Banda Larga PJ",
+        href: "https://brisanet.promo/pj",
+      },
+    ],
+  },
 ];
 export const menuOptionsAlgar: MenuItem[] = [
   ...menuOptionsCommon,
@@ -223,6 +297,19 @@ export const menuOptionsAlgar: MenuItem[] = [
       //   label: "Telefonia Móvel",
       //   to: "/app/order/telecom/telefonia-movel",
       // },
+    ],
+  },
+  {
+    label: "LPs",
+    items: [
+      {
+        label: "Banda Larga PF",
+        href: "https://algar.promo/",
+      },
+      {
+        label: "Banda Larga PJ",
+        href: "https://algar.promo/pj",
+      },
     ],
   },
 ];
@@ -290,6 +377,15 @@ export const menuOptionsNio: MenuItem[] = [
       //   label: "Telefonia Móvel",
       //   to: "/app/order/telecom/telefonia-movel",
       // },
+    ],
+  },
+  {
+    label: "LPs",
+    items: [
+      {
+        label: "Banda Larga PF",
+        href: "https://niofibra.promo/",
+      },
     ],
   },
 ];

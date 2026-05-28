@@ -5,7 +5,7 @@ import {
     resolveOrderClientType,
 } from "@/pages/orders/config-page.const";
 import { OrdersPage } from "@/pages/orders/orders";
-import { Route } from "./order.$model";
+import { Route } from "./$model";
 import type { OrderModule } from "@/services/orders.service";
 
 export function OrderModelComponent() {
