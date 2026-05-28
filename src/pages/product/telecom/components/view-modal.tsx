@@ -1,4 +1,4 @@
-import { Modal, Button, Row, Col, Typography, Space } from "antd";
+import { Modal, Button, Row, Col, Typography, Space, Tooltip } from "antd";
 import { WifiOutlined, DownloadOutlined } from "@ant-design/icons";
 import { entityPage, type EntityType } from "../config-page.const";
 import { appSetting } from "@/constants/app-setting/config.const";
@@ -68,7 +68,7 @@ export function ViewModal({
             <div>
 
 
-                <div className="max-h-130 overflow-y-auto scrollbar-thin">
+                <div className="max-h-120 overflow-y-auto scrollbar-thin">
 
                     {/* Header do Plano */}
                     <div style={{ background: "#f5f5f5", padding: 24, borderRadius: 8, marginBottom: 24 }}>
@@ -100,34 +100,39 @@ export function ViewModal({
 
                             <div className="flex flex-wrap items-center gap-2 mt-1">
                                 <span className="text-sm text-gray-500">Área de cobertura:</span>
-                                {Array.isArray(viewingEntity?.uf) && viewingEntity.uf.length > 0 ? (
-                                    viewingEntity.uf.map((uf) => (
-                                        <span
-                                            key={uf}
-                                            className={`text-xs font-medium text-${color} bg-gray-200  px-2 py-1 rounded`}
-                                        >
-                                            {uf}
-                                        </span>
-                                    ))
+
+                                {Array.isArray(viewingEntity?.coverage) && viewingEntity.coverage.length > 0 ? (
+                                    <div className="flex flex-wrap gap-1">
+                                        {viewingEntity.coverage.map(({ uf, cities }) => (
+                                            <Tooltip
+                                                key={uf}
+                                                overlayInnerStyle={{ fontSize: "12px" }}
+                                                title={
+                                                    <div className="flex flex-col gap-0.5 max-h-40 overflow-y-auto">
+                                                        <span className="font-bold text-gray-300 mb-1">{uf}</span>
+                                                        {Array.isArray(cities) && cities.length > 0 ? (
+                                                            cities.map((city) => (
+                                                                <span key={city}>• {city}</span>
+                                                            ))
+                                                        ) : (
+                                                            <span className="italic text-gray-400">Todas as cidades</span>
+                                                        )}
+                                                    </div>
+                                                }
+                                            >
+                                                <span className={`cursor-default text-xs font-bold text-${color} bg-gray-200 px-2 py-1 rounded hover:bg-gray-300 transition-colors`}>
+                                                    {uf}
+                                                </span>
+                                            </Tooltip>
+                                        ))}
+                                    </div>
                                 ) : (
-                                    <span className={`text-xs font-medium text-${color} bg-gray-200   px-2 py-1 rounded`}>
+                                    <span className={`text-xs font-medium text-${color} bg-gray-200 px-2 py-1 rounded`}>
                                         Todas as UFs
                                     </span>
                                 )}
                             </div>
-                            {viewingEntity?.city && viewingEntity.city.length > 0 && (
-                                <div className="flex flex-wrap items-center gap-2 mt-1">
-                                    <span className="text-sm text-gray-500">Cidades:</span>
-                                    {viewingEntity.city.map((city) => (
-                                        <span
-                                            key={city}
-                                            className={`text-xs font-medium text-${color} bg-gray-200   px-2 py-1 rounded`}
-                                        >
-                                            {city}
-                                        </span>
-                                    ))}
-                                </div>
-                            )}
+
                         </div>
 
                         {(viewingEntity?.offer_title || viewingEntity?.offer_subtitle) && (
