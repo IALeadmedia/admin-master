@@ -79,7 +79,7 @@ export function FormModal({ open, editingEntity, category, onClose }: FormModalP
         layout="vertical"
         style={{ marginTop: 16 }}
       >
-        <div className="max-h-115 overflow-y-auto scrollbar-thin">
+        <div className="max-h-120 overflow-y-auto scrollbar-thin">
 
           {/* Empresa (Global Admin) */}
           {isGlobalAdmin && (
@@ -198,7 +198,20 @@ export function FormModal({ open, editingEntity, category, onClose }: FormModalP
           <Row gutter={16}>
             <Col span={24}>
               <Form.Item
-                label="Cobertura (UF / Cidades)"
+                label={
+                  <>
+                    Cobertura (UF / Cidades)
+                    <Tooltip
+                      title="Selecione uma ou mais UFs. Clique em uma UF para escolher cidades específicas; se não marcar cidades, a UF cobre o estado inteiro."
+                      placement="top"
+                      overlayInnerStyle={{ fontSize: "12px" }}
+                    >
+                      <span style={{ color: "#f87171", fontSize: 12, marginLeft: 4, cursor: "pointer" }}>
+                        <ExclamationCircleOutlined />
+                      </span>
+                    </Tooltip>
+                  </>
+                }
                 name="coverage"
                 rules={[{ required: true, message: "Selecione ao menos uma UF de cobertura" }]}
               >
