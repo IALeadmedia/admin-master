@@ -28,16 +28,41 @@ export const AvailabilityStatus = ({
     localData,
     companyName,
 }: {
-    localData: { operators_availability?: OrderOperatorsAvailability | null };
+    localData: {
+        operators_availability?: OrderOperatorsAvailability | null;
+        availability?: boolean | number | null;
+        found_via_range?: boolean | null;
+    };
     companyName?: string | null;
 }) => {
     const operatorKey = resolveOperatorKey(companyName);
-    const operatorAvailability = operatorKey ? localData.operators_availability?.[operatorKey] : undefined;
+    const isVivo = operatorKey === "vivo";
 
-    if (
-        operatorAvailability?.available === null ||
-        operatorAvailability?.available === undefined
-    ) {
+    // VIVO: usa os campos diretos do pedido
+    // Outros: lê operators_availability com fallback de nome de campo (API vs tipo)
+    const available: boolean | number | null | undefined = isVivo
+        ? localData.availability
+        : (() => {
+            const avail = operatorKey ? localData.operators_availability?.[operatorKey] : undefined;
+            return avail?.availability ?? avail?.available ?? null;
+        })();
+
+    const foundViaRange: boolean | null | undefined = isVivo
+        ? localData.found_via_range
+        : (() => {
+            const avail = operatorKey ? localData.operators_availability?.[operatorKey] : undefined;
+            return avail?.encontrado_via_range ?? avail?.found_via_range ?? null;
+        })();
+
+    const rangeMin = isVivo
+        ? null
+        : (operatorKey ? localData.operators_availability?.[operatorKey]?.range_min : null) ?? null;
+
+    const rangeMax = isVivo
+        ? null
+        : (operatorKey ? localData.operators_availability?.[operatorKey]?.range_max : null) ?? null;
+
+    if (available === null || available === undefined) {
         return (
             <div className="flex flex-col items-center mt-2">
                 <div className="flex items-center justify-center">-</div>
@@ -45,8 +70,8 @@ export const AvailabilityStatus = ({
         );
     }
 
-    if (operatorAvailability.available) {
-        if (operatorAvailability.found_via_range) {
+    if (available) {
+        if (foundViaRange) {
             return (
                 <div className="flex flex-col items-center mt-2">
                     <div className="flex items-center justify-center mb-2">
@@ -58,10 +83,11 @@ export const AvailabilityStatus = ({
                             <div className="h-2 w-2 bg-yellow-500 rounded-full cursor-pointer"></div>
                         </Tooltip>
                     </div>
-                    <div className="text-center text-[11px] text-neutral-600 bg-yellow-50 px-2 py-1 rounded">
-                        <strong>Range numérico:</strong> {operatorAvailability.range_min} - {" "}
-                        {operatorAvailability.range_max}
-                    </div>
+                    {rangeMin != null && rangeMax != null && (
+                        <div className="text-center text-[11px] text-neutral-600 bg-yellow-50 px-2 py-1 rounded">
+                            <strong>Range numérico:</strong> {rangeMin} - {rangeMax}
+                        </div>
+                    )}
                 </div>
             );
         } else {

@@ -136,9 +136,13 @@ export function resolvePartnerCategory(
 export function getOrderColumnsByModel(
   model: OrderModel = defaultOrderModel,
   companies: ICompany[] = [],
+  isAdmin = false,
 ): TableColumnsType<EntityType> | undefined {
   if (model === "telecom") {
-    return getTelecomColumns(companies) as TableColumnsType<EntityType>;
+    return getTelecomColumns(
+      companies,
+      isAdmin,
+    ) as TableColumnsType<EntityType>;
   }
 
   if (model === "finances") {

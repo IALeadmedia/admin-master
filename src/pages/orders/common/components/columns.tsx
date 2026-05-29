@@ -136,11 +136,11 @@ export function getSharedOrderColumnsBefore<T extends OrderCommonRecord>(): Tabl
             title: "Pedido",
             dataIndex: "status",
             render: (status: string) =>
-                status === "ABERTO"
+                status === "ABERTO" || status === "aberto"
                     ? "Aberto"
-                    : status === "FECHADO"
+                    : status === "FECHADO" || status === "fechado"
                         ? "Fechado"
-                        : status === "CANCELADO"
+                        : status === "CANCELADO" || status === "cancelado"
                             ? "Cancelado"
                             : "-",
             width: 80,

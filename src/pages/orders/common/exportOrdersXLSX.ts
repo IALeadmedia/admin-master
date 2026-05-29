@@ -32,10 +32,17 @@ function formatCellValue(value: unknown): string | number {
 export function exportOrdersXLSX({
   data,
   visibleColumns,
+  extraExportColumns = [],
+  excludeDataIndexes = [],
   filename = "pedidos.xlsx",
 }: {
   data: unknown[];
   visibleColumns: TableColumnsType<unknown>;
+  extraExportColumns?: Array<{
+    title: string;
+    getValue: (record: unknown) => string | number;
+  }>;
+  excludeDataIndexes?: string[];
   filename?: string;
 }) {
   if (!data.length) return;
@@ -46,11 +53,19 @@ export function exportOrdersXLSX({
       "dataIndex" in col &&
       col.title &&
       typeof col.title === "string" &&
-      col.title.trim() !== "",
+      col.title.trim() !== "" &&
+      !excludeDataIndexes.includes(
+        Array.isArray((col as { dataIndex: unknown }).dataIndex)
+          ? (col as { dataIndex: string[] }).dataIndex.join(".")
+          : String((col as { dataIndex: unknown }).dataIndex ?? ""),
+      ),
   ) as Array<{ title: string; dataIndex: string | string[] }>;
 
   const rows = data.map((record) => {
     const row: Record<string, string | number> = {};
+    extraExportColumns.forEach((col) => {
+      row[col.title] = col.getValue(record);
+    });
     exportableColumns.forEach((col) => {
       const value = getNestedValue(record, col.dataIndex);
       row[col.title] = formatCellValue(value);
