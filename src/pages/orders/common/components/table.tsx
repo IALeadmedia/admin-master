@@ -67,6 +67,8 @@ interface CompaniesTableProps {
   onPageChange?: (page: number) => void;
   onPageSizeChange?: (size: number) => void;
   companies?: ICompany[];
+  exportExtraColumns?: Array<{ title: string; getValue: (record: unknown) => string | number }>;
+  exportExcludeDataIndexes?: string[];
 }
 
 export function TableMain({
@@ -83,6 +85,8 @@ export function TableMain({
   onPageChange,
   onPageSizeChange,
   companies = [],
+  exportExtraColumns = [],
+  exportExcludeDataIndexes = [],
 }: CompaniesTableProps) {
   const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
   const [searchText, setSearchText] = useState("");
@@ -173,6 +177,8 @@ export function TableMain({
             exportOrdersXLSX({
               data: exportDataSource,
               visibleColumns: visibleTableColumns,
+              extraExportColumns: exportExtraColumns,
+              excludeDataIndexes: exportExcludeDataIndexes,
               filename: "pedidos.xlsx",
             });
           }}

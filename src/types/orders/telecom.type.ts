@@ -23,6 +23,8 @@ export interface OrderOperatorsAvailabilityItem {
   found_via_range: boolean;
   range_max: number | null;
   range_min: number | null;
+  availability?: boolean;
+  encontrado_via_range?: boolean;
 }
 
 export interface TelecomOrder extends OrderBase {

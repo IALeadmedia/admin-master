@@ -17,6 +17,7 @@ import {
     useListEntity,
 } from "./config-page.const";
 import { useOrderCategoryFilter } from "./useOrderCategoryFilter";
+import { getAvailabilityExportColumns } from "./telecom/components/columns";
 
 export function OrdersAdminPage() {
     const { selectedSegmentId, selectedCompanyId, selectedPartnerId } = useAdminScope();
@@ -59,6 +60,7 @@ export function OrdersAdminPage() {
         model,
         orders: [],
         partnerCategories,
+        includeAllOption: true,
     });
 
     const isBandaLarga = model === "telecom" && effectiveCategory === "banda-larga";
@@ -106,17 +108,16 @@ export function OrdersAdminPage() {
     const orders = useMemo(() => data?.orders ?? [], [data?.orders]);
     const total = data?.total ?? 0;
 
-    const clientTypeSelect = isBandaLarga
-        ? {
-            options: [
-                { label: "PF e PJ", value: "" },
-                { label: "Pessoa Física (PF)", value: "PF" },
-                { label: "Pessoa Jurídica (PJ)", value: "PJ" },
-            ],
-            value: clientType,
-            onChange: (v: string) => { setClientType(v as "PF" | "PJ" | ""); setPage(1); },
-        }
-        : undefined;
+    const clientTypeSelect =
+    {
+        options: [
+            { label: "PF e PJ", value: "" },
+            { label: "Pessoa Física (PF)", value: "PF" },
+            { label: "Pessoa Jurídica (PJ)", value: "PJ" },
+        ],
+        value: clientType,
+        onChange: (v: string) => { setClientType(v as "PF" | "PJ" | ""); setPage(1); },
+    }
 
     // Colunas exclusivas do admin: Empresa e Parceiro no início da tabela
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -126,12 +127,17 @@ export function OrdersAdminPage() {
             dataIndex: "company_id",
             width: 110,
             ellipsis: { showTitle: false },
-            render: (company_id: number | null) => {
-                if (!company_id) return "-";
-                const name = companiesData?.companies.find(c => c.company_id === company_id)?.company_name;
+            render: (company_id: number | null, record) => {
+                // Tenta resolver pelo company_id primeiro, depois cai no campo company
+                const name = company_id
+                    ? (companiesData?.companies.find(c => c.company_id === company_id)?.company_name ?? record.company)
+                    : record.company;
+
+                if (!name) return "-";
+
                 return (
-                    <Tooltip placement="topLeft" title={name ?? `#${company_id}`} overlayInnerStyle={{ fontSize: 12 }}>
-                        {name ?? `#${company_id}`}
+                    <Tooltip placement="topLeft" title={name} overlayInnerStyle={{ fontSize: 12 }}>
+                        {name}
                     </Tooltip>
                 );
             },
@@ -155,14 +161,43 @@ export function OrdersAdminPage() {
 
     const columns = [
         ...adminPrefixColumns,
-        ...(getOrderColumnsByModel(model, companiesData?.companies ?? []) ?? []),
+        ...(getOrderColumnsByModel(model, companiesData?.companies ?? [], true) ?? []),
     ];
     const { FormModal: FormModalComponent, ViewModal: ViewModalComponent } = segmentComponents[model];
+
+    const availabilityExportColumns = useMemo(
+        () => model === "telecom" ? getAvailabilityExportColumns(companiesData?.companies ?? []) : [],
+        [model, companiesData?.companies],
+    );
+
+    const adminExportColumns = useMemo(() => [
+        {
+            title: "Empresa",
+            getValue: (record: unknown) => {
+                const r = record as { company_id?: number | null; company?: string | null };
+                const name = r.company_id
+                    ? (companiesData?.companies.find(c => c.company_id === r.company_id)?.company_name ?? r.company)
+                    : r.company;
+                return name ?? "-";
+            },
+        },
+        {
+            title: "Parceiro",
+            getValue: (record: unknown) => {
+                const r = record as { partner_id?: number | null };
+                if (!r.partner_id) return "-";
+                return partnersData?.partners?.find(p => p.partner_id === r.partner_id)?.partner_name ?? `#${r.partner_id}`;
+            },
+        },
+        ...availabilityExportColumns,
+    ], [companiesData?.companies, partnersData?.partners, availabilityExportColumns]);
 
     const pageTitle = !selectedSegmentId
         ? "Pedidos"
         : hasCategories
-            ? `${entityPage.plural} - ${getOrderCategoryLabelByModel(effectiveCategory ?? "", model)}`
+            ? effectiveCategory
+                ? `${entityPage.plural} - ${getOrderCategoryLabelByModel(effectiveCategory, model)}`
+                : entityPage.plural
             : `${entityPage.plural}`;
 
     return (
@@ -192,6 +227,8 @@ export function OrdersAdminPage() {
                     onPageChange={setPage}
                     onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
                     companies={companiesData?.companies ?? []}
+                    exportExtraColumns={adminExportColumns}
+                    exportExcludeDataIndexes={["company_id", "partner_id"]}
                 />
             )}
         </div>

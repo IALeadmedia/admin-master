@@ -56,9 +56,63 @@ function renderAvailability(value: boolean | number | null | undefined, foundVia
         </div>
     );
 }
+const OPERATOR_ASSETS: Record<string, { src: string; className: string }> = {
+    claro: { src: "/claro.png", className: "h-8 w-8" },
+    tim: { src: "/tim.svg", className: "h-9" },
+    oi: { src: "/oi.svg", className: "h-8" },
+    sky: { src: "/sky.svg", className: "h-6" },
+    nio: { src: "/nio.svg", className: "h-3" },
+    algar: { src: "/algar.png", className: "h-5" },
+    brisanet: { src: "/brisanet.png", className: "h-4" },
+    vero: { src: "/vero.svg", className: "h-4" },
 
+};
 function resolveOperatorKey(companyName?: string | null) {
     return companyName?.split(" ")[0]?.toLowerCase().trim();
+}
+
+function getAvailabilityColumns(companies: ICompany[] = []): TableColumnsType<TelecomOrder> {
+    const vivoColumn: TableColumnsType<TelecomOrder>[number] = {
+        title: (
+            <div className="flex items-center justify-center">
+                <img src="/vivo.png" alt="Vivo" />
+            </div>
+        ),
+        width: 80,
+        render: (_, record) => renderAvailability(record.availability, record.found_via_range),
+    };
+
+    const otherColumns: TableColumnsType<TelecomOrder> = companies
+        .filter((company) => company.company_name !== "Vivo")
+        .map((company) => {
+            const operatorKey = resolveOperatorKey(company.company_name);
+            const asset = operatorKey ? OPERATOR_ASSETS[operatorKey] : undefined;
+
+            return {
+                title: (
+                    <div className="flex items-center justify-center">
+                        {asset ? (
+                            <img src={asset.src} alt={company.company_name} className={asset.className} />
+                        ) : (
+                            <span className="text-xs">{company.company_name}</span>
+                        )}
+                    </div>
+                ),
+                width: 100,
+                render: (_: unknown, record: TelecomOrder) => {
+                    const companyAvailability = operatorKey
+                        ? record.operators_availability?.[operatorKey]
+                        : undefined;
+
+                    return renderAvailability(
+                        companyAvailability?.available ?? null,
+                        companyAvailability?.found_via_range ?? null,
+                    );
+                },
+            };
+        });
+
+    return [...otherColumns, vivoColumn];
 }
 
 type UseAllTableColumnsProps = {
@@ -66,26 +120,30 @@ type UseAllTableColumnsProps = {
     companies?: ICompany[];
 };
 
-function getTelecomSpecificColumns(companies: ICompany[] = []): TableColumnsType<TelecomOrder> {
-    return [
-        {
-            title: "Disponibilidade",
-            width: 120,
-            render: (_, record) => {
-                const companyName = companies.find(
-                    (company) => company.company_id === record.company_id,
-                )?.company_name;
-                const operatorKey = resolveOperatorKey(companyName);
-                const companyAvailability = operatorKey
-                    ? record.operators_availability?.[operatorKey]
-                    : undefined;
+function getSingleAvailabilityColumn(companies: ICompany[]): TableColumnsType<TelecomOrder>[number] {
+    return {
+        title: "Disponibilidade",
+        width: 120,
+        render: (_, record) => {
+            const companyName = companies.find(
+                (company) => company.company_id === record.company_id,
+            )?.company_name;
+            const operatorKey = resolveOperatorKey(companyName);
+            const companyAvailability = operatorKey
+                ? record.operators_availability?.[operatorKey]
+                : undefined;
 
-                return renderAvailability(
-                    companyAvailability?.available ?? null,
-                    companyAvailability?.found_via_range ?? null,
-                );
-            },
+            return renderAvailability(
+                companyAvailability?.available ?? null,
+                companyAvailability?.found_via_range ?? null,
+            );
         },
+    };
+}
+
+function getTelecomSpecificColumns(companies: ICompany[] = [], isAdmin = false): TableColumnsType<TelecomOrder> {
+    return [
+        ...(isAdmin ? getAvailabilityColumns(companies) : [getSingleAvailabilityColumn(companies)]),
         {
             title: "Plano",
             dataIndex: ["plan", "name"],
@@ -158,10 +216,10 @@ function getTelecomSpecificColumns(companies: ICompany[] = []): TableColumnsType
     ];
 }
 
-function getTelecomOrderColumns(companies: ICompany[] = []): TableColumnsType<TelecomOrder> {
+function getTelecomOrderColumns(companies: ICompany[] = [], isAdmin = false): TableColumnsType<TelecomOrder> {
     return [
         ...getSharedOrderColumnsBefore<TelecomOrder>(),
-        ...getTelecomSpecificColumns(companies),
+        ...getTelecomSpecificColumns(companies, isAdmin),
         ...getSharedOrderColumnsAfter<TelecomOrder>(),
     ];
 }
@@ -179,6 +237,59 @@ export function getAllTableColumns({
 
 export const useAllTableColumns = getAllTableColumns;
 
-export function getColumns(companies: ICompany[] = []): TableColumnsType<TelecomOrder> {
-    return getTelecomOrderColumns(companies);
+export function getColumns(companies: ICompany[] = [], isAdmin = false): TableColumnsType<TelecomOrder> {
+    return getTelecomOrderColumns(companies, isAdmin);
+}
+
+function resolveAvailabilityLabel(
+    available: boolean | number | null | undefined,
+    foundViaRange?: boolean | null,
+    rangeMin?: number | null,
+    rangeMax?: number | null,
+): string {
+    if (available === null || available === undefined) return "-";
+    if (!available) return "Indisponível";
+    if (foundViaRange) {
+        const range =
+            rangeMin != null && rangeMax != null
+                ? `: ${rangeMin}-${rangeMax}`
+                : "";
+        return `Disponível (via range numérico${range})`;
+    }
+    return "Disponível";
+}
+
+export function getAvailabilityExportColumns(
+    companies: ICompany[],
+): Array<{ title: string; getValue: (record: unknown) => string }> {
+    const otherCols = companies
+        .filter((c) => c.company_name !== "Vivo")
+        .map((company) => {
+            const operatorKey = resolveOperatorKey(company.company_name);
+            return {
+                title: company.company_name,
+                getValue: (record: unknown) => {
+                    const r = record as TelecomOrder;
+                    const avail = operatorKey
+                        ? r.operators_availability?.[operatorKey]
+                        : undefined;
+                    return resolveAvailabilityLabel(
+                        avail?.availability ?? avail?.available ?? null,
+                        avail?.encontrado_via_range ?? avail?.found_via_range ?? null,
+                        avail?.range_min ?? null,
+                        avail?.range_max ?? null,
+                    );
+                },
+            };
+        });
+
+    const vivoCol = {
+        title: "Vivo",
+        getValue: (record: unknown) => {
+            const r = record as TelecomOrder;
+            return resolveAvailabilityLabel(r.availability, r.found_via_range);
+        },
+    };
+
+    return [...otherCols, vivoCol];
 }

@@ -16,13 +16,14 @@ interface UseOrderCategoryFilterParams {
   model: OrderModel;
   orders: EntityType[];
   partnerCategories: string[];
+  includeAllOption?: boolean;
 }
 
 interface UseOrderCategoryFilterResult {
   categorySelect:
     | {
         options: Array<{ label: string; value: string }>;
-        value: OrderCategory | undefined;
+        value: string | undefined;
         onChange: (value: string | undefined) => void;
       }
     | undefined;
@@ -34,6 +35,7 @@ export function useOrderCategoryFilter({
   model,
   orders,
   partnerCategories,
+  includeAllOption,
 }: UseOrderCategoryFilterParams): UseOrderCategoryFilterResult {
   const { hasCategories } = segmentRegistry[model];
   const [selectedCategory, setSelectedCategory] = useState<
@@ -52,7 +54,7 @@ export function useOrderCategoryFilter({
       : categoriesFromOrders;
 
     const options = getPartnerCategoryOptions(categories, model);
-    return options.length
+    const baseOptions = options.length
       ? options
       : [
           {
@@ -63,19 +65,24 @@ export function useOrderCategoryFilter({
             value: defaultCategoryByModel[model],
           },
         ];
-  }, [hasCategories, model, orders, partnerCategories]);
+
+    return includeAllOption
+      ? [{ label: "Todas as categorias", value: "" }, ...baseOptions]
+      : baseOptions;
+  }, [hasCategories, includeAllOption, model, orders, partnerCategories]);
 
   const resolvedSelectedCategory = useMemo(() => {
     if (!hasCategories || !categoryOptions.length) return undefined;
 
     const hasSelected =
-      selectedCategory &&
+      selectedCategory !== undefined &&
       categoryOptions.some((o) => o.value === selectedCategory);
     return hasSelected ? selectedCategory : categoryOptions[0].value;
   }, [categoryOptions, hasCategories, selectedCategory]);
 
   const filteredOrders = useMemo(() => {
     if (!hasCategories) return orders;
+    if (resolvedSelectedCategory === "") return orders;
 
     const hasCategoryData = orders.some((o) => Boolean(o.category));
     if (!resolvedSelectedCategory || !hasCategoryData) return orders;
@@ -84,7 +91,7 @@ export function useOrderCategoryFilter({
 
   const effectiveCategory = useMemo(
     () =>
-      !hasCategories
+      !hasCategories || resolvedSelectedCategory === ""
         ? undefined
         : resolvePartnerCategory(
             resolvedSelectedCategory,
@@ -97,7 +104,7 @@ export function useOrderCategoryFilter({
   const categorySelect = hasCategories
     ? {
         options: categoryOptions,
-        value: effectiveCategory,
+        value: effectiveCategory ?? (includeAllOption ? "" : undefined),
         onChange: setSelectedCategory,
       }
     : undefined;
