@@ -9,16 +9,17 @@ interface CoverageFieldProps {
 }
 
 export function CoverageField({ value = [], onChange }: CoverageFieldProps) {
+    const normalizedValue = Array.isArray(value) ? value : [];
     const { data: ufOptions = [], isLoading: isLoadingUFs } = useUFs();
     const [editingUF, setEditingUF] = useState<string | null>(null);
     const [ufDropdownOpen, setUfDropdownOpen] = useState(false);
 
-    const selectedSiglasSet = new Set(value.map((coverage) => coverage.uf));
+    const selectedSiglasSet = new Set(normalizedValue.map((coverage) => coverage?.uf));
     const availableUFs = ufOptions.filter((option) => !selectedSiglasSet.has(option.sigla));
-    const allUFsSelected = ufOptions.length > 0 && availableUFs.length === 0;
+    const allUFsSelected = ufOptions?.length > 0 && availableUFs?.length === 0;
 
     function handleAddUF(uf: string) {
-        onChange?.([...value, { uf, cities: [] }]);
+        onChange?.([...normalizedValue, { uf, cities: [] }]);
     }
 
     function handleToggleAllUFs() {
@@ -28,32 +29,32 @@ export function CoverageField({ value = [], onChange }: CoverageFieldProps) {
             return;
         }
 
-        const current = new Set(value.map((coverage) => coverage.uf));
+        const current = new Set(normalizedValue.map((coverage) => coverage.uf));
         const toAdd = ufOptions
             .filter((uf) => !current.has(uf.sigla))
             .map((uf) => ({ uf: uf.sigla, cities: [] }));
 
-        onChange?.([...value, ...toAdd]);
+        onChange?.([...normalizedValue, ...toAdd]);
     }
 
     function handleRemoveUF(uf: string) {
-        onChange?.(value.filter((coverage) => coverage.uf !== uf));
+        onChange?.(normalizedValue.filter((coverage) => coverage.uf !== uf));
         if (editingUF === uf) setEditingUF(null);
     }
 
     function handleCitiesChange(uf: string, cities: string[]) {
-        onChange?.(value.map((coverage) => (coverage.uf === uf ? { ...coverage, cities } : coverage)));
+        onChange?.(normalizedValue.map((coverage) => (coverage.uf === uf ? { ...coverage, cities } : coverage)));
     }
 
-    const editingEntry = value.find((coverage) => coverage.uf === editingUF);
+    const editingEntry = normalizedValue.find((coverage) => coverage?.uf === editingUF);
 
     function getCoverageLabel(cities: string[]) {
-        if (cities.length === 0) return "Todas";
-        return `${cities.length} cidade${cities.length > 1 ? "s" : ""}`;
+        if (cities?.length === 0) return "Todas";
+        return `${cities?.length} cidade${cities?.length > 1 ? "s" : ""}`;
     }
 
     function getCitiesTooltip(cities: string[]) {
-        if (cities.length === 0) return "Todas as cidades deste estado";
+        if (cities?.length === 0) return "Todas as cidades deste estado";
         return cities.join(", ");
     }
 
@@ -80,7 +81,7 @@ export function CoverageField({ value = [], onChange }: CoverageFieldProps) {
                             <>
                                 <div style={{ padding: "6px 12px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
                                     <span style={{ fontSize: 12, color: "#6b7280" }}>
-                                        {value.length > 0 ? `${value.length} selecionado${value.length > 1 ? "s" : ""}` : "Nenhum selecionado"}
+                                        {normalizedValue.length > 0 ? `${normalizedValue.length} selecionado${normalizedValue.length > 1 ? "s" : ""}` : "Nenhum selecionado"}
                                     </span>
                                     <Button
                                         type="link"
@@ -99,8 +100,8 @@ export function CoverageField({ value = [], onChange }: CoverageFieldProps) {
                     />
                 </div>
 
-                {value.map(({ uf, cities }) => {
-                    const hasSpecificCities = cities.length > 0;
+                {normalizedValue.map(({ uf, cities }) => {
+                    const hasSpecificCities = cities?.length > 0;
                     const isEditing = editingUF === uf;
 
                     return (
@@ -170,10 +171,11 @@ export function CoverageField({ value = [], onChange }: CoverageFieldProps) {
 
 function CitySelect({ uf, cities, onChange }: { uf: string; cities: string[]; onChange: (c: string[]) => void }) {
     const [open, setOpen] = useState(false);
-    const { data: cityOptions = [], isFetching } = useCities(open || cities.length > 0 ? uf : null);
+    const normalizedCities = Array.isArray(cities) ? cities : [];
+    const { data: cityOptions = [], isFetching } = useCities(open || normalizedCities.length > 0 ? uf : null);
 
     const allCityNames = cityOptions.map((city) => city.nome);
-    const allSelected = allCityNames.length > 0 && allCityNames.every((name) => cities.includes(name));
+    const allSelected = allCityNames?.length > 0 && allCityNames.every((name) => normalizedCities.includes(name));
 
     function handleToggleAll() {
         onChange(allSelected ? [] : allCityNames);
@@ -189,7 +191,7 @@ function CitySelect({ uf, cities, onChange }: { uf: string; cities: string[]; on
             <Select
                 mode="multiple"
                 placeholder="Selecione cidades..."
-                value={cities}
+                value={normalizedCities}
                 onChange={onChange}
                 onDropdownVisibleChange={setOpen}
                 loading={isFetching}
@@ -201,7 +203,7 @@ function CitySelect({ uf, cities, onChange }: { uf: string; cities: string[]; on
                     <>
                         <div style={{ padding: "6px 12px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
                             <span style={{ fontSize: 12, color: "#6b7280" }}>
-                                {cities.length > 0 ? `${cities.length} selecionada${cities.length > 1 ? "s" : ""}` : "Nenhuma selecionada"}
+                                {normalizedCities.length > 0 ? `${normalizedCities.length} selecionada${normalizedCities.length > 1 ? "s" : ""}` : "Nenhuma selecionada"}
                             </span>
                             <Button
                                 type="link"

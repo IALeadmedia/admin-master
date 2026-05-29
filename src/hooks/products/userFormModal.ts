@@ -128,6 +128,12 @@ export function useFormModal({ open, editingEntity, category, onClose }: any) {
     if (open && editingEntity) {
       form.setFieldsValue({
         ...editingEntity,
+        coverage: Array.isArray(editingEntity.coverage)
+          ? editingEntity.coverage.map((coverage: any) => ({
+              uf: coverage?.uf,
+              cities: Array.isArray(coverage?.cities) ? coverage.cities : [],
+            }))
+          : [],
         offer_conditions: mapExistingConditionsToUploadFiles(
           editingEntity.offer_conditions,
         ),

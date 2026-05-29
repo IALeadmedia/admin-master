@@ -172,7 +172,7 @@ export function ViewModal({
                                 <div className="flex flex-wrap gap-4">
                                     <div className="flex items-center gap-2">
                                         <span className="text-[14px] font-semibold">Pedido:</span>
-                                        <Select size="small" style={{ width: 110 }} value={viewingEntity?.status} onChange={(value) => statusMutation.mutate({ id: viewingEntity!.id, payload: { status: value } })} options={[{ value: "ABERTO", label: "Aberto" }, { value: "FECHADO", label: "Fechado" }, { value: "CANCELADO", label: "Cancelado" }]} />
+                                        <Select size="small" style={{ width: 110 }} value={viewingEntity?.status} onChange={(value) => statusMutation.mutate({ id: viewingEntity!.id, payload: { status: value } })} options={[{ value: "ABERTO", label: "Aberto" }, { value: "FECHADO", label: "Fechado" }, { value: "CANCELADO", label: "Cancelado" }, { value: "TRANSBORDO", label: "Transbordo" }]} />
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <span className="text-[14px] font-semibold">Tramitação:</span>

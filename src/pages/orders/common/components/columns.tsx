@@ -142,7 +142,9 @@ export function getSharedOrderColumnsBefore<T extends OrderCommonRecord>(): Tabl
                         ? "Fechado"
                         : status === "CANCELADO" || status === "cancelado"
                             ? "Cancelado"
-                            : "-",
+                            : status === "TRANSBORDO" || status === "transbordo"
+                                ? "Transbordo"
+                                : "-",
             width: 80,
         },
         {
