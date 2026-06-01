@@ -110,7 +110,6 @@ export interface OrderBase {
   corporate_id?: string | null;
   cpf?: string | null;
   created_at: string;
-  credit?: number | string | null;
   crm_id?: string | number | null;
   district?: string | null;
   email?: string | null;
@@ -121,7 +120,6 @@ export interface OrderBase {
   highlight_bottom?: string | null;
   highlight_top?: string | null;
   id: number;
-  installation?: string | null;
   ip_access_type?: string | null;
   ip_as?: string | null;
   ip_isp?: string | null;
@@ -154,7 +152,7 @@ export interface OrderBase {
   service?: string | null;
   single_zip_code?: boolean | undefined;
   state?: string | null;
-  status: string;
+  status: string; // ABERTO/FECHADO/CANCELADO/TRANSBORDO
   support?: string;
   team?: string | null;
   updated_at: string;
@@ -162,4 +160,15 @@ export interface OrderBase {
   whatsapp?: OrderWhatsAppInfo | null;
   zip_code?: string | null;
   zip_code_type?: string | null;
+
+  input_crm?: boolean;
+  availability_crm?: string; // sim/não/sem análise
+  debt_with_operator?: string; // sim/não/sem análise
+  credit?: string; // positivo/negativo/sem análise
+  contract?: string; //não enviado/aguardando/assinado/cancelado
+  biometrics?: string; // não enviada/aguardando/realizado/cancelado
+  installation?: string; // não agendado/agendado/instalado/inviável/cancelado
+
+  re_registration?: boolean; // ver campo second_call
+  transhipment?: boolean; // ver campo journey
 }
