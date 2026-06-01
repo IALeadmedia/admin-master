@@ -119,8 +119,6 @@ export function OrdersAdminPage() {
         onChange: (v: string) => { setClientType(v as "PF" | "PJ" | ""); setPage(1); },
     }
 
-    // Colunas exclusivas do admin: Empresa e Parceiro no início da tabela
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const adminPrefixColumns: TableColumnsType<any> = [
         {
             title: "Empresa",
