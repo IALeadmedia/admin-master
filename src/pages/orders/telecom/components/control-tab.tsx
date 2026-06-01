@@ -1,4 +1,6 @@
-import { Row, Col, Select } from "antd";
+import { appSetting } from "@/constants/app-setting/config.const";
+import { Row, Col, Select, Input, ConfigProvider, Typography } from "antd";
+import { useState } from "react";
 
 export function OrderControlTab({
     viewingEntity,
@@ -7,218 +9,199 @@ export function OrderControlTab({
     viewingEntity: any;
     updateMutation: any;
 }) {
+
+    const [consultor, setConsultor] = useState("");
+    const [idCRM, setIdCRM] = useState("");
+    const [idCORP, setIdCORP] = useState("");
+    const [credito, setCredito] = useState("");
+    const color = appSetting.primaryColor;
     return (
-        <div className="max-h-[70vh] overflow-y-auto scrollbar-thin p-2 flex flex-col gap-6">
+        <div className="max-h-90 overflow-y-auto scrollbar-thin flex flex-col gap-4 ">
+            <ConfigProvider
+                theme={{
+                    components: {
+                        Select: { hoverBorderColor: color, activeBorderColor: color, activeOutlineColor: "none" },
+                        Input: { hoverBorderColor: color, activeBorderColor: color },
+                    },
+                }}
+            >
 
-            {/* ===================== */}
-            {/* CONTROLE COMERCIAL */}
-            {/* ===================== */}
-            <div className="border rounded-md p-4 bg-white">
-                <div className="font-semibold mb-4 text-neutral-700">
-                    Controle Comercial
+                <div className="bg-neutral-100 rounded-sm p-3 w-full">
+                    <div className="font-semibold mb-4 text-neutral-700">
+
+                    </div>
+
+                    <Row gutter={[16, 16]}>
+
+                        <Col span={6}>
+                            <span className="flex flex-col gap-1">
+                                <Typography.Text type="secondary">Consultor</Typography.Text>
+                                <Input size="small" style={{ width: 200 }} maxLength={13} value={consultor} onChange={(e) => setConsultor(e.target.value)} onPressEnter={() => updateMutation.mutate({ id: viewingEntity!.id, payload: { responsible_consultant: consultor } })} />
+                            </span>
+                        </Col>
+
+                        <Col span={6}>
+                            <span className="flex flex-col gap-1">
+                                <Typography.Text type="secondary">ID CRM</Typography.Text>
+                                <Input size="small" style={{ width: 160 }} maxLength={8} value={idCRM} onChange={(e) => setIdCRM(e.target.value)} onPressEnter={() => updateMutation.mutate({ id: viewingEntity!.id, payload: { crm_id: Number(idCRM) } })} />
+                            </span>
+                        </Col>
+
+                        <Col span={6}>
+                            <span className="flex flex-col gap-1">
+                                <Typography.Text type="secondary">ID CORP</Typography.Text>
+                                <Input size="small" style={{ width: 160 }} maxLength={8} value={idCORP} onChange={(e) => setIdCORP(e.target.value)} onPressEnter={() => updateMutation.mutate({ id: viewingEntity!.id, payload: { corporate_id: String(idCORP || "") } })} />
+                            </span>
+                        </Col>
+                        <Col span={6}>
+                            <span className="flex flex-col gap-1">
+                                <Typography.Text type="secondary">Equipe</Typography.Text>
+                                <Select size="small" value={viewingEntity?.team} style={{ width: 200 }} onChange={(value) => updateMutation.mutate({ id: viewingEntity!.id, payload: { team: value } })} options={[]} />
+                            </span>
+                        </Col>
+
+
+                    </Row>
                 </div>
 
-                <Row gutter={[16, 16]}>
 
-                    <Col span={6}>
-                        <div className="text-xs text-neutral-500 mb-1">Consultor</div>
-                        <Select
-                            value={viewingEntity?.responsible_consultant || undefined}
-                            style={{ width: "100%" }}
-                            placeholder="Selecionar"
-                            onChange={(value) =>
-                                updateMutation.mutate({
-                                    id: viewingEntity.id,
-                                    payload: {
-                                        responsible_consultant: value,
-                                    },
-                                })
-                            }
-                            options={[
-                                { value: "Carlos Silva", label: "Carlos Silva" },
-                                { value: "Maria Souza", label: "Maria Souza" },
-                            ]}
-                        />
-                    </Col>
+                <div className="bg-neutral-100 rounded-sm p-3 w-full">
+                    <div className="font-semibold mb-4 text-neutral-700">
 
-                    <Col span={6}>
-                        <div className="text-xs text-neutral-500 mb-1">ID CRM</div>
-                        <Select
-                            value={viewingEntity?.crm_id || undefined}
-                            style={{ width: "100%" }}
-                            placeholder="ID CRM"
-                            onChange={(value) =>
-                                updateMutation.mutate({
-                                    id: viewingEntity.id,
-                                    payload: { crm_id: value },
-                                })
-                            }
-                            options={[
-                                { value: 1001, label: "1001" },
-                                { value: 1002, label: "1002" },
-                            ]}
-                        />
-                    </Col>
+                    </div>
 
-                    <Col span={6}>
-                        <div className="text-xs text-neutral-500 mb-1">ID CORP</div>
-                        <Select
-                            value={viewingEntity?.corporate_id || undefined}
-                            style={{ width: "100%" }}
-                            placeholder="ID CORP"
-                            onChange={(value) =>
-                                updateMutation.mutate({
-                                    id: viewingEntity.id,
-                                    payload: { corporate_id: value },
-                                })
-                            }
-                            options={[
-                                { value: "A123", label: "A123" },
-                                { value: "B456", label: "B456" },
-                            ]}
-                        />
-                    </Col>
+                    <Row gutter={[16, 16]}>
 
-                    <Col span={6}>
-                        <div className="text-xs text-neutral-500 mb-1">Crédito</div>
-                        <Select
-                            value={viewingEntity?.credit ?? undefined}
-                            style={{ width: "100%" }}
-                            placeholder="Crédito"
-                            onChange={(value) =>
-                                updateMutation.mutate({
-                                    id: viewingEntity.id,
-                                    payload: { credit: value },
-                                })
-                            }
-                            options={[
-                                { value: 0, label: "0" },
-                                { value: 50, label: "50" },
-                                { value: 100, label: "100" },
-                            ]}
-                        />
-                    </Col>
+                        <Col span={6}>
+                            <span className="flex flex-col gap-1">
+                                <Typography.Text type="secondary">Input CRM</Typography.Text>
+                                <Select
+                                    size="small"
+                                    style={{ width: 160 }}
+                                    value={viewingEntity?.input_crm ?? undefined}
+                                    onChange={(value) =>
+                                        updateMutation.mutate({
+                                            id: viewingEntity.id,
+                                            payload: { input_crm: value },
+                                        })
+                                    }
+                                    options={[
+                                        { value: true, label: "Sim" },
+                                        { value: false, label: "Não" },
+                                    ]}
+                                /></span>
+                        </Col>
 
-                </Row>
-            </div>
+                        <Col span={6}>
+                            <span className="flex flex-col gap-1">
+                                <Typography.Text type="secondary">Disponibilidade CRM</Typography.Text>
+                                <Select
+                                    size="small"
+                                    style={{ width: 160 }}
+                                    value={viewingEntity?.availability_crm ?? undefined}
+                                    onChange={(value) =>
+                                        updateMutation.mutate({
+                                            id: viewingEntity.id,
+                                            payload: { availability_crm: value },
+                                        })
+                                    }
+                                    options={[
+                                        { value: "sim", label: "Sim" },
+                                        { value: "nao", label: "Não" },
+                                        { value: "sem_analise", label: "Sem análise" },
+                                    ]}
+                                /></span>
+                        </Col>
+                        <Col span={6}>
+                            <span className="flex flex-col gap-1">
+                                <Typography.Text type="secondary">Crédito</Typography.Text>
 
-            {/* ===================== */}
-            {/* VALIDAÇÕES */}
-            {/* ===================== */}
-            <div className="border rounded-md p-4 bg-white">
-                <div className="font-semibold mb-4 text-neutral-700">
-                    Validações
+                                <Input size="small" style={{ width: 160 }} maxLength={13} value={credito} onChange={(e) => setCredito(e.target.value)} onPressEnter={() => { const normalizedCredit = Number(String(credito ?? "").replace(/\s+/g, "").replace(",", ".")); updateMutation.mutate({ id: viewingEntity!.id, payload: { credit: Number.isNaN(normalizedCredit) ? 0 : normalizedCredit } }); }} />
+                            </span>
+                        </Col>
+                        <Col span={6}>
+                            <span className="flex flex-col gap-1">
+                                <Typography.Text type="secondary">Débito Operadora</Typography.Text>
+
+                                <Select
+                                    size="small"
+                                    style={{ width: 160 }}
+                                    value={viewingEntity?.debt_with_operator ?? undefined}
+                                    onChange={(value) =>
+                                        updateMutation.mutate({
+                                            id: viewingEntity.id,
+                                            payload: { debt_with_operator: value },
+                                        })
+                                    }
+                                    options={[
+                                        { value: "sim", label: "Sim" },
+                                        { value: "nao", label: "Não" },
+                                        { value: "sem_analise", label: "Sem análise" },
+                                    ]}
+                                /></span>
+                        </Col>
+
+                    </Row>
                 </div>
 
-                <Row gutter={[16, 16]}>
+                <div className="bg-neutral-100 rounded-sm p-3 w-full">
+                    <div className="font-semibold mb-4 text-neutral-700">
 
-                    <Col span={6}>
-                        <div className="text-xs text-neutral-500 mb-1">Input CRM</div>
-                        <Select
-                            value={viewingEntity?.input_crm ?? undefined}
-                            onChange={(value) =>
-                                updateMutation.mutate({
-                                    id: viewingEntity.id,
-                                    payload: { input_crm: value },
-                                })
-                            }
-                            options={[
-                                { value: true, label: "Sim" },
-                                { value: false, label: "Não" },
-                            ]}
-                        />
-                    </Col>
+                    </div>
 
-                    <Col span={6}>
-                        <div className="text-xs text-neutral-500 mb-1">Disponibilidade CRM</div>
-                        <Select
-                            value={viewingEntity?.availability_crm ?? undefined}
-                            onChange={(value) =>
-                                updateMutation.mutate({
-                                    id: viewingEntity.id,
-                                    payload: { availability_crm: value },
-                                })
-                            }
-                            options={[
-                                { value: "sim", label: "Sim" },
-                                { value: "nao", label: "Não" },
-                                { value: "sem_analise", label: "Sem análise" },
-                            ]}
-                        />
-                    </Col>
+                    <Row gutter={[16, 16]}>
 
-                    <Col span={6}>
-                        <div className="text-xs text-neutral-500 mb-1">Débito Operadora</div>
-                        <Select
-                            value={viewingEntity?.debt_with_operator ?? undefined}
-                            onChange={(value) =>
-                                updateMutation.mutate({
-                                    id: viewingEntity.id,
-                                    payload: { debt_with_operator: value },
-                                })
-                            }
-                            options={[
-                                { value: "sim", label: "Sim" },
-                                { value: "nao", label: "Não" },
-                                { value: "sem_analise", label: "Sem análise" },
-                            ]}
-                        />
-                    </Col>
+                        <Col span={6} >
 
-                </Row>
-            </div>
+                            <span className="flex flex-col gap-1">
+                                <Typography.Text type="secondary">Contrato</Typography.Text>
 
-            {/* ===================== */}
-            {/* FORMALIZAÇÃO */}
-            {/* ===================== */}
-            <div className="border rounded-md p-4 bg-white">
-                <div className="font-semibold mb-4 text-neutral-700">
-                    Formalização
+                                <Select
+                                    size="small"
+                                    style={{ width: 160 }}
+                                    value={viewingEntity?.contract ?? undefined}
+                                    onChange={(value) =>
+                                        updateMutation.mutate({
+                                            id: viewingEntity.id,
+                                            payload: { contract: value },
+                                        })
+                                    }
+                                    options={[
+                                        { value: "nao_enviado", label: "Não enviado" },
+                                        { value: "aguardando", label: "Aguardando" },
+                                        { value: "assinado", label: "Assinado" },
+                                        { value: "cancelado", label: "Cancelado" },
+                                    ]}
+                                />
+                            </span>
+                        </Col>
+
+                        <Col span={6}>
+                            <span className="flex flex-col gap-1">
+                                <Typography.Text type="secondary">Biometria</Typography.Text>
+
+                                <Select
+                                    size="small"
+                                    style={{ width: 160 }}
+                                    value={viewingEntity?.biometrics ?? undefined}
+                                    onChange={(value) =>
+                                        updateMutation.mutate({
+                                            id: viewingEntity.id,
+                                            payload: { biometrics: value },
+                                        })
+                                    }
+                                    options={[
+                                        { value: "nao_enviada", label: "Não enviada" },
+                                        { value: "aguardando", label: "Aguardando" },
+                                        { value: "realizado", label: "Realizado" },
+                                        { value: "cancelado", label: "Cancelado" },
+                                    ]}
+                                /></span>
+                        </Col>
+
+                    </Row>
                 </div>
-
-                <Row gutter={[16, 16]}>
-
-                    <Col span={6}>
-                        <div className="text-xs text-neutral-500 mb-1">Contrato</div>
-                        <Select
-                            value={viewingEntity?.contract ?? undefined}
-                            onChange={(value) =>
-                                updateMutation.mutate({
-                                    id: viewingEntity.id,
-                                    payload: { contract: value },
-                                })
-                            }
-                            options={[
-                                { value: "nao_enviado", label: "Não enviado" },
-                                { value: "aguardando", label: "Aguardando" },
-                                { value: "assinado", label: "Assinado" },
-                                { value: "cancelado", label: "Cancelado" },
-                            ]}
-                        />
-                    </Col>
-
-                    <Col span={6}>
-                        <div className="text-xs text-neutral-500 mb-1">Biometria</div>
-                        <Select
-                            value={viewingEntity?.biometrics ?? undefined}
-                            onChange={(value) =>
-                                updateMutation.mutate({
-                                    id: viewingEntity.id,
-                                    payload: { biometrics: value },
-                                })
-                            }
-                            options={[
-                                { value: "nao_enviada", label: "Não enviada" },
-                                { value: "aguardando", label: "Aguardando" },
-                                { value: "realizado", label: "Realizado" },
-                                { value: "cancelado", label: "Cancelado" },
-                            ]}
-                        />
-                    </Col>
-
-                </Row>
-            </div>
-
+            </ConfigProvider>
         </div>
     );
 }

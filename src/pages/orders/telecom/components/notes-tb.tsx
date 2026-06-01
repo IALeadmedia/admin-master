@@ -1,9 +1,12 @@
-import { Button, Card, Divider, Form, Input } from "antd";
+import { appSetting } from "@/constants/app-setting/config.const";
+import { Button, Card, ConfigProvider, Divider, Form, Input } from "antd";
 
 export function OrderNotesTab({
     orderId,
+    handleSaveObservacao
 }: {
     orderId: number;
+    handleSaveObservacao: any
 }) {
 
     const [form] = Form.useForm();
@@ -26,26 +29,38 @@ export function OrderNotesTab({
     ];
     console.log("Order ID for notes:", orderId);
     // const { data } = useOrderNotes(orderId);
-
+    const color = appSetting.primaryColor;
     return (
-        <div className="max-h-90 overflow-y-auto scrollbar-thin">
+        <div className="max-h-90 overflow-y-auto scrollbar-thin flex flex-col gap-4 ">   <div className="bg-neutral-100 rounded-sm p-3 w-full">
+            <ConfigProvider
+                theme={{
+                    components: {
+                        Input: {
+                            hoverBorderColor: color,
+                            activeBorderColor: color,
+                            activeShadow: "none",
+                            colorBorder: "#bfbfbf",
+                            colorTextPlaceholder: "#666666",
+                        },
+                        Button: {
+                            colorBorder: color,
+                            colorText: color,
+                            colorPrimary: color,
+                            colorPrimaryHover: color,
+                        },
+                    },
+                }}
+            >
+                <Form form={form} layout="vertical">
+                    <Form.Item name="consultant_observation" style={{ marginBottom: 8 }}>
+                        <Input.TextArea autoSize={{ minRows: 3, maxRows: 6 }} className="text-[16px] font-light text-[#353535] w-full" placeholder="Adicione aqui uma observação sobre esse pedido..." />
+                    </Form.Item>
+                    <Button className="self-end" style={{ fontSize: "12px", height: "25px" }} onClick={handleSaveObservacao}>
+                        Salvar
+                    </Button>
 
-            <Form form={form}>
-                <Form.Item name="note">
-
-                    <Input.TextArea
-                        rows={4}
-                        placeholder="Adicionar observação..."
-                    />
-
-                </Form.Item>
-
-                <Button type="primary">
-                    Adicionar
-                </Button>
-
-            </Form>
-
+                </Form>
+            </ConfigProvider>
             <Divider />
 
             <div className="flex flex-col gap-3">
@@ -75,7 +90,7 @@ export function OrderNotesTab({
                 ))}
 
             </div>
-
+        </div>
         </div>
     );
 }

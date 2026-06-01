@@ -6,14 +6,7 @@ export function OrderHistoryTab({
     orderId: number;
 }) {
     const mockHistory = [
-        {
-            id: 1,
-            user_name: "Sistema",
-            created_at: "01/06/2026 08:15",
-            action: "Pedido criado",
-            description:
-                "Cliente iniciou o preenchimento do formulário.",
-        },
+
         {
             id: 2,
             user_name: "Carlos Silva",
@@ -51,7 +44,7 @@ export function OrderHistoryTab({
     console.log(orderId);
 
     return (
-        <div className="max-h-90 overflow-y-auto scrollbar-thin px-2">
+        <div className="max-h-90 overflow-y-auto scrollbar-thin flex flex-col gap-4 ">   <div className="bg-neutral-100 rounded-sm p-3 w-full">
             <Timeline
                 reverse
                 items={mockHistory.map((log) => ({
@@ -98,6 +91,7 @@ export function OrderHistoryTab({
                     ),
                 }))}
             />
+        </div>
         </div>
     );
 }

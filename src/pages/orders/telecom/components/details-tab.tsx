@@ -43,7 +43,7 @@ export function OrderDetailsTab({
         <div className="max-h-90 overflow-y-auto scrollbar-thin">
             <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {isAdmin && (
-                    <OrderModalSection title="">
+                    <div className="bg-neutral-100 rounded-sm p-3 w-full">
                         <Row gutter={[16, 16]}>
                             <Col span={12}>
                                 <ReadonlyField
@@ -62,7 +62,7 @@ export function OrderDetailsTab({
                                 />
                             </Col>
                         </Row>
-                    </OrderModalSection>
+                    </div>
                 )}
                 <OrderModalSection title="Detalhes do Plano">
                     <div className="mt-4 text-neutral-700">

@@ -1,12 +1,7 @@
-import { App, Button, Form, ConfigProvider, Input, Select, Tooltip, Tabs } from "antd";
-
+import { App, Button, Form, ConfigProvider, Select, Tooltip, Tabs } from "antd";
 import { OrderModalShell } from "../../common/components/order-modal-shell";
-
-
 import { useEffect, useState } from "react";
 import { useUpdateOrderStatusMutation } from "@/hooks/orders/useUpdateOrderStatusMutation";
-
-
 import { appSetting, isAdminDomain } from "@/constants/app-setting/config.const";
 import { useUpdateEntity, type EntityType } from "../../config-page.const";
 import { useAuth } from "@/context/auth-provider";
@@ -186,10 +181,11 @@ export function ViewModal({
     const updateMutation = useUpdateEntity();
     const statusMutation = useUpdateOrderStatusMutation();
 
-    const [consultor, setConsultor] = useState("");
-    const [idCRM, setIdCRM] = useState("");
-    const [idCORP, setIdCORP] = useState("");
-    const [credito, setCredito] = useState("");
+    // const [consultor, setConsultor] = useState("");
+    // const [idCRM, setIdCRM] = useState("");
+    // const [idCORP, setIdCORP] = useState("");
+    // const [credito, setCredito] = useState("");
+    // const [equipe, setEquipe] = useState("");
     const [isExportingPdf, setIsExportingPdf] = useState(false);
 
     // const [expanded, setExpanded] = useState<Record<string, boolean>>({});
@@ -287,7 +283,7 @@ export function ViewModal({
                                     },
                                 }}
                             >
-                                <div className="flex flex-wrap gap-4">
+                                {/* <div className="flex flex-wrap gap-4">
                                     <div className="flex items-center gap-2">
                                         <span className="text-[14px] font-semibold">Consultor:</span>
                                         <Input size="small" placeholder="Consultor" style={{ width: 200 }} maxLength={13} value={consultor} onChange={(e) => setConsultor(e.target.value)} onPressEnter={() => updateMutation.mutate({ id: viewingEntity!.id, payload: { responsible_consultant: consultor } })} />
@@ -300,7 +296,7 @@ export function ViewModal({
                                         <span className="text-[14px] font-semibold">ID CRM:</span>
                                         <Input size="small" placeholder="ID CRM" style={{ width: 110 }} maxLength={8} value={idCRM} onChange={(e) => setIdCRM(e.target.value)} onPressEnter={() => updateMutation.mutate({ id: viewingEntity!.id, payload: { crm_id: Number(idCRM) } })} />
                                     </div>
-                                </div>
+                                </div> */}
                                 <div className="flex flex-wrap gap-4">
                                     <div className="flex items-center gap-2">
                                         <span className="text-[14px] font-semibold">Pedido:</span>
@@ -310,16 +306,13 @@ export function ViewModal({
                                         <span className="text-[14px] font-semibold">Tramitação:</span>
                                         <Select placeholder="Selecione o status" size="small" value={viewingEntity?.after_sales_status} style={{ width: 280 }} onChange={(value) => updateMutation.mutate({ id: viewingEntity!.id, payload: { after_sales_status: value } })} options={[]} />
                                     </div>
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-[14px] font-semibold">Equipe:</span>
-                                        <span className="font-normal text-[14px]">{viewingEntity?.team || "-"}</span>
-                                    </div>
+
                                 </div>
                                 <div className="flex flex-wrap gap-4">
-                                    <div className="flex items-center gap-2">
+                                    {/* <div className="flex items-center gap-2">
                                         <span className="text-[14px] font-semibold">Crédito:</span>
                                         <Input size="small" placeholder="Crédito" style={{ width: 100 }} maxLength={13} value={credito} onChange={(e) => setCredito(e.target.value)} onPressEnter={() => { const normalizedCredit = Number(String(credito ?? "").replace(/\s+/g, "").replace(",", ".")); updateMutation.mutate({ id: viewingEntity!.id, payload: { credit: Number.isNaN(normalizedCredit) ? 0 : normalizedCredit } }); }} />
-                                    </div>
+                                    </div> */}
                                     <div className="flex items-center gap-2">
                                         <span className="text-[14px] font-semibold">Atendimento:</span>
                                         <Select size="small" value={viewingEntity?.service} style={{ width: 160 }} onChange={(value) => updateMutation.mutate({ id: viewingEntity!.id, payload: { service: value } })} options={[{ value: "em_andamento", label: "Em Andamento" }, { value: "concluido", label: "Concluído" }]} />
@@ -396,6 +389,7 @@ export function ViewModal({
                         label: "Observações",
                         children: (
                             <OrderNotesTab
+                                handleSaveObservacao={handleSaveObservacao}
                                 orderId={viewingEntity.id}
                             />
                         ),
