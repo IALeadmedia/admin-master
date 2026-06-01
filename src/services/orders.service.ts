@@ -3,6 +3,7 @@ import type {
   TelecomOrderFilters,
   FinanceOrderFilters,
   BenefitsOrderFilters,
+  OrderLogsResponse,
 } from "@/types/orders";
 import type {
   TelecomFormValues,
@@ -82,5 +83,16 @@ export class OrdersService {
       `${resolveOrdersBasePath(module, operator)}/${id}/status`,
       payload,
     );
+  }
+
+  static async getLogById(
+    id: number,
+    module: OrderModule,
+    operator: string,
+  ): Promise<OrderLogsResponse> {
+    const { data } = await httpClientAxios.get<OrderLogsResponse>(
+      `${resolveOrdersBasePath(module, operator)}/${id}/logs`,
+    );
+    return data;
   }
 }

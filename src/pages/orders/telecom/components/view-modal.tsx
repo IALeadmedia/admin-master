@@ -319,7 +319,7 @@ export function ViewModal({
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <span className="text-[14px] font-semibold">Instalação:</span>
-                                        <Select size="small" value={viewingEntity?.installation} style={{ width: 160 }} onChange={(value) => updateMutation.mutate({ id: viewingEntity!.id, payload: { installation: value } })} options={[{ value: "nao_agendado", label: "Não Agendado" }, { value: "agendado", label: "Agendado" }, { value: "instalado", label: "Instalado" }, { value: "inviavel", label: "Inviável" }, { value: "cancelado", label: "Cancelado" }]} />
+                                        <Select size="small" value={viewingEntity?.installation} style={{ width: 160 }} onChange={(value) => updateMutation.mutate({ id: viewingEntity!.id, payload: { installation: value } })} options={[{ value: "não agendado", label: "Não Agendado" }, { value: "agendado", label: "Agendado" }, { value: "instalado", label: "Instalado" }, { value: "inviável", label: "Inviável" }, { value: "cancelado", label: "Cancelado" }]} />
                                     </div>
                                 </div>
                             </ConfigProvider>
