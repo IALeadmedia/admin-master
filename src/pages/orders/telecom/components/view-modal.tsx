@@ -17,6 +17,7 @@ import type { OrderOperatorsAvailability } from "@/types/orders";
 import { OrderDetailsTab } from "./details-tab";
 import { OrderHistoryTab } from "./history-tab";
 import { OrderNotesTab } from "./notes-tb";
+import { OrderControlTab } from "./control-tab";
 
 function resolveOperatorKey(companyName?: string | null) {
     return companyName?.split(" ")[0]?.toLowerCase().trim();
@@ -369,6 +370,15 @@ export function ViewModal({
                                 observationForm={observationForm}
                                 updateMutation={updateMutation}
                                 handleSaveObservacao={handleSaveObservacao}
+                            />
+                        ),
+                    }, {
+                        key: "control",
+                        label: "Controle",
+                        children: (
+                            <OrderControlTab
+                                viewingEntity={viewingEntity}
+                                updateMutation={updateMutation}
                             />
                         ),
                     },
