@@ -317,15 +317,15 @@ export function ViewModal({
                                 <div className="flex flex-wrap gap-4">
                                     <div className="flex items-center gap-2">
                                         <span className="text-[14px] font-semibold">Crédito:</span>
-                                        <Input size="small" placeholder="Crédito" style={{ width: 110 }} maxLength={13} value={credito} onChange={(e) => setCredito(e.target.value)} onPressEnter={() => { const normalizedCredit = Number(String(credito ?? "").replace(/\s+/g, "").replace(",", ".")); updateMutation.mutate({ id: viewingEntity!.id, payload: { credit: Number.isNaN(normalizedCredit) ? 0 : normalizedCredit } }); }} />
+                                        <Input size="small" placeholder="Crédito" style={{ width: 100 }} maxLength={13} value={credito} onChange={(e) => setCredito(e.target.value)} onPressEnter={() => { const normalizedCredit = Number(String(credito ?? "").replace(/\s+/g, "").replace(",", ".")); updateMutation.mutate({ id: viewingEntity!.id, payload: { credit: Number.isNaN(normalizedCredit) ? 0 : normalizedCredit } }); }} />
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <span className="text-[14px] font-semibold">Atendimento:</span>
-                                        <Select size="small" value={viewingEntity?.service} style={{ width: 180 }} onChange={(value) => updateMutation.mutate({ id: viewingEntity!.id, payload: { service: value } })} options={[{ value: "em_andamento", label: "Em Andamento" }, { value: "concluido", label: "Concluído" }]} />
+                                        <Select size="small" value={viewingEntity?.service} style={{ width: 160 }} onChange={(value) => updateMutation.mutate({ id: viewingEntity!.id, payload: { service: value } })} options={[{ value: "em_andamento", label: "Em Andamento" }, { value: "concluido", label: "Concluído" }]} />
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <span className="text-[14px] font-semibold">Instalação:</span>
-                                        <span className="font-normal text-[14px]">{viewingEntity?.installation || "-"}</span>
+                                        <Select size="small" value={viewingEntity?.installation} style={{ width: 160 }} onChange={(value) => updateMutation.mutate({ id: viewingEntity!.id, payload: { installation: value } })} options={[{ value: "nao_agendado", label: "Não Agendado" }, { value: "agendado", label: "Agendado" }, { value: "instalado", label: "Instalado" }, { value: "inviavel", label: "Inviável" }, { value: "cancelado", label: "Cancelado" }]} />
                                     </div>
                                 </div>
                             </ConfigProvider>
