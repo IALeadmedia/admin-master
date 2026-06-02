@@ -1,28 +1,8 @@
 import { useOrderLogsQuery } from "@/hooks/orders/useOrderLogsQuery";
 import type { OrderLogItem } from "@/types/orders";
+import { organizeDateFormat } from "@/utils/number.utils";
+import { formatRoleLabel } from "@/utils/role.util";
 import { Empty, Tag, Timeline } from "antd";
-
-function formatDateTime(value: string): string {
-    const date = new Date(value);
-
-    if (Number.isNaN(date.getTime())) {
-        return value;
-    }
-
-    return new Intl.DateTimeFormat("pt-BR", {
-        dateStyle: "short",
-        timeStyle: "short",
-    }).format(date);
-}
-
-function formatUserType(value: string): string {
-    const labels: Record<string, string> = {
-        admin: "Administrador",
-        order_token: "Cliente",
-    };
-
-    return labels[value] ?? value;
-}
 
 function formatFieldLabel(field: string): string {
     const labels: Record<string, string> = {
@@ -32,6 +12,11 @@ function formatFieldLabel(field: string): string {
         credit: "Crédito",
         plan: "Plano",
         selected_extras: "Extras selecionados",
+        instalation: "Instalação",
+        service: "Atendimento",
+        cpf: "CPF",
+        email: "E-mail",
+        due_day: "Vencimento"
     };
 
     return labels[field] ?? field.replaceAll("_", " ");
@@ -141,11 +126,11 @@ export function OrderHistoryTab({
                                         </span>
 
                                         <Tag color="blue">
-                                            {formatUserType(log.user_type)}
+                                            {formatRoleLabel(log.user_type)}
                                         </Tag>
 
                                         <span className="text-xs text-neutral-500">
-                                            {formatDateTime(log.created_at)}
+                                            {organizeDateFormat(log.created_at)}
                                         </span>
                                     </div>
 

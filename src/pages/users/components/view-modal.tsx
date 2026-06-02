@@ -1,9 +1,10 @@
 import { Col, Modal, Row, Button, Typography } from "antd";
-import { entityPage, type EntityType, roleLabelMap } from "../config-page.const";
+import { entityPage, type EntityType } from "../config-page.const";
 import ReadonlyField from "@/layout/common-components/ReadOnlyField";
 import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import { formatCNPJ, formatCPF } from "@/utils/document.util";
 import { formatPhoneNumber } from "@/utils/number.utils";
+import { formatRoleLabel } from "@/utils/role.util";
 
 interface ViewModalProps {
     open: boolean;
@@ -72,7 +73,7 @@ export function ViewModal({
                     <Col span={8}>
                         <ReadonlyField
                             label="Nível de Acesso"
-                            value={viewingEntity?.role ? roleLabelMap[viewingEntity.role] : undefined}
+                            value={viewingEntity?.role ? formatRoleLabel(viewingEntity.role) : undefined}
                         />
                     </Col>
                     <Col span={8}>
@@ -99,7 +100,7 @@ export function ViewModal({
                     <Col span={8}>
                         <ReadonlyField
                             label="Responsável"
-                            value={viewingEntity?.person_responsible?.user_name || "-" + " - " + (viewingEntity?.person_responsible?.role === "DIRETOR" ? "Diretor" : viewingEntity?.person_responsible?.role === "GERENTE" ? "Gerente" : viewingEntity?.person_responsible?.role === "LIDER" ? "Líder" : viewingEntity?.person_responsible?.role === "GESTOR" ? "Gestor" : "-")}
+                            value={viewingEntity?.person_responsible?.user_name || "-" + " - " + formatRoleLabel(viewingEntity?.person_responsible?.role ?? "")}
                         />
                     </Col>
 
