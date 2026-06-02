@@ -30,9 +30,65 @@ function formatFieldLabel(field: string): string {
         phone: "Telefone",
         consultant: "Consultor",
         credit: "Crédito",
+        plan: "Plano",
+        selected_extras: "Extras selecionados",
     };
 
     return labels[field] ?? field.replaceAll("_", " ");
+}
+
+function formatLogValue(value: unknown): string {
+    if (value === null || value === undefined || value === "") {
+        return "-";
+    }
+
+    if (
+        typeof value === "string" ||
+        typeof value === "number" ||
+        typeof value === "boolean"
+    ) {
+        return String(value);
+    }
+
+    if (Array.isArray(value)) {
+        if (value.length === 0) {
+            return "[]";
+        }
+
+        return value.map(formatLogValue).join(", ");
+    }
+
+    if (typeof value === "object") {
+        const record = value as Record<string, unknown>;
+
+        if (typeof record.name === "string") {
+            const parts = [record.name];
+
+            if (typeof record.speed === "string" && record.speed.trim()) {
+                parts.push(record.speed);
+            }
+
+            if (typeof record.value === "number") {
+                parts.push(String(record.value));
+            }
+
+            return parts.join(" - ");
+        }
+
+        if (typeof record.label === "string") {
+            return record.label;
+        }
+
+        if (typeof record.id === "string" || typeof record.id === "number") {
+            return `#${record.id}`;
+        }
+
+        return Object.entries(record)
+            .map(([key, entryValue]) => `${key}: ${formatLogValue(entryValue)}`)
+            .join(" | ");
+    }
+
+    return String(value);
 }
 
 export function OrderHistoryTab({
@@ -41,7 +97,7 @@ export function OrderHistoryTab({
     orderId: number;
 }) {
 
-    const { data, isLoading } = useOrderLogsQuery(orderId, "telecom", "tim");
+    const { data, isLoading } = useOrderLogsQuery(orderId, "telecom");
     const logs = data?.logs ?? [];
 
     const renderLogChange = (log: OrderLogItem) =>
@@ -53,13 +109,13 @@ export function OrderHistoryTab({
 
                 <div className="flex flex-wrap items-center gap-2">
                     <span className="font-medium text-neutral-900">
-                        {change.old ?? "-"}
+                        {formatLogValue(change.old)}
                     </span>
 
                     <span className="text-neutral-400">→</span>
 
                     <span className="font-medium text-green-700">
-                        {change.new ?? "-"}
+                        {formatLogValue(change.new)}
                     </span>
                 </div>
             </div>

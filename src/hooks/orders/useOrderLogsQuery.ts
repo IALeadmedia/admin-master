@@ -6,12 +6,11 @@ import type { OrderLogsResponse } from "@/types/orders";
 export const useOrderLogsQuery = (
   id: number,
   module: OrderModule,
-  operator: string,
   enabled: boolean = true,
 ): UseQueryResult<OrderLogsResponse, Error> => {
   return useQuery({
-    queryKey: ["orderLogs", id, module, operator],
-    queryFn: () => OrdersService.getLogById(id, module, operator),
+    queryKey: ["orderLogs", id, module],
+    queryFn: () => OrdersService.getLogById(id, module),
     enabled,
   });
 };

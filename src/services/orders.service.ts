@@ -21,6 +21,10 @@ function resolveOrdersBasePath(module: OrderModule, operator: string): string {
   return `/${module}/${operator}/orders`;
 }
 
+function resolveOrdersModulePath(module: OrderModule): string {
+  return `/${module}/orders`;
+}
+
 export class OrdersService {
   static async getAll<T = Record<string, unknown>>(
     module: OrderModule,
@@ -88,10 +92,9 @@ export class OrdersService {
   static async getLogById(
     id: number,
     module: OrderModule,
-    operator: string,
   ): Promise<OrderLogsResponse> {
     const { data } = await httpClientAxios.get<OrderLogsResponse>(
-      `${resolveOrdersBasePath(module, operator)}/${id}/logs`,
+      `${resolveOrdersModulePath(module)}/${id}/logs`,
     );
     return data;
   }
