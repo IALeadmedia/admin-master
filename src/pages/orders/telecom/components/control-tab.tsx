@@ -1,6 +1,7 @@
 import { appSetting } from "@/constants/app-setting/config.const";
 import { Row, Col, Select, Input, ConfigProvider, Typography } from "antd";
 import { useState } from "react";
+import { OrderModalSection } from "../../common/components/order-modal-section";
 
 export function OrderControlTab({
     viewingEntity,
@@ -14,6 +15,8 @@ export function OrderControlTab({
     const [idCRM, setIdCRM] = useState("");
     const [idCORP, setIdCORP] = useState("");
     const [credito, setCredito] = useState("");
+
+
     const color = appSetting.primaryColor;
     return (
         <div className="max-h-90 overflow-y-auto scrollbar-thin flex flex-col gap-4 ">
@@ -26,27 +29,14 @@ export function OrderControlTab({
                 }}
             >
 
-                <div className="bg-neutral-100 rounded-sm p-3 w-full">
-                    <div className="font-semibold mb-4 text-neutral-700">
-
-                    </div>
-
+                <OrderModalSection title="Informações Gerais">
                     <Row gutter={[16, 16]}>
-
                         <Col span={6}>
                             <span className="flex flex-col gap-1">
                                 <Typography.Text type="secondary">Consultor</Typography.Text>
                                 <Input size="small" style={{ width: 200 }} maxLength={13} value={consultor} onChange={(e) => setConsultor(e.target.value)} onPressEnter={() => updateMutation.mutate({ id: viewingEntity!.id, payload: { responsible_consultant: consultor } })} />
                             </span>
                         </Col>
-
-                        <Col span={6}>
-                            <span className="flex flex-col gap-1">
-                                <Typography.Text type="secondary">ID CRM</Typography.Text>
-                                <Input size="small" style={{ width: 160 }} maxLength={8} value={idCRM} onChange={(e) => setIdCRM(e.target.value)} onPressEnter={() => updateMutation.mutate({ id: viewingEntity!.id, payload: { crm_id: Number(idCRM) } })} />
-                            </span>
-                        </Col>
-
                         <Col span={6}>
                             <span className="flex flex-col gap-1">
                                 <Typography.Text type="secondary">ID CORP</Typography.Text>
@@ -59,19 +49,19 @@ export function OrderControlTab({
                                 <Select size="small" value={viewingEntity?.team} style={{ width: 200 }} onChange={(value) => updateMutation.mutate({ id: viewingEntity!.id, payload: { team: value } })} options={[]} />
                             </span>
                         </Col>
-
-
                     </Row>
-                </div>
+                </OrderModalSection>
 
 
-                <div className="bg-neutral-100 rounded-sm p-3 w-full">
-                    <div className="font-semibold mb-4 text-neutral-700">
-
-                    </div>
+                <OrderModalSection title="CRM">
 
                     <Row gutter={[16, 16]}>
-
+                        <Col span={6}>
+                            <span className="flex flex-col gap-1">
+                                <Typography.Text type="secondary">ID CRM</Typography.Text>
+                                <Input size="small" style={{ width: 160 }} maxLength={8} value={idCRM} onChange={(e) => setIdCRM(e.target.value)} onPressEnter={() => updateMutation.mutate({ id: viewingEntity!.id, payload: { crm_id: Number(idCRM) } })} />
+                            </span>
+                        </Col>
                         <Col span={6}>
                             <span className="flex flex-col gap-1">
                                 <Typography.Text type="secondary">Input CRM</Typography.Text>
@@ -112,6 +102,13 @@ export function OrderControlTab({
                                     ]}
                                 /></span>
                         </Col>
+
+
+                    </Row>
+                </OrderModalSection>
+
+                <OrderModalSection title="Formalização e Análise">
+                    <Row gutter={[16, 16]}>
                         <Col span={6}>
                             <span className="flex flex-col gap-1">
                                 <Typography.Text type="secondary">Crédito</Typography.Text>
@@ -140,17 +137,6 @@ export function OrderControlTab({
                                     ]}
                                 /></span>
                         </Col>
-
-                    </Row>
-                </div>
-
-                <div className="bg-neutral-100 rounded-sm p-3 w-full">
-                    <div className="font-semibold mb-4 text-neutral-700">
-
-                    </div>
-
-                    <Row gutter={[16, 16]}>
-
                         <Col span={6} >
 
                             <span className="flex flex-col gap-1">
@@ -200,7 +186,7 @@ export function OrderControlTab({
                         </Col>
 
                     </Row>
-                </div>
+                </OrderModalSection>
             </ConfigProvider>
         </div>
     );

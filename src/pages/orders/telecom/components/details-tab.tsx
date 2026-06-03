@@ -167,8 +167,6 @@ export function OrderDetailsTab({
                     </Row>
                 </OrderModalSection>
 
-
-
                 <OrderModalSection title="Informações do Cliente">
                     <Row gutter={[16, 16]}>
                         <Col span={24}>
@@ -192,6 +190,7 @@ export function OrderDetailsTab({
                         <Col span={8}><ReadonlyField label="Nome Mãe (RFB)" value={viewingEntity?.rfb_mother_name} copyable /></Col>
                     </Row>
                 </OrderModalSection>
+
                 <OrderModalSection title="Informações de Pagamento">
                     <Row gutter={[16, 16]}>
                         <Col span={12}><ReadonlyField label="Método de Pagamento" value={formatPaymentMethod(viewingEntity?.payment_method)} /></Col>
@@ -202,6 +201,7 @@ export function OrderDetailsTab({
                         <Col span={12}><ReadonlyField label="CPF do Titular" value={formatCPF(viewingEntity?.bank_account_holder_cpf || '') || '-'} copyable /></Col>
                     </Row>
                 </OrderModalSection>
+
                 <OrderModalSection title="Contato">
                     <Row gutter={[16, 16]}>
                         <Col span={12}>
