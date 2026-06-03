@@ -13,6 +13,7 @@ import { OrderDetailsTab } from "./details-tab";
 import { OrderHistoryTab } from "./history-tab";
 import { OrderNotesTab } from "./notes-tb";
 import { OrderControlTab } from "./control-tab";
+import { TranshipmentTab } from "./transhipment-tab";
 
 function resolveOperatorKey(companyName?: string | null) {
     return companyName?.split(" ")[0]?.toLowerCase().trim();
@@ -391,6 +392,18 @@ export function ViewModal({
                             <OrderNotesTab
                                 handleSaveObservacao={handleSaveObservacao}
                                 orderId={viewingEntity.id}
+                            />
+                        ),
+                    },
+
+
+                    {
+                        key: "transhipment",
+                        label: "Transbordo",
+                        children: (
+                            isAdmin && <TranshipmentTab
+
+                                viewingEntity={viewingEntity}
                             />
                         ),
                     },
