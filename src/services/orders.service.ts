@@ -17,7 +17,11 @@ type OrderFilters =
   | BenefitsOrderFilters;
 export type OrderModule = "telecom" | "finances" | "benefits";
 
-function resolveOrdersBasePath(module: OrderModule, operator: string): string {
+function resolveOrdersBasePath(module: OrderModule, operator?: string): string {
+  if (!operator) {
+    return `/${module}/orders`;
+  }
+
   return `/${module}/${operator}/orders`;
 }
 
@@ -53,7 +57,7 @@ export class OrdersService {
   static async update(
     id: number,
     module: OrderModule,
-    operator: string,
+    operator: string | undefined,
     payload:
       | TelecomFormValues
       | FinanceOrderFormValues
@@ -70,7 +74,7 @@ export class OrdersService {
   static async delete(
     id: number,
     module: OrderModule,
-    operator: string,
+    operator: string | undefined,
   ): Promise<void> {
     await httpClientAxios.delete(
       `${resolveOrdersBasePath(module, operator)}/${id}`,
@@ -80,7 +84,7 @@ export class OrdersService {
   static async changeStatus(
     id: number,
     module: OrderModule,
-    operator: string,
+    operator: string | undefined,
     payload: { status: string },
   ): Promise<void> {
     await httpClientAxios.patch(
