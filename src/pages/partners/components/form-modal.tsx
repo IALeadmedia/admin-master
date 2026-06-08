@@ -355,6 +355,17 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
               />
             </Form.Item>
           </Col>
+
+          <Col span={8}>
+            <Form.Item
+              name="clientId_uberich"
+              label="Cliente Uberich"
+              rules={[{ required: true, message: "Informe o cliente Uberich" }]}
+            >
+              <Input placeholder="Informe o cliente Uberich" />
+            </Form.Item>
+          </Col>
+
         </Row>
       </Form>
     </Modal >

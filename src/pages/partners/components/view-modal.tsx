@@ -112,6 +112,8 @@ export function ViewModal({ open, viewingEntity, onClose, onEdit, onDelete }: Vi
                             label="Categoria"
                             values={viewingEntity?.category?.map(formatCategoryLabel)}
                         />
+                    </Col> <Col span={8}>
+                        <ReadonlyField label="Cliente Uberich" value={viewingEntity?.clientId_uberich} copyable />
                     </Col>
                 </Row>
             </div>
