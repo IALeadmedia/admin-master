@@ -2,25 +2,9 @@ import { useOrderLogsQuery } from "@/hooks/orders/useOrderLogsQuery";
 import type { OrderLogItem } from "@/types/orders";
 import { organizeDateFormat } from "@/utils/number.utils";
 import { formatRoleLabel } from "@/utils/role.util";
+import { formatFieldLabel } from "@/utils/translate-orders.utils";
 import { Empty, Tag, Timeline } from "antd";
 
-function formatFieldLabel(field: string): string {
-    const labels: Record<string, string> = {
-        status: "Status",
-        phone: "Telefone",
-        consultant: "Consultor",
-        credit: "Crédito",
-        plan: "Plano",
-        selected_extras: "Extras selecionados",
-        instalation: "Instalação",
-        service: "Atendimento",
-        cpf: "CPF",
-        email: "E-mail",
-        due_day: "Vencimento"
-    };
-
-    return labels[field] ?? field.replaceAll("_", " ");
-}
 
 function formatLogValue(value: unknown): string {
     if (value === null || value === undefined || value === "") {

@@ -1,6 +1,6 @@
 import { App, Button, Form, ConfigProvider, Select, Tooltip, Tabs } from "antd";
 import { OrderModalShell } from "../../common/components/order-modal-shell";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useUpdateOrderStatusMutation } from "@/hooks/orders/useUpdateOrderStatusMutation";
 import { appSetting, isAdminDomain } from "@/constants/app-setting/config.const";
 import { useUpdateEntity, type EntityType } from "../../config-page.const";
@@ -179,6 +179,7 @@ export function ViewModal({
 }: ViewModalProps) {
     const { message } = App.useApp();
     const [observationForm] = Form.useForm();
+    const [controlForm] = Form.useForm();
     const updateMutation = useUpdateEntity();
     const statusMutation = useUpdateOrderStatusMutation();
 
@@ -188,7 +189,7 @@ export function ViewModal({
     // const [credito, setCredito] = useState("");
     // const [equipe, setEquipe] = useState("");
     const [isExportingPdf, setIsExportingPdf] = useState(false);
-
+    const [activeTab, setActiveTab] = useState("details");
     // const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
     // const toggleExpand = (id: string) => {
@@ -198,21 +199,60 @@ export function ViewModal({
     //     }));
     // };
 
-    useEffect(() => {
-        if (open && viewingEntity) {
-            observationForm.setFieldsValue({
-                consultant: viewingEntity.responsible_consultant || "",
-                crm_id: String(viewingEntity.crm_id || ""),
-                corporate_id: viewingEntity.corporate_id || "",
-                credit: String(viewingEntity.credit || ""),
-                consultant_observation: viewingEntity.consultant_observation || "",
-            });
-        }
-    }, [open, viewingEntity, observationForm]);
+    // useEffect(() => {
+    //     if (open && viewingEntity) {
+    //         observationForm.setFieldsValue({
+    //             consultant: viewingEntity.responsible_consultant || "",
+    //             crm_id: String(viewingEntity.crm_id || ""),
+    //             corporate_id: viewingEntity.corporate_id || "",
+    //             credit: String(viewingEntity.credit || ""),
+    //             consultant_observation: viewingEntity.consultant_observation || "",
+    //         });
+    //     }
+    // }, [open, viewingEntity, observationForm]);
 
     const { isGlobalAdmin } = useAuth();
     const isAdmin = isAdminDomain && isGlobalAdmin;
+    const renderFooter = () => {
+        switch (activeTab) {
+            case "details":
+                return (
+                    <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
+                        <Button onClick={handleExportPdf} loading={isExportingPdf}>
+                            Exportar PDF
+                        </Button>
+                        <Button type="primary" onClick={() => viewingEntity && onEdit?.(viewingEntity)}>
+                            Editar
+                        </Button>
+                        {canDelete && (
+                            <Button danger onClick={() => viewingEntity && onDelete?.(viewingEntity)}>
+                                Deletar
+                            </Button>
+                        )}
+                    </div>
+                );
 
+            case "control":
+                return (
+                    <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
+                        <Button type="primary" onClick={() => controlForm.submit()}>
+                            Salvar
+                        </Button>
+                    </div>
+                );
+            case "notes":
+                return (
+                    <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
+                        <Button type="primary" onClick={handleSaveObservacao}>
+                            Salvar
+                        </Button>
+                    </div>
+                );
+
+            default:
+                return null;
+        }
+    };
     const { data: partnerData } = usePartnerQuery({
         partnerId: viewingEntity?.partner_id ?? undefined,
         enabled: isAdmin && !!viewingEntity?.partner_id,
@@ -284,20 +324,6 @@ export function ViewModal({
                                     },
                                 }}
                             >
-                                {/* <div className="flex flex-wrap gap-4">
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-[14px] font-semibold">Consultor:</span>
-                                        <Input size="small" placeholder="Consultor" style={{ width: 200 }} maxLength={13} value={consultor} onChange={(e) => setConsultor(e.target.value)} onPressEnter={() => updateMutation.mutate({ id: viewingEntity!.id, payload: { responsible_consultant: consultor } })} />
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-[14px] font-semibold">ID CORP:</span>
-                                        <Input size="small" placeholder="ID CORP" style={{ width: 110 }} maxLength={8} value={idCORP} onChange={(e) => setIdCORP(e.target.value)} onPressEnter={() => updateMutation.mutate({ id: viewingEntity!.id, payload: { corporate_id: String(idCORP || "") } })} />
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-[14px] font-semibold">ID CRM:</span>
-                                        <Input size="small" placeholder="ID CRM" style={{ width: 110 }} maxLength={8} value={idCRM} onChange={(e) => setIdCRM(e.target.value)} onPressEnter={() => updateMutation.mutate({ id: viewingEntity!.id, payload: { crm_id: Number(idCRM) } })} />
-                                    </div>
-                                </div> */}
                                 <div className="flex flex-wrap gap-4">
                                     <div className="flex items-center gap-2">
                                         <span className="text-[14px] font-semibold">Pedido:</span>
@@ -328,28 +354,15 @@ export function ViewModal({
                     </div>
                 </>
             }
-            footer={
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
-                    <Button onClick={handleExportPdf} loading={isExportingPdf}>
-                        Exportar PDF
-                    </Button>
-                    <Button type="primary" onClick={() => viewingEntity && onEdit?.(viewingEntity)}>
-                        Editar
-                    </Button>
-                    {canDelete && (
-                        <Button danger onClick={() => viewingEntity && onDelete?.(viewingEntity)}>
-                            Deletar
-                        </Button>
-                    )}
-                </div>
-            }
+            footer={renderFooter()}
             onCancel={onClose}
             destroyOnHidden
             width={1000}
         >
             <Tabs
                 defaultActiveKey="details"
-
+                activeKey={activeTab}
+                onChange={setActiveTab}
                 items={[
                     {
                         key: "details",
@@ -373,6 +386,7 @@ export function ViewModal({
                             <OrderControlTab
                                 viewingEntity={viewingEntity}
                                 updateMutation={updateMutation}
+                                form={controlForm}
                             />
                         ),
                     },
