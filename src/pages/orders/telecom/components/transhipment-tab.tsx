@@ -1,9 +1,9 @@
-
 import { Card, Tag } from "antd";
 
 type TranshipmentEntity = {
     previous_order_ids?: number[];
     journey?: string[];
+    transhipment?: boolean;
 };
 
 function formatOperatorName(operator: string) {
@@ -26,7 +26,7 @@ export function TranshipmentTab({
 }) {
     const previousOrderIds = viewingEntity?.previous_order_ids ?? [];
     const journey = viewingEntity?.journey ?? [];
-    const hasTranshipment = previousOrderIds.length > 0 || journey.length > 0;
+    const hasTranshipment = viewingEntity?.transhipment
 
     return (
         <div className="max-h-90 overflow-y-auto scrollbar-thin flex flex-col gap-4">
