@@ -85,18 +85,18 @@ export function OrderDetailsTab({
                                             : "-"}
                                     </p>
                                     <p className="text-[14px] w-50 text-center">
-                                        {viewingEntity.installation_preferred_date_one
+                                        {viewingEntity.installation_preferred_date_one && viewingEntity.installation_preferred_date_one !== "Invalid Date"
                                             ? `${organizeDateFormat(viewingEntity.installation_preferred_date_one)} - ${viewingEntity.installation_preferred_period_one || "-"}`
                                             : "-"}
                                     </p>
                                     <p className="text-[14px] w-50 text-center">
-                                        {viewingEntity.installation_preferred_date_two
+                                        {viewingEntity.installation_preferred_date_two && viewingEntity.installation_preferred_date_two !== "Invalid Date"
                                             ? `${organizeDateFormat(viewingEntity.installation_preferred_date_two)} - ${viewingEntity.installation_preferred_period_two || "-"}`
 
                                             : "-"}
                                     </p>
                                     <p className="text-[14px] w-50 text-center">
-                                        {viewingEntity.installation_preferred_date_three
+                                        {viewingEntity.installation_preferred_date_three && viewingEntity.installation_preferred_date_three !== "Invalid Date"
                                             ? `${organizeDateFormat(viewingEntity.installation_preferred_date_three)} - ${viewingEntity.installation_preferred_period_three || "-"}`
 
                                             : "-"}
