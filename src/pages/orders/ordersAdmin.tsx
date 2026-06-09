@@ -31,7 +31,7 @@ export function OrdersAdminPage() {
     const { hasCategories } = segmentRegistry[model];
 
     const [page, setPage] = useState(1);
-    const [pageSize, setPageSize] = useState(20);
+    const [pageSize, setPageSize] = useState(100);
     const [clientType, setClientType] = useState<"PF" | "PJ" | "">("");
 
     const { data: companiesData } = useCompanyQuery({ enabled: !!selectedSegmentId });

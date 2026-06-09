@@ -80,7 +80,7 @@ export function TableMain({
   FormModalComponent,
   ViewModalComponent,
   currentPage,
-  pageSize = 20,
+  pageSize = 100,
   total,
   onPageChange,
   onPageSizeChange,
@@ -311,7 +311,7 @@ export function TableMain({
                 pageSize,
                 total,
                 locale: { items_per_page: "" },
-                pageSizeOptions: [5, 10, 20, 50, 100],
+                pageSizeOptions: [20, 50, 100, 200, 500],
                 showSizeChanger: true,
                 showTotal: (t) => `Total de ${t} ${entityPage.plural.toLowerCase()}`,
                 onChange: (p) => onPageChange?.(p),
@@ -321,7 +321,7 @@ export function TableMain({
                 },
               }
               : {
-                pageSize: 20,
+                pageSize: 100,
                 showTotal: (t) => `Total de ${t} ${entityPage.plural.toLowerCase()}`,
               }
           }

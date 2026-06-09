@@ -49,7 +49,7 @@ export function OrdersPage({ model, category, clientType }: OrdersPageProps) {
     segmentComponents[resolvedModel];
 
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(20);
+  const [pageSize, setPageSize] = useState(100);
 
   const { data, isLoading } = useListEntity({
     model: resolvedModel,
