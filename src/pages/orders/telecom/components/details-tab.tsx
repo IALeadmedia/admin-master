@@ -58,7 +58,7 @@ export function OrderDetailsTab({
                     />
                 ))}
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 2, marginTop: 8 }}>
                 {isAdmin && (
                     <div className="bg-neutral-100 rounded-sm p-3 w-full">
                         <Row gutter={[16, 16]}>
