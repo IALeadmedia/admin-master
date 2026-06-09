@@ -2,6 +2,11 @@ import { appSetting } from "@/constants/app-setting/config.const";
 import { Row, Col, Select, Input, ConfigProvider, Typography, Form } from "antd";
 import type { FormInstance } from "antd";
 import { useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/context/auth-provider";
+import { useAdminScope } from "@/context/admin-scope-provider";
+import { isAdminDomain } from "@/constants/app-setting/config.const";
+import { UsersService } from "@/services/users.service";
 import { OrderModalSection } from "../../common/components/order-modal-section";
 import type { EntityType } from "../../config-page.const";
 
@@ -62,6 +67,29 @@ export function OrderControlTab({
         });
     };
 
+    const { user } = useAuth();
+    const { selectedCompanyId, selectedPartnerId } = useAdminScope();
+
+    const companyId = isAdminDomain ? selectedCompanyId : (user?.user.company_id ?? undefined);
+    const partnerId = isAdminDomain ? selectedPartnerId : (user?.user.partner_id ?? undefined);
+    const hasScope = companyId != null || partnerId != null;
+
+    const { data: usersData } = useQuery({
+        queryKey: ["consultant-users", companyId, partnerId],
+        queryFn: () =>
+            UsersService.getAll({
+                ...(companyId != null ? { company_id: companyId } : {}),
+                ...(partnerId != null ? { partner_id: partnerId } : {}),
+
+            }),
+        enabled: hasScope,
+    });
+
+    const consultorOptions = (usersData?.users ?? []).map((u) => ({
+        value: u.user_name,
+        label: u.user_name + " - " + u.role,
+    }));
+
     const color = appSetting.primaryColor;
     return (
         <Form form={form} onFinish={handleFinish}>
@@ -76,11 +104,22 @@ export function OrderControlTab({
                 >
                     <OrderModalSection title="Informações Gerais">
                         <Row gutter={[16, 16]}>
-                            <Col span={6}>
+                            <Col span={7}>
                                 <span className="flex flex-col gap-1">
                                     <Typography.Text type="secondary">Consultor</Typography.Text>
                                     <Form.Item name="consultor" noStyle>
-                                        <Input size="small" style={{ width: 200 }} maxLength={13} />
+                                        <Select
+                                            showSearch
+                                            size="small"
+                                            style={{ width: 240 }}
+                                            options={consultorOptions}
+                                            filterOption={(input, option) =>
+                                                (option?.label as string)
+                                                    ?.toLowerCase()
+                                                    .includes(input.toLowerCase())
+                                            }
+                                            allowClear
+                                        />
                                     </Form.Item>
                                 </span>
                             </Col>
@@ -96,7 +135,7 @@ export function OrderControlTab({
                                 <span className="flex flex-col gap-1">
                                     <Typography.Text type="secondary">Equipe</Typography.Text>
                                     <Form.Item name="team" noStyle>
-                                        <Select size="small" style={{ width: 200 }} options={[]} />
+                                        <Select showSearch size="small" style={{ width: 200 }} options={[]} />
                                     </Form.Item>
                                 </span>
                             </Col>
@@ -157,7 +196,7 @@ export function OrderControlTab({
                                     <Form.Item name="credit" noStyle>
                                         <Select
                                             size="small"
-                                            style={{ width: 160 }}
+                                            style={{ width: 180 }}
                                             options={[
                                                 { value: "positivo", label: "Positivo" },
                                                 { value: "negativo", label: "Negativo" },

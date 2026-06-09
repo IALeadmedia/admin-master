@@ -5,7 +5,6 @@ import { formatRoleLabel } from "@/utils/role.util";
 import { formatFieldLabel } from "@/utils/translate-orders.utils";
 import { Empty, Tag, Timeline } from "antd";
 
-
 function formatLogValue(value: unknown): string {
     if (value === null || value === undefined || value === "") {
         return "-";
@@ -51,9 +50,11 @@ function formatLogValue(value: unknown): string {
         if (typeof record.id === "string" || typeof record.id === "number") {
             return `#${record.id}`;
         }
-
         return Object.entries(record)
-            .map(([key, entryValue]) => `${key}: ${formatLogValue(entryValue)}`)
+            .map(
+                ([key, entryValue]) =>
+                    `${formatFieldLabel(key)}: ${formatLogValue(entryValue)}`
+            )
             .join(" | ");
     }
 
