@@ -1,4 +1,4 @@
-import { App, Button, Form, ConfigProvider, Select, Tooltip, Tabs } from "antd";
+import { App, Button, Form, ConfigProvider, Select, Tooltip, Tabs, Badge } from "antd";
 import { OrderModalShell } from "../../common/components/order-modal-shell";
 import { useState } from "react";
 import { useUpdateOrderStatusMutation } from "@/hooks/orders/useUpdateOrderStatusMutation";
@@ -14,6 +14,7 @@ import { OrderHistoryTab } from "./history-tab";
 import { OrderNotesTab } from "./notes-tb";
 import { OrderControlTab } from "./control-tab";
 import { TranshipmentTab } from "./transhipment-tab";
+import { getAlertScenarios } from "@/utils/orders.util";
 
 function resolveOperatorKey(companyName?: string | null) {
     return companyName?.split(" ")[0]?.toLowerCase().trim();
@@ -33,8 +34,6 @@ export const AvailabilityStatus = ({
     const operatorKey = resolveOperatorKey(companyName);
     const isVivo = operatorKey === "vivo";
 
-    // VIVO: usa os campos diretos do pedido
-    // Outros: lê operators_availability com fallback de nome de campo (API vs tipo)
     const available: boolean | number | null | undefined = isVivo
         ? localData.availability
         : (() => {
@@ -118,10 +117,7 @@ export const AvailabilityStatus = ({
 };
 
 export const PAPStatus = ({ localData }: { localData: { availability_pap?: boolean | number | null } }) => {
-    if (
-        localData.availability_pap === null ||
-        localData.availability_pap === undefined
-    ) {
+    if (localData.availability_pap === null || localData.availability_pap === undefined) {
         return (
             <div className="flex flex-col items-center">
                 <div className="flex items-center justify-center">-</div>
@@ -133,11 +129,7 @@ export const PAPStatus = ({ localData }: { localData: { availability_pap?: boole
         return (
             <div className="flex flex-col items-center mt-2">
                 <div className="flex items-center justify-center">
-                    <Tooltip
-                        title="PAP - Disponível"
-                        placement="top"
-                        overlayStyle={{ fontSize: "12px" }}
-                    >
+                    <Tooltip title="PAP - Disponível" placement="top" overlayStyle={{ fontSize: "12px" }}>
                         <div className="h-2 w-2 bg-green-500 rounded-full"></div>
                     </Tooltip>
                 </div>
@@ -148,11 +140,7 @@ export const PAPStatus = ({ localData }: { localData: { availability_pap?: boole
     return (
         <div className="flex flex-col items-center mt-2">
             <div className="flex items-center justify-center">
-                <Tooltip
-                    title="PAP - Indisponível"
-                    placement="top"
-                    overlayStyle={{ fontSize: "12px" }}
-                >
+                <Tooltip title="PAP - Indisponível" placement="top" overlayStyle={{ fontSize: "12px" }}>
                     <div className="h-2 w-2 bg-red-500 rounded-full"></div>
                 </Tooltip>
             </div>
@@ -182,37 +170,27 @@ export function ViewModal({
     const [controlForm] = Form.useForm();
     const updateMutation = useUpdateEntity();
     const statusMutation = useUpdateOrderStatusMutation();
-
-    // const [consultor, setConsultor] = useState("");
-    // const [idCRM, setIdCRM] = useState("");
-    // const [idCORP, setIdCORP] = useState("");
-    // const [credito, setCredito] = useState("");
-    // const [equipe, setEquipe] = useState("");
     const [isExportingPdf, setIsExportingPdf] = useState(false);
     const [activeTab, setActiveTab] = useState("details");
-    // const [expanded, setExpanded] = useState<Record<string, boolean>>({});
-
-    // const toggleExpand = (id: string) => {
-    //     setExpanded((prev) => ({
-    //         ...prev,
-    //         [id]: !prev[id],
-    //     }));
-    // };
-
-    // useEffect(() => {
-    //     if (open && viewingEntity) {
-    //         observationForm.setFieldsValue({
-    //             consultant: viewingEntity.responsible_consultant || "",
-    //             crm_id: String(viewingEntity.crm_id || ""),
-    //             corporate_id: viewingEntity.corporate_id || "",
-    //             credit: String(viewingEntity.credit || ""),
-    //             consultant_observation: viewingEntity.consultant_observation || "",
-    //         });
-    //     }
-    // }, [open, viewingEntity, observationForm]);
 
     const { isGlobalAdmin } = useAuth();
     const isAdmin = isAdminDomain && isGlobalAdmin;
+
+    const alertScenarios = (viewingEntity?.status === "FECHADO" || viewingEntity?.status === "fechado")
+        ? getAlertScenarios({
+            availability: viewingEntity?.availability ?? undefined,
+            found_via_range: viewingEntity?.found_via_range,
+            single_zip_code: viewingEntity?.single_zip_code,
+            status: viewingEntity?.status,
+        })
+        : [];
+
+    const badgeColor = alertScenarios.some(s => s.color === "#ffeaea")
+        ? "red"
+        : alertScenarios.some(s => s.color === "#fff6c7")
+            ? "gold"
+            : "green";
+
     const renderFooter = () => {
         switch (activeTab) {
             case "details":
@@ -231,7 +209,6 @@ export function ViewModal({
                         )}
                     </div>
                 );
-
             case "control":
                 return (
                     <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
@@ -248,11 +225,11 @@ export function ViewModal({
                         </Button>
                     </div>
                 );
-
             default:
                 return null;
         }
     };
+
     const { data: partnerData } = usePartnerQuery({
         partnerId: viewingEntity?.partner_id ?? undefined,
         enabled: isAdmin && !!viewingEntity?.partner_id,
@@ -271,11 +248,7 @@ export function ViewModal({
     );
     const companyName = selectedCompany?.company_name;
 
-    if (!viewingEntity) {
-        return null;
-    }
-
-    // const resolvedCompanyName = viewingEntity.company ?? null;
+    if (!viewingEntity) return null;
 
     const handleSaveObservacao = async () => {
         const values = await observationForm.validateFields();
@@ -289,7 +262,6 @@ export function ViewModal({
 
     const handleExportPdf = async () => {
         if (!viewingEntity) return;
-
         setIsExportingPdf(true);
         try {
             await generateOrderPdf({
@@ -306,53 +278,86 @@ export function ViewModal({
     };
 
     const color = appSetting.primaryColor;
+
     return (
         <OrderModalShell
             open={open}
             title={
-                <>
-                    <div className="flex flex-col md:flex-row lg:flex-row gap-4 mg:items-start lg:items-start justify-between">
-                        <span style={{ color: "#252525" }}>
-                            Pedido Nº {viewingEntity?.order_number || viewingEntity?.id}
-                        </span>
-                        <div className="flex flex-col flex-wrap items-center gap-4 mr-6">
-                            <ConfigProvider
-                                theme={{
-                                    components: {
-                                        Select: { hoverBorderColor: color, activeBorderColor: color, activeOutlineColor: "none" },
-                                        Input: { hoverBorderColor: color, activeBorderColor: color },
-                                    },
-                                }}
-                            >
-                                <div className="flex flex-wrap gap-4">
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-[14px] font-semibold">Pedido:</span>
-                                        <Select size="small" style={{ width: 110 }} value={viewingEntity?.status} onChange={(value) => statusMutation.mutate({ id: viewingEntity!.id, payload: { status: value } })} options={[{ value: "ABERTO", label: "Aberto" }, { value: "FECHADO", label: "Fechado" }, { value: "CANCELADO", label: "Cancelado" }, { value: "TRANSBORDO", label: "Transbordo" }]} />
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-[14px] font-semibold">Tramitação:</span>
-                                        <Select placeholder="Selecione o status" size="small" value={viewingEntity?.after_sales_status} style={{ width: 280 }} onChange={(value) => updateMutation.mutate({ id: viewingEntity!.id, payload: { after_sales_status: value } })} options={[]} />
-                                    </div>
-
+                <div className="flex flex-col md:flex-row lg:flex-row gap-4 mg:items-start lg:items-start justify-between">
+                    <span style={{ color: "#252525" }}>
+                        Pedido Nº {viewingEntity?.order_number || viewingEntity?.id}
+                    </span>
+                    <div className="flex flex-col flex-wrap items-center gap-4 mr-6">
+                        <ConfigProvider
+                            theme={{
+                                components: {
+                                    Select: { hoverBorderColor: color, activeBorderColor: color, activeOutlineColor: "none" },
+                                    Input: { hoverBorderColor: color, activeBorderColor: color },
+                                },
+                            }}
+                        >
+                            <div className="flex flex-wrap gap-4">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-[14px] font-semibold">Pedido:</span>
+                                    <Select
+                                        size="small"
+                                        style={{ width: 110 }}
+                                        value={viewingEntity?.status}
+                                        onChange={(value) => statusMutation.mutate({ id: viewingEntity!.id, payload: { status: value } })}
+                                        options={[
+                                            { value: "ABERTO", label: "Aberto" },
+                                            { value: "FECHADO", label: "Fechado" },
+                                            { value: "CANCELADO", label: "Cancelado" },
+                                            { value: "TRANSBORDO", label: "Transbordo" },
+                                        ]}
+                                    />
                                 </div>
-                                <div className="flex flex-wrap gap-4">
-                                    {/* <div className="flex items-center gap-2">
-                                        <span className="text-[14px] font-semibold">Crédito:</span>
-                                        <Input size="small" placeholder="Crédito" style={{ width: 100 }} maxLength={13} value={credito} onChange={(e) => setCredito(e.target.value)} onPressEnter={() => { const normalizedCredit = Number(String(credito ?? "").replace(/\s+/g, "").replace(",", ".")); updateMutation.mutate({ id: viewingEntity!.id, payload: { credit: Number.isNaN(normalizedCredit) ? 0 : normalizedCredit } }); }} />
-                                    </div> */}
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-[14px] font-semibold">Atendimento:</span>
-                                        <Select size="small" value={viewingEntity?.service} style={{ width: 160 }} onChange={(value) => updateMutation.mutate({ id: viewingEntity!.id, payload: { service: value } })} options={[{ value: "em_andamento", label: "Em Andamento" }, { value: "concluido", label: "Concluído" }]} />
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-[14px] font-semibold">Instalação:</span>
-                                        <Select size="small" value={viewingEntity?.installation} style={{ width: 160 }} onChange={(value) => updateMutation.mutate({ id: viewingEntity!.id, payload: { installation: value } })} options={[{ value: "não agendado", label: "Não Agendado" }, { value: "agendado", label: "Agendado" }, { value: "instalado", label: "Instalado" }, { value: "inviável", label: "Inviável" }, { value: "cancelado", label: "Cancelado" }]} />
-                                    </div>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-[14px] font-semibold">Tramitação:</span>
+                                    <Select
+                                        placeholder="Selecione o status"
+                                        size="small"
+                                        value={viewingEntity?.after_sales_status}
+                                        style={{ width: 280 }}
+                                        onChange={(value) => updateMutation.mutate({ id: viewingEntity!.id, payload: { after_sales_status: value } })}
+                                        options={[]}
+                                    />
                                 </div>
-                            </ConfigProvider>
-                        </div>
+                            </div>
+                            <div className="flex flex-wrap gap-4">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-[14px] font-semibold">Atendimento:</span>
+                                    <Select
+                                        size="small"
+                                        value={viewingEntity?.service}
+                                        style={{ width: 160 }}
+                                        onChange={(value) => updateMutation.mutate({ id: viewingEntity!.id, payload: { service: value } })}
+                                        options={[
+                                            { value: "em_andamento", label: "Em Andamento" },
+                                            { value: "concluido", label: "Concluído" },
+                                        ]}
+                                    />
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-[14px] font-semibold">Instalação:</span>
+                                    <Select
+                                        size="small"
+                                        value={viewingEntity?.installation}
+                                        style={{ width: 160 }}
+                                        onChange={(value) => updateMutation.mutate({ id: viewingEntity!.id, payload: { installation: value } })}
+                                        options={[
+                                            { value: "não agendado", label: "Não Agendado" },
+                                            { value: "agendado", label: "Agendado" },
+                                            { value: "instalado", label: "Instalado" },
+                                            { value: "inviável", label: "Inviável" },
+                                            { value: "cancelado", label: "Cancelado" },
+                                        ]}
+                                    />
+                                </div>
+                            </div>
+                        </ConfigProvider>
                     </div>
-                </>
+                </div>
             }
             footer={renderFooter()}
             onCancel={onClose}
@@ -366,7 +371,12 @@ export function ViewModal({
                 items={[
                     {
                         key: "details",
-                        label: "Dados do Pedido",
+                        label: (
+                            <span className="flex items-center gap-1">
+                                Dados do Pedido
+                                {alertScenarios.length > 0 && <Badge dot color={badgeColor} />}
+                            </span>
+                        ),
                         children: (
                             <OrderDetailsTab
                                 viewingEntity={viewingEntity}
@@ -374,12 +384,11 @@ export function ViewModal({
                                 isAdmin={isAdmin}
                                 partnerName={partnerName}
                                 color={color}
-                                observationForm={observationForm}
-                                updateMutation={updateMutation}
-                                handleSaveObservacao={handleSaveObservacao}
+                                alertScenarios={alertScenarios}
                             />
                         ),
-                    }, {
+                    },
+                    {
                         key: "control",
                         label: "Controle",
                         children: (
@@ -394,9 +403,7 @@ export function ViewModal({
                         key: "history",
                         label: "Histórico",
                         children: (
-                            <OrderHistoryTab
-                                orderId={viewingEntity.id}
-                            />
+                            <OrderHistoryTab orderId={viewingEntity.id} />
                         ),
                     },
                     {
@@ -409,16 +416,11 @@ export function ViewModal({
                             />
                         ),
                     },
-
-
                     {
                         key: "transhipment",
                         label: "Transbordo",
-                        children: (
-                            isAdmin && <TranshipmentTab
-
-                                viewingEntity={viewingEntity}
-                            />
+                        children: isAdmin && (
+                            <TranshipmentTab viewingEntity={viewingEntity} />
                         ),
                     },
                 ]}

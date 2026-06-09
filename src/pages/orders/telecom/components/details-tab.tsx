@@ -1,45 +1,63 @@
-import { Col, Row, Button, Form, ConfigProvider, Input, Tooltip } from "antd";
-
-
+import { Col, Row, Tooltip, Alert } from "antd";
+import { useState } from "react";
 import { OrderModalSection } from "../../common/components/order-modal-section";
 import ReadonlyField from "@/layout/common-components/ReadOnlyField";
 import { formatBRL, formatPaymentMethod, formatPhoneNumber, organizeDateFormat } from "@/utils/number.utils";
 import { formatCEP, formatCPF } from "@/utils/document.util";
-import { formatBrowserDisplay, formatDevice, formatOSDisplay, formatPeriodInstallation, formatResolution, getAlertScenarios } from "@/utils/orders.util";
-import { ExclamationOutlined } from "@ant-design/icons";
-
+import { formatBrowserDisplay, formatDevice, formatOSDisplay, formatPeriodInstallation, formatResolution } from "@/utils/orders.util";
 import { EmpresasDisplay } from "../../common/components/companiesDisplay";
-
 import anonymousAvatar from "@/assets/anonymous_avatar.png";
 import { type EntityType } from "../../config-page.const";
-import React, { useState } from "react";
+import React from "react";
 import { AvailabilityStatus, PAPStatus } from "./view-modal";
 
+type AlertScenario = { color: string; content: React.ReactNode };
+
+function resolveAlertType(color: string): "error" | "warning" | "success" {
+    if (color === "#ffeaea") return "error";
+    if (color === "#fff6c7") return "warning";
+    if (color === "#e6ffed") return "success";
+    return "warning";
+}
+
 export function OrderDetailsTab({
-    viewingEntity, isAdmin, companyName, partnerName, color, observationForm, updateMutation, handleSaveObservacao
+    viewingEntity,
+    isAdmin,
+    companyName,
+    partnerName,
+    color,
+    alertScenarios = [],
 }: {
     viewingEntity: EntityType;
     isAdmin: boolean;
     companyName?: string;
     partnerName?: string;
     color?: string;
-    observationForm?: any;
-    updateMutation?: any;
-    handleSaveObservacao?: any;
+    alertScenarios?: AlertScenario[];
 }) {
-
     const resolvedCompanyName = viewingEntity.company ?? null;
-
     const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
     const toggleExpand = (id: string) => {
-        setExpanded((prev) => ({
-            ...prev,
-            [id]: !prev[id],
-        }));
+        setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
     };
+
     return (
         <div className="max-h-90 overflow-y-auto scrollbar-thin">
+
+
+            {alertScenarios
+
+                .map((scenario, idx) => (
+                    <Alert
+                        key={idx}
+                        type={resolveAlertType(scenario.color)}
+                        message={scenario.content}
+                        showIcon
+                        className="mb-2"
+                    />
+                ))}
+
             <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {isAdmin && (
                     <div className="bg-neutral-100 rounded-sm p-3 w-full">
@@ -63,6 +81,7 @@ export function OrderDetailsTab({
                         </Row>
                     </div>
                 )}
+
                 <OrderModalSection title="Detalhes do Plano">
                     <div className="mt-4 text-neutral-700">
                         <div className="flex items-center font-semibold text-[#666666] text-[14px]">
@@ -91,14 +110,11 @@ export function OrderDetailsTab({
                                     <p className="text-[14px] w-50 text-center">
                                         {viewingEntity.installation_preferred_date_two && viewingEntity.installation_preferred_date_two !== "Invalid Date"
                                             ? `${organizeDateFormat(viewingEntity.installation_preferred_date_two)} - ${formatPeriodInstallation(viewingEntity.installation_preferred_period_two || "")}`
-
-
                                             : "-"}
                                     </p>
                                     <p className="text-[14px] w-50 text-center">
                                         {viewingEntity.installation_preferred_date_three && viewingEntity.installation_preferred_date_three !== "Invalid Date"
                                             ? `${organizeDateFormat(viewingEntity.installation_preferred_date_three)} - ${formatPeriodInstallation(viewingEntity.installation_preferred_period_three || "")}`
-
                                             : "-"}
                                     </p>
                                     <p className="text-[14px] font-semibold w-32 text-center">{viewingEntity.due_day?.toString() || "-"}</p>
@@ -107,7 +123,12 @@ export function OrderDetailsTab({
                                     </p>
                                     {viewingEntity.selected_extras && viewingEntity.selected_extras.length > 0 ? (
                                         <Tooltip title="Ver extras adicionados ao plano" placement="top">
-                                            <button className={`w-12 text-center text-${color} font-bold focus:outline-none`} onClick={() => toggleExpand(String(viewingEntity.id))} aria-label="Expandir extras" type="button">
+                                            <button
+                                                className={`w-12 text-center text-${color} font-bold focus:outline-none`}
+                                                onClick={() => toggleExpand(String(viewingEntity.id))}
+                                                aria-label="Expandir extras"
+                                                type="button"
+                                            >
                                                 {expanded[viewingEntity.id] ? "−" : "+"}
                                             </button>
                                         </Tooltip>
@@ -299,59 +320,6 @@ export function OrderDetailsTab({
                     </Row>
                 </OrderModalSection>
             </div>
-
-            {(viewingEntity?.status === "FECHADO" || viewingEntity?.status === "fechado") &&
-                getAlertScenarios({ availability: viewingEntity?.availability ?? undefined, found_via_range: viewingEntity?.found_via_range, single_zip_code: viewingEntity?.single_zip_code, status: viewingEntity?.status }).map((scenario, idx) => (
-                    <div key={idx} className="flex flex-col gap-2 mb-3 rounded-sm p-3 w-full" style={{ backgroundColor: scenario.color }}>
-                        <div className="flex items-center">
-                            <h2 className="text-[14px] font-semibold">
-                                <ExclamationOutlined />
-                                <ExclamationOutlined /> ALERTA
-                                <ExclamationOutlined />
-                                <ExclamationOutlined />
-                            </h2>
-                        </div>
-                        <div className="flex flex-col text-neutral-800 gap-2 rounded-lg min-h-12.5 p-3">
-                            <div className="text-[14px] w-full text-neutral-700">{scenario.content}</div>
-                        </div>
-                    </div>
-                ))}
-
-            <ConfigProvider
-                theme={{
-                    components: {
-                        Input: {
-                            hoverBorderColor: color,
-                            activeBorderColor: color,
-                            activeShadow: "none",
-                            colorBorder: "#bfbfbf",
-                            colorTextPlaceholder: "#666666",
-                        },
-                        Button: {
-                            colorBorder: color,
-                            colorText: color,
-                            colorPrimary: color,
-                            colorPrimaryHover: color,
-                        },
-                    },
-                }}
-            >
-                <OrderModalSection title="Observação do Consultor">
-                    <div className="flex flex-col justify-center bg-neutral-100 text-[14px] rounded-sm mt-2">
-
-                        <Form form={observationForm} layout="vertical">
-                            <div className="flex flex-col p-4 text-[14px] w-full text-neutral-700">
-                                <Form.Item name="consultant_observation" style={{ marginBottom: 8 }}>
-                                    <Input.TextArea autoSize={{ minRows: 3, maxRows: 6 }} className="text-[16px] font-light text-[#353535] w-full" placeholder="Adicione aqui uma observação sobre esse pedido..." />
-                                </Form.Item>
-                                <Button className="self-end" loading={updateMutation.isPending} style={{ fontSize: "12px", height: "25px" }} onClick={handleSaveObservacao}>
-                                    Salvar
-                                </Button>
-                            </div>
-                        </Form>
-                    </div></OrderModalSection>
-            </ConfigProvider>
         </div>
-
     );
 }
