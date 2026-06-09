@@ -30,7 +30,7 @@ export function OrdersPage({ model, category, clientType }: OrdersPageProps) {
   const { hasCategories } = segmentRegistry[resolvedModel];
   const resolvedCategory = hasCategories ? resolveOrderCategory(category, resolvedModel) : undefined;
   const resolvedClientType = resolveOrderClientType(clientType);
-  const { resolvedPartnerId } = useResolvedOrderScope(resolvedModel);
+  const { resolvedPartnerId, resolvedCompanyId } = useResolvedOrderScope(resolvedModel);
   const { data: companiesData } = useCompanyQuery();
   const { data: partnersData } = usePartnerQuery({
     partnerId: resolvedPartnerId,
@@ -90,6 +90,8 @@ export function OrdersPage({ model, category, clientType }: OrdersPageProps) {
             {
               ...(effectiveCategory ? { category: effectiveCategory } : {}),
               ...(resolvedClientType ? { client_type: resolvedClientType } : {}),
+              ...(resolvedCompanyId != null ? { company_id: resolvedCompanyId } : {}),
+              ...(resolvedPartnerId != null ? { partner_id: resolvedPartnerId } : {}),
             } as any,
           );
           return response.orders;

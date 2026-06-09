@@ -229,9 +229,14 @@ export function OrdersAdminPage() {
                     exportExtraColumns={adminExportColumns}
                     exportExcludeDataIndexes={["company_id", "partner_id"]}
                     onExportAll={async () => {
+                        const exportFilters = {
+                            ...sharedFilters,
+                            ...(selectedCompanyId != null ? { company_id: selectedCompanyId } : {}),
+                            ...(selectedPartnerId != null ? { partner_id: selectedPartnerId } : {}),
+                        };
                         const response = await OrdersService.getAllOrderExport<{ orders: any[] }>(
                             model,
-                            sharedFilters as any,
+                            exportFilters as any,
                         );
                         return response.orders;
                     }}
