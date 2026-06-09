@@ -5,7 +5,7 @@ import { OrderModalSection } from "../../common/components/order-modal-section";
 import ReadonlyField from "@/layout/common-components/ReadOnlyField";
 import { formatBRL, formatPaymentMethod, formatPhoneNumber, organizeDateFormat } from "@/utils/number.utils";
 import { formatCEP, formatCPF } from "@/utils/document.util";
-import { formatBrowserDisplay, formatDevice, formatOSDisplay, formatResolution, getAlertScenarios } from "@/utils/orders.util";
+import { formatBrowserDisplay, formatDevice, formatOSDisplay, formatPeriodInstallation, formatResolution, getAlertScenarios } from "@/utils/orders.util";
 import { ExclamationOutlined } from "@ant-design/icons";
 
 import { EmpresasDisplay } from "../../common/components/companiesDisplay";
@@ -14,7 +14,6 @@ import anonymousAvatar from "@/assets/anonymous_avatar.png";
 import { type EntityType } from "../../config-page.const";
 import React, { useState } from "react";
 import { AvailabilityStatus, PAPStatus } from "./view-modal";
-
 
 export function OrderDetailsTab({
     viewingEntity, isAdmin, companyName, partnerName, color, observationForm, updateMutation, handleSaveObservacao
@@ -86,18 +85,19 @@ export function OrderDetailsTab({
                                     </p>
                                     <p className="text-[14px] w-50 text-center">
                                         {viewingEntity.installation_preferred_date_one && viewingEntity.installation_preferred_date_one !== "Invalid Date"
-                                            ? `${organizeDateFormat(viewingEntity.installation_preferred_date_one)} - ${viewingEntity.installation_preferred_period_one || "-"}`
+                                            ? `${organizeDateFormat(viewingEntity.installation_preferred_date_one)} - ${formatPeriodInstallation(viewingEntity.installation_preferred_period_one || "")}`
                                             : "-"}
                                     </p>
                                     <p className="text-[14px] w-50 text-center">
                                         {viewingEntity.installation_preferred_date_two && viewingEntity.installation_preferred_date_two !== "Invalid Date"
-                                            ? `${organizeDateFormat(viewingEntity.installation_preferred_date_two)} - ${viewingEntity.installation_preferred_period_two || "-"}`
+                                            ? `${organizeDateFormat(viewingEntity.installation_preferred_date_two)} - ${formatPeriodInstallation(viewingEntity.installation_preferred_period_two || "")}`
+
 
                                             : "-"}
                                     </p>
                                     <p className="text-[14px] w-50 text-center">
                                         {viewingEntity.installation_preferred_date_three && viewingEntity.installation_preferred_date_three !== "Invalid Date"
-                                            ? `${organizeDateFormat(viewingEntity.installation_preferred_date_three)} - ${viewingEntity.installation_preferred_period_three || "-"}`
+                                            ? `${organizeDateFormat(viewingEntity.installation_preferred_date_three)} - ${formatPeriodInstallation(viewingEntity.installation_preferred_period_three || "")}`
 
                                             : "-"}
                                     </p>

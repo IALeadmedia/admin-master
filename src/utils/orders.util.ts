@@ -183,3 +183,16 @@ export function normalizeCompanyPartners(
     return [];
   }
 }
+
+export function formatPeriodInstallation(period?: string) {
+  switch (period) {
+    case "manhã":
+      return "Manhã";
+    case "tarde":
+      return "Tarde";
+    case "noite":
+      return "Noite";
+    default:
+      return period || "-";
+  }
+}
