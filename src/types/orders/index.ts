@@ -28,6 +28,11 @@ export type {
   BenefitsOrderResponse,
   BenefitsOrderFormValues,
 } from "./benefits.type";
+export type {
+  OrderLogChange,
+  OrderLogItem,
+  OrderLogsResponse,
+} from "./order-log.type";
 import type {
   TelecomOrder,
   TelecomOrderFilters,

@@ -162,7 +162,7 @@ export function ViewModal({
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <span className="text-[14px] font-semibold">ID CORP:</span>
-                                        <Input size="small" placeholder="ID CORP" style={{ width: 110 }} maxLength={8} value={idCORP} onChange={(e) => setIdCORP(e.target.value)} onPressEnter={() => updateMutation.mutate({ id: viewingEntity!.id, payload: { corporate_id: String(idCORP || "") } })} />
+                                        <Input size="small" placeholder="ID CORP" style={{ width: 110 }} maxLength={8} value={idCORP} onChange={(e) => setIdCORP(e.target.value)} onPressEnter={() => updateMutation.mutate({ id: viewingEntity!.id, payload: { corporate_id: idCORP } })} />
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <span className="text-[14px] font-semibold">ID CRM:</span>

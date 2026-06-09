@@ -49,10 +49,10 @@ export const allRoleOptions = [
   { label: "Consultor", value: "CONSULTOR" },
 ];
 
-export const subCredenciadoRoleOptions = allRoleOptions.filter(
-  (option) => option.value === "LIDER" || option.value === "CONSULTOR",
-);
-
 export const roleLabelMap: Record<string, string> = Object.fromEntries(
   allRoleOptions.map((option) => [option.value, option.label]),
+);
+
+export const subCredenciadoRoleOptions = allRoleOptions.filter(
+  (option) => option.value === "LIDER" || option.value === "CONSULTOR",
 );

@@ -172,6 +172,12 @@ export function getSharedOrderColumnsBefore<T extends OrderCommonRecord>(): Tabl
             render: (number_attempts_second_call) => number_attempts_second_call || "-",
         },
         {
+            title: "Transbordo",
+            dataIndex: "transhipment",
+            width: 110,
+            render: (transhipment) => transhipment ? "Sim" : "Não",
+        },
+        {
             title: "Suporte",
             dataIndex: "support",
             width: 110,

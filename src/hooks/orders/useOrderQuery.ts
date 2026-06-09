@@ -40,7 +40,7 @@ export function useOrderQuery<
     queryKey: [
       entity.key,
       resolvedModule,
-      resolvedOperator,
+      resolvedOperator ?? null,
       resolvedFilters.company_id ?? null,
       resolvedFilters.partner_id ?? null,
       filters ?? null,
@@ -48,11 +48,16 @@ export function useOrderQuery<
       per_page,
     ],
     queryFn: () =>
-      entity.service.getAll<TResponse>(
-        resolvedModule,
-        resolvedOperator,
-        resolvedFilters,
-      ),
+      resolvedOperator
+        ? entity.service.getAll<TResponse>(
+            resolvedModule,
+            resolvedOperator,
+            resolvedFilters,
+          )
+        : entity.service.getAllBySegment<TResponse>(
+            resolvedModule,
+            resolvedFilters,
+          ),
     retry: 2,
     enabled,
   });

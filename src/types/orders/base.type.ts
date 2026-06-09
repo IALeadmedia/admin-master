@@ -171,4 +171,7 @@ export interface OrderBase {
 
   re_registration?: boolean; // ver campo second_call
   transhipment?: boolean; // ver campo journey
+
+  previous_order_ids: number[];
+  journey: string[];
 }

@@ -3,6 +3,7 @@ import type { TableColumnsType } from "antd";
 import { type EntityType, roleLabelMap } from "../config-page.const";
 import { formatCNPJ, formatCPF } from "@/utils/document.util";
 import { formatPhoneNumber } from "@/utils/number.utils";
+import { formatRoleLabel } from "@/utils/role.util";
 
 export function getColumns(): TableColumnsType<EntityType> {
   return [
@@ -107,7 +108,7 @@ export function getColumns(): TableColumnsType<EntityType> {
         (typeof value === "string" || typeof value === "number") && record.role === value,
       render: (role: EntityType["role"]) => (
         <Tag color={role === "ADMIN" ? "magenta" : "gray"}>
-          {roleLabelMap[role]}
+          {formatRoleLabel(role)}
         </Tag>
       ),
     },

@@ -41,6 +41,11 @@ type EditablePlan = {
     original_value?: number;
 };
 
+function toValidDayjs(value?: string | null) {
+    if (!value) return undefined;
+    const parsed = dayjs(value);
+    return parsed.isValid() ? parsed : undefined;
+}
 function toNumber(value?: number | string | null) {
     if (value === null || value === undefined || value === "") return 0;
     return Number(value);
@@ -124,12 +129,12 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
     const planOptions = useMemo<PlanOption[]>(
         () => (productsData?.products ?? []).map((product) => ({
             label: product.name + " - " + formatBRL(product.pricing.base_monthly.current_price),
-            value: product.id,
+            value: String(product.id),
             plan: product,
         })),
         [productsData?.products],
     );
-
+    console.log(planOptions)
     const selectedPlan = useMemo(
         () => planOptions.find((option) => String(option.value) === String(selectedPlanId))?.plan,
         [planOptions, selectedPlanId],
@@ -220,23 +225,17 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
             };
 
             form.setFieldsValue({
-                plan_id: editingEntity.plan?.id,
-                installation_preferred_date_one:
-                    editingEntity.installation_preferred_date_one
-                        ? dayjs(editingEntity.installation_preferred_date_one)
-                        : undefined,
+                plan_id: editingEntity.plan?.id != null ? String(editingEntity.plan.id) : undefined,
+                installation_preferred_date_one: toValidDayjs(editingEntity.installation_preferred_date_one),
+                installation_preferred_date_two: toValidDayjs(editingEntity.installation_preferred_date_two),
+                installation_preferred_date_three: toValidDayjs(editingEntity.installation_preferred_date_three),
+
                 installation_preferred_period_one:
                     editingEntity.installation_preferred_period_one ?? undefined,
-                installation_preferred_date_two:
-                    editingEntity.installation_preferred_date_two
-                        ? dayjs(editingEntity.installation_preferred_date_two)
-                        : undefined,
+
                 installation_preferred_period_two:
                     editingEntity.installation_preferred_period_two ?? undefined,
-                installation_preferred_date_three:
-                    editingEntity.installation_preferred_date_three
-                        ? dayjs(editingEntity.installation_preferred_date_three)
-                        : undefined,
+
                 installation_preferred_period_three:
                     editingEntity.installation_preferred_period_three ?? undefined,
                 full_name: editingEntity.full_name ?? undefined,

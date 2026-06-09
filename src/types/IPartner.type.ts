@@ -29,6 +29,7 @@ export interface IPartner {
   };
   uf: string[];
   client_type: string[];
+  clientId_uberich?: string;
 }
 
 export interface ICreatePartner {
@@ -47,6 +48,7 @@ export interface ICreatePartner {
   uf: string[];
   client_type: string[];
   category?: string[];
+  clientId_uberich?: string;
 }
 
 export interface ICreatePartnerPayload {
@@ -75,6 +77,7 @@ export interface IUpdatePartner {
   };
   uf: string[];
   client_type: string[];
+  clientId_uberich?: string;
 }
 
 export interface IUpdatePartnerPayload {

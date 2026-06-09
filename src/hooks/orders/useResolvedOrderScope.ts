@@ -8,8 +8,8 @@ import { resolveOrderModule, resolveOrderOperator } from "./orderScope";
 export interface ResolvedOrderScope {
   /** Módulo usado no path da URL: telecom | financies | benefits */
   resolvedModule: OrderModule;
-  /** Operadora usada no path da URL: tim | claro | c6 | vr | ... */
-  resolvedOperator: string;
+  /** Operadora usada no path da URL quando a rota depende de empresa. */
+  resolvedOperator?: string;
   /** company_id resolvido para filtros de query */
   resolvedCompanyId: number | undefined;
   /** partner_id resolvido para filtros de query */
@@ -47,16 +47,12 @@ export function useResolvedOrderScope(
   });
 
   if (isAdmin) {
-    const fallbackCompany = companiesData?.companies.find(
-      (c) => c.segment === selectedSegmentId,
-    ) ?? companiesData?.companies[0];
     const selectedCompany = companiesData?.companies.find(
       (c) => c.company_id === selectedCompanyId,
-    ) ?? fallbackCompany;
+    );
 
-    // operator vem da primeira palavra do company_name (ex: "C6 Bank" → "c6")
     const operatorFromCompany = selectedCompany?.company_name
-      ?.split(" ")[0] // extrai primeira palavra
+      ?.split(" ")[0]
       ?.toLowerCase()
       .trim();
 
@@ -64,12 +60,15 @@ export function useResolvedOrderScope(
       selectedSegmentId,
       explicitModule,
     );
-    const resolvedOperator = resolveOrderOperator(operatorFromCompany, true);
+    const resolvedOperator =
+      selectedCompanyId != null
+        ? resolveOrderOperator(operatorFromCompany, true)
+        : undefined;
 
     return {
       resolvedModule,
       resolvedOperator,
-      resolvedCompanyId: selectedCompany?.company_id ?? selectedCompanyId,
+      resolvedCompanyId: selectedCompanyId,
       resolvedPartnerId: selectedPartnerId,
     };
   }
