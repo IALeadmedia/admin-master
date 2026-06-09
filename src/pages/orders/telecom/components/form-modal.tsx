@@ -129,12 +129,12 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
     const planOptions = useMemo<PlanOption[]>(
         () => (productsData?.products ?? []).map((product) => ({
             label: product.name + " - " + formatBRL(product.pricing.base_monthly.current_price),
-            value: product.id,
+            value: String(product.id),
             plan: product,
         })),
         [productsData?.products],
     );
-
+    console.log(planOptions)
     const selectedPlan = useMemo(
         () => planOptions.find((option) => String(option.value) === String(selectedPlanId))?.plan,
         [planOptions, selectedPlanId],
@@ -225,7 +225,7 @@ export function FormModal({ open, editingEntity, onClose }: FormModalProps) {
             };
 
             form.setFieldsValue({
-                plan_id: editingEntity.plan?.id,
+                plan_id: editingEntity.plan?.id != null ? String(editingEntity.plan.id) : undefined,
                 installation_preferred_date_one: toValidDayjs(editingEntity.installation_preferred_date_one),
                 installation_preferred_date_two: toValidDayjs(editingEntity.installation_preferred_date_two),
                 installation_preferred_date_three: toValidDayjs(editingEntity.installation_preferred_date_three),
