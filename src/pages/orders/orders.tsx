@@ -17,6 +17,7 @@ import { useResolvedOrderScope } from "@/hooks/orders/useResolvedOrderScope";
 import { useCompanyQuery } from "@/hooks/companies/useCompanyQuery";
 import { usePartnerQuery } from "@/hooks/partners/usePartnerQuery";
 import { TableMain as CommonTableMain } from "./common/components/table";
+import { OrdersService } from "@/services/orders.service";
 
 interface OrdersPageProps {
   model?: string;
@@ -49,7 +50,7 @@ export function OrdersPage({ model, category, clientType }: OrdersPageProps) {
     segmentComponents[resolvedModel];
 
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(20);
+  const [pageSize, setPageSize] = useState(100);
 
   const { data, isLoading } = useListEntity({
     model: resolvedModel,
@@ -83,6 +84,16 @@ export function OrdersPage({ model, category, clientType }: OrdersPageProps) {
         onPageChange={setPage}
         onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
         companies={companiesData?.companies ?? []}
+        onExportAll={async () => {
+          const response = await OrdersService.getAllOrderExport<{ orders: any[] }>(
+            resolvedModel,
+            {
+              ...(effectiveCategory ? { category: effectiveCategory } : {}),
+              ...(resolvedClientType ? { client_type: resolvedClientType } : {}),
+            } as any,
+          );
+          return response.orders;
+        }}
       />
     </div>
   );

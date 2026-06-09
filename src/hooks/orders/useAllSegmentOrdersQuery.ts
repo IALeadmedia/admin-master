@@ -13,7 +13,7 @@ export function useAllSegmentOrdersQuery({
   filters,
   enabled = true,
   page = 1,
-  per_page = 20,
+  per_page = 100,
 }: {
   module?: OrderModule;
   filters?: Omit<TelecomOrderFilters, "company_id" | "partner_id">;

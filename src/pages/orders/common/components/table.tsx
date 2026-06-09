@@ -69,6 +69,7 @@ interface CompaniesTableProps {
   companies?: ICompany[];
   exportExtraColumns?: Array<{ title: string; getValue: (record: unknown) => string | number }>;
   exportExcludeDataIndexes?: string[];
+  onExportAll?: () => Promise<any[]>;
 }
 
 export function TableMain({
@@ -80,13 +81,14 @@ export function TableMain({
   FormModalComponent,
   ViewModalComponent,
   currentPage,
-  pageSize = 20,
+  pageSize = 100,
   total,
   onPageChange,
   onPageSizeChange,
   companies = [],
   exportExtraColumns = [],
   exportExcludeDataIndexes = [],
+  onExportAll,
 }: CompaniesTableProps) {
   const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
   const [searchText, setSearchText] = useState("");
@@ -96,6 +98,7 @@ export function TableMain({
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [entitiesToDelete, setEntitiesToDelete] = useState<any[]>([]);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   const { user } = useAuth();
   const canDeleteOrders = can(user?.user?.role, "orders", "delete");
   const { styles } = useStyle();
@@ -154,6 +157,40 @@ export function TableMain({
     return data.filter((u) => u.email?.toLowerCase().includes(lower));
   }, [data, searchText]);
 
+  const handleExport = async () => {
+    try {
+      setIsExporting(true);
+
+      if (selectedRowKeys.length > 0) {
+        const exportDataSource = filteredData.filter((r: { id: unknown }) =>
+          selectedRowKeys.includes(r.id as Key),
+        );
+
+        exportOrdersXLSX({
+          data: exportDataSource,
+          visibleColumns: visibleTableColumns,
+          extraExportColumns: exportExtraColumns,
+          excludeDataIndexes: exportExcludeDataIndexes,
+          filename: "pedidos.xlsx",
+        });
+
+        return;
+      }
+
+      const allData = await onExportAll?.();
+
+      exportOrdersXLSX({
+        data: allData ?? [],
+        visibleColumns: visibleTableColumns,
+        extraExportColumns: exportExtraColumns,
+        excludeDataIndexes: exportExcludeDataIndexes,
+        filename: "pedidos.xlsx",
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   const columnSelectorDropdown = (
     <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
       <Tooltip
@@ -166,22 +203,9 @@ export function TableMain({
         overlayStyle={{ fontSize: "12px" }}
       >
         <Button
+          loading={isExporting}
           icon={<DownloadOutlined />}
-          onClick={() => {
-            const exportDataSource =
-              selectedRowKeys.length > 0
-                ? filteredData.filter((r: { id: unknown }) =>
-                  selectedRowKeys.includes(r.id as Key),
-                )
-                : filteredData;
-            exportOrdersXLSX({
-              data: exportDataSource,
-              visibleColumns: visibleTableColumns,
-              extraExportColumns: exportExtraColumns,
-              excludeDataIndexes: exportExcludeDataIndexes,
-              filename: "pedidos.xlsx",
-            });
-          }}
+          onClick={handleExport}
         />
       </Tooltip>
       <Dropdown
@@ -311,7 +335,7 @@ export function TableMain({
                 pageSize,
                 total,
                 locale: { items_per_page: "" },
-                pageSizeOptions: [5, 10, 20, 50, 100],
+                pageSizeOptions: [20, 50, 100, 200, 500],
                 showSizeChanger: true,
                 showTotal: (t) => `Total de ${t} ${entityPage.plural.toLowerCase()}`,
                 onChange: (p) => onPageChange?.(p),
@@ -321,7 +345,7 @@ export function TableMain({
                 },
               }
               : {
-                pageSize: 20,
+                pageSize: 100,
                 showTotal: (t) => `Total de ${t} ${entityPage.plural.toLowerCase()}`,
               }
           }

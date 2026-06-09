@@ -12,7 +12,7 @@ export function useOrderQuery<
   filters,
   enabled = true,
   page = 1,
-  per_page = 20,
+  per_page = 100,
 }: {
   model?: OrderModule;
   filters?: TFilters;
