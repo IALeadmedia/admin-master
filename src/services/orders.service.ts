@@ -53,6 +53,17 @@ export class OrdersService {
     });
     return data;
   }
+  // GET /telecom/orders/export ( filtros funcionam normal )
+  // GET /telecom/orders/export   :  traz tudo (todos os 2mil+)
+  static async getAllOrderExport<T = Record<string, unknown>>(
+    module: OrderModule,
+    filters?: OrderFilters,
+  ): Promise<T> {
+    const { data } = await httpClientAxios.get<T>(`/${module}/orders/export`, {
+      params: filters,
+    });
+    return data;
+  }
 
   static async update(
     id: number,
