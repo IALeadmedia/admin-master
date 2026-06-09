@@ -53,6 +53,7 @@ export class OrdersService {
     });
     return data;
   }
+
   // GET /telecom/orders/export ( filtros funcionam normal )
   // GET /telecom/orders/export   :  traz tudo (todos os 2mil+)
   static async getAllOrderExport<T = Record<string, unknown>>(

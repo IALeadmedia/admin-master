@@ -6,6 +6,7 @@ import { useCompanyQuery } from "@/hooks/companies/useCompanyQuery";
 import { usePartnerQuery } from "@/hooks/partners/usePartnerQuery";
 import { useAllSegmentOrdersQuery } from "@/hooks/orders/useAllSegmentOrdersQuery";
 import { TableMain as CommonTableMain } from "./common/components/table";
+import { OrdersService } from "@/services/orders.service";
 
 import {
     entityPage,
@@ -227,6 +228,13 @@ export function OrdersAdminPage() {
                     companies={companiesData?.companies ?? []}
                     exportExtraColumns={adminExportColumns}
                     exportExcludeDataIndexes={["company_id", "partner_id"]}
+                    onExportAll={async () => {
+                        const response = await OrdersService.getAllOrderExport<{ orders: any[] }>(
+                            model,
+                            sharedFilters as any,
+                        );
+                        return response.orders;
+                    }}
                 />
             )}
         </div>
