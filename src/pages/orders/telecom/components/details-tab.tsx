@@ -99,7 +99,7 @@ export function OrderDetailsTab({
                                 <div className="flex items-center py-4 text-[14px] text-neutral-700 hover:bg-neutral-50 transition">
                                     <p className="text-[14px] font-semibold w-72 text-center">
                                         {viewingEntity.plan?.name
-                                            ? `${viewingEntity.plan.name} - ${viewingEntity.price_summary?.plan_price != null ? formatBRL(viewingEntity.price_summary.plan_price) : "-"}`
+                                            ? `${viewingEntity.plan.name} - ${viewingEntity.plan?.speed} - ${viewingEntity.price_summary?.plan_price != null ? formatBRL(viewingEntity.price_summary.plan_price) : "-"}`
                                             : "-"}
                                     </p>
                                     <p className="text-[14px] w-50 text-center">
@@ -280,9 +280,10 @@ export function OrderDetailsTab({
                         <Col span={6}><ReadonlyField label="CEP Único" value={viewingEntity?.single_zip_code ? 'Sim' : 'Não'} /></Col>
                         <Col span={6}><ReadonlyField label="Quadra" value={viewingEntity?.address_complement?.square || '-'} copyable /></Col>
                         <Col span={6}><ReadonlyField label="Lote" value={viewingEntity?.address_complement?.lot || '-'} copyable /></Col>
-                        <Col span={8}><ReadonlyField label="Tipo" value={viewingEntity?.address_complement?.building_or_house === 'building' ? 'Edifício' : 'Casa'} /></Col>
-                        <Col span={8}><ReadonlyField label="Andar" value={viewingEntity?.address_complement?.floor || '-'} copyable /></Col>
-                        <Col span={8}><ReadonlyField label="Ponto de Referência" value={viewingEntity?.address_complement?.reference_point || '-'} copyable /></Col>
+                        <Col span={5}><ReadonlyField label="Tipo" value={viewingEntity?.address_complement?.building_or_house === 'building' ? 'Edifício' : 'Casa'} /></Col>
+                        <Col span={5}><ReadonlyField label="Andar" value={viewingEntity?.address_complement?.floor || '-'} copyable /></Col>
+                        <Col span={5}><ReadonlyField label="Bloco" value={viewingEntity?.address_complement?.block || '-'} copyable /></Col>
+                        <Col span={9}><ReadonlyField label="Ponto de Referência" value={viewingEntity?.address_complement?.reference_point || '-'} copyable /></Col>
                         <Col span={12}><ReadonlyField label="Coordenadas" value={viewingEntity?.geolocation?.latitude && viewingEntity?.geolocation?.longitude ? `${viewingEntity?.geolocation.latitude}, ${viewingEntity?.geolocation.longitude}` : '-'} /></Col>
                         <Col span={6} style={{ display: 'flex', alignItems: 'flex-end' }}>
                             <a href={viewingEntity?.geolocation?.maps_link} target="_blank" rel="noopener noreferrer" style={{ color: color }}>

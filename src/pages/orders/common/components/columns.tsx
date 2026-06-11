@@ -11,7 +11,7 @@ import {
     Venus,
     XCircle,
 } from "lucide-react";
-import { formatCPF } from "@/utils/document.util";
+import { formatCEP, formatCPF } from "@/utils/document.util";
 import { formatPhoneNumber } from "@/utils/number.utils";
 import {
     formatBrowserDisplay,
@@ -467,7 +467,7 @@ export function getSharedOrderColumnsAfter<T extends OrderCommonRecord>(): Table
 
             return (
                 <span className="flex items-center gap-1">
-                    {record.zip_code}
+                    {formatCEP(record.zip_code)}
                     {isCepUnico ? (
                         <Tooltip
                             title="CEP único para localidade. Dados inseridos manualmente pelo usuário. Sujeito a erro de digitação."
@@ -489,6 +489,13 @@ export function getSharedOrderColumnsAfter<T extends OrderCommonRecord>(): Table
             );
         },
     },
+
+    {
+        title: "CEP Único",
+        dataIndex: "single_zip_code",
+        width: 90,
+        render: (single_zip_code) => single_zip_code ? 'Sim' : 'Não',
+    },
     {
         title: "Endereço",
         dataIndex: "address",
@@ -505,6 +512,12 @@ export function getSharedOrderColumnsAfter<T extends OrderCommonRecord>(): Table
         dataIndex: "address_number",
         width: 80,
         render: (addressNumber) => addressNumber || "-",
+    },
+    {
+        title: "Complemento",
+        dataIndex: "address_complement",
+        width: 120,
+        render: (addressComplement) => addressComplement?.building_or_house === "house" ? addressComplement.home_complement || "-" : addressComplement?.building_or_house === "building" ? `${addressComplement.unit_type || "-"} ${addressComplement.unit_number || "-"}` : "-",
     },
     {
         title: "Bairro",

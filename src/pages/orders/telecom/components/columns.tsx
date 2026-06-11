@@ -156,6 +156,12 @@ function getTelecomSpecificColumns(companies: ICompany[] = [], isAdmin = false):
             width: 180,
         },
         {
+            title: "Velocidade",
+            dataIndex: ["plan", "speed"],
+            width: 120,
+            render: (speed) => (speed ? speed : "-"),
+        },
+        {
             title: "Valor do Plano",
             dataIndex: ["plan", "value"],
             width: 120,
