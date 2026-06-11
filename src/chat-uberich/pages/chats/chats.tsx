@@ -19,7 +19,7 @@ import { useChatSearchWordController } from "./searchController";
 import { HotLead } from "./components/hot-lead";
 import { useMessageSocket } from "@/chat-uberich/hooks/use-message-socket";
 import { Loader } from "@/chat-uberich/components/common/loader";
-import { ResizablePanel, ResizablePanelGroup } from "@/chat-uberich/components/ui/resizable";
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/chat-uberich/components/ui/resizable";
 import { Button } from "@/chat-uberich/components/ui/button";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/chat-uberich/components/ui/select";
 import type { IBot } from "@/chat-uberich/service/bots";
