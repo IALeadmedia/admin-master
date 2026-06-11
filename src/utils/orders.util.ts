@@ -113,37 +113,27 @@ export const getAlertScenarios = ({
   status?: string;
 } = {}) => {
   const scenarios: { color: string; content: React.ReactNode }[] = [];
-  const noAvailability =
-    availability === false || availability === null || availability === 0;
-  const isCoveredByRange = Boolean(found_via_range);
-  const hasUnicCep = Boolean(single_zip_code);
 
-  if (status === "FECHADO" || status === "fechado") {
-    if (noAvailability) {
-      scenarios.push({
-        color: "#ffeaea",
-        content: "Não foi identificada disponibilidade no endereço fornecido.",
-      });
-    } else if (isCoveredByRange) {
-      scenarios.push({
-        color: "#fff6c7",
-        content:
-          "O número fornecido esta dentro de um range com disponibilidade.",
-      });
-    } else if (hasUnicCep) {
-      scenarios.push({
-        color: "#fff6c7",
-        content: "CEP Único",
-      });
-    }
+  if (status?.toLowerCase() !== "fechado") {
+    return scenarios;
   }
 
-  if (
-    (status === "FECHADO" || status === "fechado") &&
-    !hasUnicCep &&
-    !isCoveredByRange &&
-    !noAvailability
-  ) {
+  const noAvailability =
+    availability === false || availability === null || availability === 0;
+
+  if (noAvailability) {
+    scenarios.push({
+      color: "#ffeaea",
+      content: "Não foi identificada disponibilidade no endereço fornecido.",
+    });
+  } else if (found_via_range || single_zip_code) {
+    scenarios.push({
+      color: "#fff6c7",
+      content: found_via_range
+        ? "O número fornecido está dentro de um range com disponibilidade."
+        : "CEP Único",
+    });
+  } else {
     scenarios.push({
       color: "#e6ffed",
       content: "Esse pedido não possui travas",

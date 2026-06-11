@@ -99,6 +99,13 @@ export function TableMain({
   const [entitiesToDelete, setEntitiesToDelete] = useState<any[]>([]);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+
+  useEffect(() => {
+    if (viewingEntity) {
+      const updated = data.find((item: any) => item.id === viewingEntity.id);
+      if (updated) setViewingEntity(updated);
+    }
+  }, [data]);
   const { user } = useAuth();
   const canDeleteOrders = can(user?.user?.role, "orders", "delete");
   const { styles } = useStyle();

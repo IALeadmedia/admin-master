@@ -148,6 +148,7 @@ export const PAPStatus = ({ localData }: { localData: { availability_pap?: boole
     );
 };
 
+
 interface ViewModalProps {
     open: boolean;
     viewingEntity: EntityType | null;
@@ -175,22 +176,6 @@ export function ViewModal({
 
     const { isGlobalAdmin } = useAuth();
     const isAdmin = isAdminDomain && isGlobalAdmin;
-
-    const alertScenarios = (viewingEntity?.status === "FECHADO" || viewingEntity?.status === "fechado")
-        ? getAlertScenarios({
-            availability: viewingEntity?.availability ?? undefined,
-            found_via_range: viewingEntity?.found_via_range,
-            single_zip_code: viewingEntity?.single_zip_code,
-            status: viewingEntity?.status,
-        })
-        : [];
-
-    const badgeColor = alertScenarios.some(s => s.color === "#ffeaea")
-        ? "red"
-        : alertScenarios.some(s => s.color === "#fff6c7")
-            ? "gold"
-            : "green";
-
     const renderFooter = () => {
         switch (activeTab) {
             case "details":
@@ -248,6 +233,29 @@ export function ViewModal({
     );
     const companyName = selectedCompany?.company_name;
 
+    const operatorKey = companyName?.split(" ")[0]?.toLowerCase().trim();
+
+    const operatorAvailability = operatorKey
+        ? viewingEntity?.operators_availability?.[operatorKey]
+        : undefined;
+
+    const alertScenarios =
+        viewingEntity?.status?.toLowerCase() === "fechado"
+            ? getAlertScenarios({
+                availability: operatorAvailability?.available,
+                found_via_range: operatorAvailability?.found_via_range,
+                single_zip_code: viewingEntity?.single_zip_code,
+                status: viewingEntity?.status,
+            })
+            : [];
+
+    const badgeColor = alertScenarios.some(s => s.color === "#ffeaea")
+        ? "red"
+        : alertScenarios.some(s => s.color === "#fff6c7")
+            ? "gold"
+            : "green";
+
+
     if (!viewingEntity) return null;
 
     const handleSaveObservacao = async () => {
@@ -279,6 +287,21 @@ export function ViewModal({
 
     const color = appSetting.primaryColor;
 
+    const after_sales_status_enum = [
+        "Em contato com cliente",
+        "Ag. Retorno do cliente",
+        "Contrato enviado - Ag. Assinatura Cliente",
+        `Contrato assinado - Tramitando ${partnerName}`,
+        `Contrato assinado - Tramitando ${companyName}`,
+        "Pedido Concluído",
+        `Pedido Negado ${companyName} - Crédito`,
+        "Venda perdida - Oportunidade futura",
+        "Venda Perdida - Sem Cobertura",
+        "Venda Perdida - Sem retorno do cliente",
+        "Venda Perdida - Outros",
+        "Venda Perdida - Cliente não assinou",
+        "Venda Perdida - Crédito Negado"
+    ];
     return (
         <OrderModalShell
             open={open}
@@ -318,10 +341,11 @@ export function ViewModal({
                                         placeholder="Selecione o status"
                                         size="small"
                                         value={viewingEntity?.after_sales_status}
-                                        style={{ width: 280 }}
+                                        style={{ width: 340 }}
                                         onChange={(value) => updateMutation.mutate({ id: viewingEntity!.id, payload: { after_sales_status: value } })}
-                                        options={[]}
+                                        options={after_sales_status_enum.map((status) => ({ value: status, label: status }))}
                                     />
+
                                 </div>
                             </div>
                             <div className="flex flex-wrap gap-4">
