@@ -167,7 +167,7 @@ export function ViewModal({
     canDelete = false,
 }: ViewModalProps) {
     const { message } = App.useApp();
-    const [observationForm] = Form.useForm();
+    const currentUser = useAuth().user!;
     const [controlForm] = Form.useForm();
     const updateMutation = useUpdateEntity();
     const statusMutation = useUpdateOrderStatusMutation();
@@ -202,14 +202,14 @@ export function ViewModal({
                         </Button>
                     </div>
                 );
-            case "notes":
-                return (
-                    <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
-                        <Button type="primary" onClick={handleSaveObservacao}>
-                            Salvar
-                        </Button>
-                    </div>
-                );
+            // case "notes":
+            //     return (
+            //         <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
+            //             <Button type="primary" onClick={handleSaveObservacao}>
+            //                 Salvar
+            //             </Button>
+            //         </div>
+            //     );
             default:
                 return null;
         }
@@ -258,14 +258,26 @@ export function ViewModal({
 
     if (!viewingEntity) return null;
 
-    const handleSaveObservacao = async () => {
-        const values = await observationForm.validateFields();
-        if (values.consultant_observation?.trim() !== "") {
-            updateMutation.mutate({
-                id: viewingEntity!.id,
-                payload: { consultant_observation: values.consultant_observation },
-            });
-        }
+    const handleSaveObservacao = (values: {
+        consultant_observation: string;
+    }) => {
+        const obs = values.consultant_observation?.trim();
+
+        if (!obs) return;
+
+        updateMutation.mutate({
+            id: viewingEntity!.id,
+            payload: {
+                consultant_notes: [
+                    ...(viewingEntity?.consultant_notes ?? []),
+                    {
+                        obs,
+                        user: currentUser.user.name,
+                        role: currentUser.user.role,
+                    },
+                ],
+            },
+        });
     };
 
     const handleExportPdf = async () => {
@@ -436,7 +448,7 @@ export function ViewModal({
                         children: (
                             <OrderNotesTab
                                 handleSaveObservacao={handleSaveObservacao}
-                                orderId={viewingEntity.id}
+                                viewingEntity={viewingEntity}
                             />
                         ),
                     },
