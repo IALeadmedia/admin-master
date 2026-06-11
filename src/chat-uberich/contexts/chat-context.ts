@@ -246,7 +246,7 @@ export const useChatStore = create<ChatState>()(
         sentAt: new Date().toISOString(),
         platform: "whatsapp",
         data: {
-          messageType: "text" as any,
+          messageType: "conversation",
           s3: false,
           content: messageData.data?.content || "",
         },

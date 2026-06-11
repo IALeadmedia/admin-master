@@ -14,9 +14,13 @@ interface SocketState {
 }
 
 export const useMessageSocket = () => {
-  const { addMessage, addNewChat, pauseConversation, resumeConversation } =
-    useChatContext();
-  const selectedClientId = import.meta.env.VITE_CLIENT_ID; // mokado de clientId
+  const {
+    addMessage,
+    addNewChat,
+    pauseConversation,
+    resumeConversation,
+    selectedClientId,
+  } = useChatContext();
 
   const soundRef = useRef<Howl | null>(null);
 

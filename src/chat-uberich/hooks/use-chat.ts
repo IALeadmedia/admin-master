@@ -2,12 +2,56 @@ import { useQuery } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
 import { MessagesService } from "../service/messages";
 import { useChatStore } from "../contexts/chat-context";
+import { useListEntity } from "@/pages/partners/config-page.const";
+import { useAuth } from "@/context/auth-provider";
+import { useAdminScope } from "@/context/admin-scope-provider";
+import type { MessageType } from "../interfaces/message-type";
 
 const messagesService = new MessagesService();
 
 // Hook otimizado para conectar com o contexto de autenticação e carregar mensagens
 export const useChatContext = () => {
-  const selectedClientId = import.meta.env.VITE_CLIENT_ID; // mokado de clientId
+  const { user, isGlobalAdmin } = useAuth();
+  const { selectedCompanyId, selectedPartnerId } = useAdminScope();
+
+  const shouldFetchPartners = isGlobalAdmin
+    ? selectedCompanyId != null && selectedPartnerId != null
+    : user?.user.company_id != null && user?.user.partner_id != null;
+
+  const { data: partnersData } = useListEntity({
+    enabled: shouldFetchPartners,
+    companyId: isGlobalAdmin
+      ? selectedCompanyId
+      : (user?.user.company_id ?? undefined),
+    partnerId: isGlobalAdmin
+      ? selectedPartnerId
+      : (user?.user.partner_id ?? undefined),
+    per_page: 100,
+  });
+
+  const selectedClientId = useMemo(() => {
+    const partners = partnersData?.partners ?? [];
+    const selectedPartner = isGlobalAdmin
+      ? partners.find(
+          (partner) =>
+            partner.partner_id === selectedPartnerId &&
+            partner.company_id === selectedCompanyId,
+        )
+      : partners.find(
+          (partner) =>
+            partner.partner_id === user?.user.partner_id &&
+            partner.company_id === user?.user.company_id,
+        );
+
+    return selectedPartner?.clientId_uberich;
+  }, [
+    isGlobalAdmin,
+    partnersData,
+    selectedCompanyId,
+    selectedPartnerId,
+    user?.user.company_id,
+    user?.user.partner_id,
+  ]);
 
   // Seletores específicos para evitar rerenders desnecessários com shallow equality
   const chats = useChatStore((state) => state.chats);
@@ -137,7 +181,7 @@ export const useChatContext = () => {
       // Adiciona mensagem otimista para feedback imediato
       const tempId = addOptimisticMessage(prospectId, {
         data: {
-          messageType: "text" as any,
+          messageType: "conversation" as MessageType,
           s3: false,
           content: content.trim(),
         },
@@ -158,7 +202,7 @@ export const useChatContext = () => {
             sentAt: new Date().toISOString(),
             platform: "whatsapp",
             data: {
-              messageType: "text" as any,
+              messageType: "conversation" as MessageType,
               s3: false,
               content: content.trim(),
             },
@@ -176,7 +220,7 @@ export const useChatContext = () => {
   );
 
   // Estados derivados memoizados
-  const sortedChats = useMemo(() => getSortedChats(), [chats]);
+  const sortedChats = useMemo(() => getSortedChats(), [getSortedChats]);
 
   const isLoadingChats = loading.fetchingChats || chatsQuery.isLoading;
   const isLoadingMessages = selectedChatId
