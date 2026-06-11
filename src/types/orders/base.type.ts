@@ -105,7 +105,15 @@ export interface OrderBase {
   company_legal_name?: string | null;
   company_partners?: OrderCompanyPartner[] | string | null;
   consultation_id?: string | null;
-  consultant_notes?: string | null;
+  consultant_notes?:
+    | {
+        id: string;
+        obs: string;
+        user: string;
+        role: string;
+        created_at: string;
+      }[]
+    | null;
   consultant_observation?: string | null;
   corporate_id?: string | null;
   cpf?: string | null;

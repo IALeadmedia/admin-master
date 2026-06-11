@@ -1,34 +1,17 @@
 import { appSetting } from "@/constants/app-setting/config.const";
+import { formatRoleLabel } from "@/utils/role.util";
 import { Button, Card, ConfigProvider, Divider, Form, Input } from "antd";
 
 export function OrderNotesTab({
-    orderId,
+    viewingEntity,
     handleSaveObservacao
 }: {
-    orderId: number;
+    viewingEntity: any;
     handleSaveObservacao: any
 }) {
 
     const [form] = Form.useForm();
-    const mockNotes = [
-        {
-            id: 1,
-            user_name: "Carlos Silva",
-            created_at: "01/06/2026 09:15",
-            message:
-                "Cliente informou que prefere instalação após as 18h.",
-        },
-        {
-            id: 2,
-            user_name: "Maria Souza",
-            created_at: "01/06/2026 10:30",
-            message:
-                "Entramos em contato por telefone e confirmamos os dados cadastrais.",
-        },
 
-    ];
-    console.log("Order ID for notes:", orderId);
-    // const { data } = useOrderNotes(orderId);
     const color = appSetting.primaryColor;
     return (
         <div className="max-h-90 overflow-y-auto scrollbar-thin flex flex-col gap-4 ">   <div className="bg-neutral-100 rounded-sm p-3 w-full">
@@ -51,11 +34,16 @@ export function OrderNotesTab({
                     },
                 }}
             >
-                <Form form={form} layout="vertical">
+                <Form form={form} layout="vertical" className="w-full flex flex-col">
                     <Form.Item name="consultant_observation" style={{ marginBottom: 8 }}>
                         <Input.TextArea autoSize={{ minRows: 3, maxRows: 6 }} className="text-[16px] font-light text-[#353535] w-full" placeholder="Adicione aqui uma observação sobre esse pedido..." />
                     </Form.Item>
-                    <Button className="self-end" style={{ fontSize: "12px", height: "25px" }} onClick={handleSaveObservacao}>
+                    <Button className="self-end" style={{ fontSize: "12px", height: "25px" }} onClick={async () => {
+                        const values = await form.validateFields();
+                        handleSaveObservacao(values);
+                        form.resetFields();
+                    }}
+                    >
                         Salvar
                     </Button>
 
@@ -65,24 +53,24 @@ export function OrderNotesTab({
 
             <div className="flex flex-col gap-3">
 
-                {mockNotes?.map((note) => (
+                {viewingEntity?.consultant_notes?.slice().reverse().map((note: any) => (
 
-                    <Card key={note.id}>
+                    <Card key={note?.id}>
 
                         <div className="flex justify-between">
 
                             <strong>
-                                {note.user_name}
+                                {note?.user} - {formatRoleLabel(note?.role)}
                             </strong>
 
                             <span>
-                                {note.created_at}
+                                {note?.created_at}
                             </span>
 
                         </div>
 
                         <p className="mt-2">
-                            {note.message}
+                            {note?.obs}
                         </p>
 
                     </Card>

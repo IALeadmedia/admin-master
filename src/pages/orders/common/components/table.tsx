@@ -161,7 +161,11 @@ export function TableMain({
   const filteredData = useMemo(() => {
     if (!searchText) return data;
     const lower = searchText.toLowerCase();
-    return data.filter((u) => u.email?.toLowerCase().includes(lower));
+    return data.filter(
+      (u) =>
+        u.full_name?.toLowerCase().includes(lower) ||
+        u.email?.toLowerCase().includes(lower),
+    );
   }, [data, searchText]);
 
   const handleExport = async () => {
