@@ -1,7 +1,7 @@
 import { memo, useState } from "react";
 import type { IBaseMessage } from ".";
-import { Button } from "@/chat-uberich/components/ui/button";
 import { Modal } from "@/chat-uberich/components/common/modal";
+import { Button } from "@/chat-uberich/components/ui/button";
 
 interface IStickerMessage extends IBaseMessage {
   imageUrl: string;

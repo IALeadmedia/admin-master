@@ -1,7 +1,8 @@
-import { Image } from "@/components/chat/common/image";
-import { Tooltip } from "@/components/chat/common/tooltip";
-import { IChat } from "@/interfaces/chat/chat";
-import { formatPhoneNumber } from "@/utils/format_number";
+import { Image } from "@/chat-uberich/components/common/image";
+import { Tooltip } from "@/chat-uberich/components/common/tooltip";
+import type { IChat } from "@/chat-uberich/interfaces/chat";
+import { formatPhoneNumber } from "@/chat-uberich/utils/format_number";
+
 
 interface IHotLeadProps {
   chat: IChat;

@@ -1,7 +1,4 @@
 import { Loader, Pause, Play, Text } from "lucide-react";
-import { Button } from "@/chat-uberich/components/ui/button";
-import { formatPhoneNumber } from "@/utils/format_number";
-
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { useChatController } from "../../controller";
@@ -9,11 +6,14 @@ import { ArrowUp, ArrowDown, Search, X } from "lucide-react";
 import { Separator } from "@/chat-uberich/components/ui/separator";
 import { Thermometer } from "@/chat-uberich/components/common/thermometer";
 import { FireFromThermometer } from "@/chat-uberich/components/common/fire-from-thermometer";
-import { Input } from "@/chat-uberich/components/ui/input";
+
 import { MessagesService } from "@/chat-uberich/service/messages";
 import { useChatContext } from "@/chat-uberich/hooks/use-chat";
-import { Tooltip } from "@/chat-uberich/components/ui/tooltip";
 import { Modal } from "@/chat-uberich/components/common/modal";
+import { Tooltip } from "@/chat-uberich/components/common/tooltip";
+import { Input } from "@/chat-uberich/components/ui/input";
+import { formatPhoneNumber } from "@/chat-uberich/utils/format_number";
+import { Button } from "@/chat-uberich/components/ui/button";
 
 const messagesService = new MessagesService();
 

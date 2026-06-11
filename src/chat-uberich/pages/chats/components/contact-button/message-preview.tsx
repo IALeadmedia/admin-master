@@ -1,4 +1,5 @@
-import { MessageType } from "@/interfaces/chat/message-type";
+
+import type { MessageType } from "@/chat-uberich/interfaces/message-type";
 import { Checks } from "@phosphor-icons/react";
 import { Ban, File, Image, Mic, Sticker } from "lucide-react";
 import { memo } from "react";

@@ -2,17 +2,20 @@ import { WhatsappLogo } from "@phosphor-icons/react";
 import { Circle, Pause } from "lucide-react";
 import { MessagePreview } from "./message-preview";
 // import { FavoriteButton } from "./favorite-button";
-import { IChat } from "@/interfaces/chat/chat"; // Import the Thermometer component
+
 import { HandHelpButton } from "./hand-help-button";
-import { useChatContext } from "@/hooks/use-chat";
-import { MessagesService } from "@/services/messages";
+
 import { useMutation } from "@tanstack/react-query";
-import { formatPhoneNumber } from "@/utils/format_number";
-import { Tooltip } from "@/components/chat/common/tooltip";
-import { FireFromThermometer } from "@/components/chat/common/fire-from-thermometer";
-import { Visible } from "@/components/chat/common/visible";
-import { Image } from "@/components/chat/common/image";
-import { Thermometer } from "@/components/chat/common/thermometer";
+import type { IChat } from "@/chat-uberich/interfaces/chat";
+import { MessagesService } from "@/chat-uberich/service/messages";
+import { useChatContext } from "@/chat-uberich/hooks/use-chat";
+import { formatPhoneNumber } from "@/chat-uberich/utils/format_number";
+import { Tooltip } from "@/chat-uberich/components/common/tooltip";
+import { Image } from "@/chat-uberich/components/common/image";
+import { FireFromThermometer } from "@/chat-uberich/components/common/fire-from-thermometer";
+import { Visible } from "@/chat-uberich/components/common/visible";
+import { Thermometer } from "@/chat-uberich/components/common/thermometer";
+
 
 interface IContactButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
   chat: IChat;

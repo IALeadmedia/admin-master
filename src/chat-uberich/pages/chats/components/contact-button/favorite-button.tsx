@@ -1,5 +1,6 @@
 
-import { Tooltip } from "@/chat-uberich/components/ui/tooltip";
+
+import { Tooltip } from "@/chat-uberich/components/common/tooltip";
 import { Star } from "lucide-react";
 import { memo } from "react";
 
