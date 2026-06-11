@@ -8,6 +8,7 @@ const messagesService = new MessagesService();
 // Hook otimizado para conectar com o contexto de autenticação e carregar mensagens
 export const useChatContext = () => {
   const selectedClientId = import.meta.env.VITE_CLIENT_ID; // mokado de clientId
+
   // Seletores específicos para evitar rerenders desnecessários com shallow equality
   const chats = useChatStore((state) => state.chats);
   const selectedChatId = useChatStore((state) => state.selectedChatId);

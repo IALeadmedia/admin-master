@@ -1,5 +1,5 @@
-import { Bounce, toast, ToastOptions } from "react-toastify";
-
+import { Bounce, toast } from "react-toastify";
+import type { ToastOptions } from "react-toastify";
 const config: ToastOptions = {
   position: "bottom-right",
   autoClose: 3000,

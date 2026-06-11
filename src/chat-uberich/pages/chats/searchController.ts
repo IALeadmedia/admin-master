@@ -4,11 +4,13 @@ export function useChatSearchWordController() {
   const [searchedTerm, setSearchedTerm] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [matchedMessages, setMatchedMessages] = useState<string[]>([]);
-  const [isCurrentChatChanged, setIsCurrentChatChanged] = useState<boolean>(true);
+  const [isCurrentChatChanged, setIsCurrentChatChanged] =
+    useState<boolean>(true);
   const [isByGlobalSearch, setIsByGlobalSearch] = useState<boolean>(false);
-  const [selectedMessageIdFoIndex, setSelectedMessageIdFoIndex] = useState<string | null>(null);
+  const [selectedMessageIdFoIndex, setSelectedMessageIdFoIndex] = useState<
+    string | null
+  >(null);
 
-  
   const changeSearchedTerm = (newSearchedTerm: string) => {
     setSearchedTerm(newSearchedTerm);
   };
@@ -61,6 +63,6 @@ export function useChatSearchWordController() {
     goToNext,
     goToPrevious,
     selectedMessageIdFoIndex,
-    setSelectedMessageIdFoIndex
+    setSelectedMessageIdFoIndex,
   };
 }

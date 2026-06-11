@@ -28,6 +28,15 @@ export const menuOptionsCommon: MenuItem[] = [
       },
     ],
   },
+  {
+    label: "Chatter",
+    items: [
+      {
+        label: "Chat",
+        to: "/app/chat",
+      },
+    ],
+  },
 ];
 
 export const menuOptionsAdmin: MenuItem[] = [

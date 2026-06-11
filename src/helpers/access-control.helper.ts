@@ -8,7 +8,8 @@ export type PermissionResource =
   | "users"
   | "priorities"
   | "products"
-  | "orders";
+  | "orders"
+  | "chat";
 
 export type PermissionAction = "view" | "create" | "edit" | "delete";
 
@@ -19,7 +20,8 @@ type RestrictedRoute =
   | "/app/priorities"
   | "/app/products"
   | "/app/order"
-  | "/app/orders";
+  | "/app/orders"
+  | "/app/chat";
 
 const allCrudActions: PermissionAction[] = ["view", "create", "edit", "delete"];
 
@@ -34,11 +36,13 @@ const permissionsByRole: Record<
     products: allCrudActions,
     priorities: allCrudActions,
     orders: allCrudActions,
+    chat: allCrudActions,
   },
   GESTOR: {
     users: allCrudActions,
     products: allCrudActions,
     orders: allCrudActions,
+    chat: allCrudActions,
   },
   DIRETOR: { products: allCrudActions, orders: allCrudActions },
   GERENTE: { products: allCrudActions, orders: ["view", "edit"] },
@@ -54,6 +58,7 @@ const routeResourceMap: Record<RestrictedRoute, PermissionResource> = {
   "/app/products": "products",
   "/app/order": "orders",
   "/app/orders": "orders",
+  "/app/chat": "chat",
 };
 
 function resolveRestrictedRoute(path: string): RestrictedRoute | null {
@@ -67,6 +72,7 @@ function resolveRestrictedRoute(path: string): RestrictedRoute | null {
   if (path.startsWith("/app/partners")) return "/app/partners";
   if (path.startsWith("/app/companies")) return "/app/companies";
   if (path.startsWith("/app/priorities")) return "/app/priorities";
+  if (path.startsWith("/app/chat")) return "/app/chat";
 
   return null;
 }

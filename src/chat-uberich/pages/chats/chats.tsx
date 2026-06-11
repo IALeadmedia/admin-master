@@ -601,7 +601,6 @@ export function Chats() {
     </>
   );
 }
-
 // function NoChatSelected() {
 //   return (
 //     <div className="flex flex-col items-center justify-center w-full h-full gap-2">

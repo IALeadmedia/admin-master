@@ -1,12 +1,10 @@
-import { useCallback, useEffect, useRef } from "react";
-import { messagesSocket as socket } from "../configs/socket";
+import { useCallback, useEffect, useRef, useState } from "react";
+// import { AuthService } from "@/services/auth";
 import { useChatContext } from "./use-chat";
 import { Howl } from "howler";
-import { CHAT_CONFIG, socketLogger } from "../configs/chat-config";
 import type { IResponseChatSocket } from "../interfaces/chat";
-// import { AuthService } from "@/services/auth.service";
-
-// const authService = new AuthService();
+import { CHAT_CONFIG, socketLogger } from "../configs/chat-config";
+import { messagesSocket as socket } from "../configs/socket";
 
 // Interface para controlar o estado do socket
 interface SocketState {
@@ -68,7 +66,13 @@ export const useMessageSocket = () => {
   );
 
   // Ref para controlar o estado do socket
-  const socketState = useRef<SocketState>({
+  // const socketState = useRef<SocketState>({
+  //   isConnected: false,
+  //   reconnectAttempts: 0,
+  //   lastError: null,
+  // });
+
+  const [socketState, setSocketState] = useState<SocketState>({
     isConnected: false,
     reconnectAttempts: 0,
     lastError: null,
@@ -193,8 +197,12 @@ export const useMessageSocket = () => {
   // Função para conectar ao socket
   const connectSocket = useCallback(() => {
     try {
-      socketState.current.lastError = null;
+      // socketState.current.lastError = null;
 
+      setSocketState((prev) => ({
+        ...prev,
+        lastError: null,
+      }));
       // const authToken = authService.getAuthToken();
       // if (authToken) {
       //   socket.auth = { token: authToken.token };
@@ -202,17 +210,22 @@ export const useMessageSocket = () => {
       socket.connect();
     } catch (error) {
       socketLogger.error("Erro ao conectar socket:", error);
-      socketState.current.lastError =
-        error instanceof Error ? error.message : "Erro desconhecido";
+      // socketState.current.lastError =
+      //   error instanceof Error ? error.message : "Erro desconhecido";
+      setSocketState((prev) => ({
+        ...prev,
+        lastError: error instanceof Error ? error.message : "Erro desconhecido",
+      }));
     }
   }, []);
 
   // Função para reconectar com backoff exponencial
   const scheduleReconnect = useCallback(() => {
-    if (
-      socketState.current.reconnectAttempts >=
-      CHAT_CONFIG.MAX_RECONNECT_ATTEMPTS
-    ) {
+    // if (
+    //   socketState.current.reconnectAttempts >=
+    //   CHAT_CONFIG.MAX_RECONNECT_ATTEMPTS
+    // )
+    if (socketState.reconnectAttempts >= CHAT_CONFIG.MAX_RECONNECT_ATTEMPTS) {
       socketLogger.error(
         "Máximo de tentativas de reconexão atingido",
         new Error("Max reconnect attempts reached"),
@@ -220,15 +233,22 @@ export const useMessageSocket = () => {
       return;
     }
 
+    // const delay =
+    //   CHAT_CONFIG.RECONNECT_DELAY *
+    //   Math.pow(2, socketState.current.reconnectAttempts);
     const delay =
-      CHAT_CONFIG.RECONNECT_DELAY *
-      Math.pow(2, socketState.current.reconnectAttempts);
+      CHAT_CONFIG.RECONNECT_DELAY * Math.pow(2, socketState.reconnectAttempts);
 
     clearReconnectTimer();
     reconnectTimer.current = setTimeout(() => {
-      socketState.current.reconnectAttempts++;
+      // socketState.current.reconnectAttempts++;
+
+      setSocketState((prev) => ({
+        ...prev,
+        reconnectAttempts: prev.reconnectAttempts + 1,
+      }));
       socketLogger.log(
-        `Tentativa de reconexão ${socketState.current.reconnectAttempts}/${CHAT_CONFIG.MAX_RECONNECT_ATTEMPTS}`,
+        `Tentativa de reconexão ${socketState.reconnectAttempts}/${CHAT_CONFIG.MAX_RECONNECT_ATTEMPTS}`,
       );
       connectSocket();
     }, delay);
@@ -237,26 +257,60 @@ export const useMessageSocket = () => {
   // Effect principal para gerenciar conexão do socket
   useEffect(() => {
     // Event handlers
+    // const handleConnect = () => {
+    //   socketState.current.isConnected = true;
+    //   socketState.current.reconnectAttempts = 0;
+    //   socketState.current.lastError = null;
+    //   clearReconnectTimer();
+    //   socketLogger.log("Socket conectado com sucesso");
+    // };
+
     const handleConnect = () => {
-      socketState.current.isConnected = true;
-      socketState.current.reconnectAttempts = 0;
-      socketState.current.lastError = null;
+      setSocketState((prev) => ({
+        ...prev,
+        isConnected: true,
+        reconnectAttempts: 0,
+        lastError: null,
+      }));
+
       clearReconnectTimer();
       socketLogger.log("Socket conectado com sucesso");
     };
 
+    // const handleDisconnect = (reason: string) => {
+    //   socketState.current.isConnected = false;
+    //   socketLogger.warn("Socket desconectado:", reason);
+
+    //   // Tenta reconectar apenas em casos específicos
+    //   if (reason === "io server disconnect" || reason === "transport close") {
+    //     scheduleReconnect();
+    //   }
+    // };
+
     const handleDisconnect = (reason: string) => {
-      socketState.current.isConnected = false;
+      setSocketState((prev) => ({
+        ...prev,
+        isConnected: false,
+      }));
+
       socketLogger.warn("Socket desconectado:", reason);
 
-      // Tenta reconectar apenas em casos específicos
       if (reason === "io server disconnect" || reason === "transport close") {
         scheduleReconnect();
       }
     };
 
+    // const handleError = (error: Error) => {
+    //   socketState.current.lastError = error.message;
+    //   socketLogger.error("Erro no socket:", error);
+    // };
+
     const handleError = (error: Error) => {
-      socketState.current.lastError = error.message;
+      setSocketState((prev) => ({
+        ...prev,
+        lastError: error.message,
+      }));
+
       socketLogger.error("Erro no socket:", error);
     };
 
@@ -301,10 +355,17 @@ export const useMessageSocket = () => {
   ]);
 
   // Retorna socket e estado para uso externo se necessário
+  // return {
+  //   socket,
+  //   isConnected: socketState.current.isConnected,
+  //   reconnectAttempts: socketState.current.reconnectAttempts,
+  //   lastError: socketState.current.lastError,
+  // };
+
   return {
     socket,
-    isConnected: socketState.current.isConnected,
-    reconnectAttempts: socketState.current.reconnectAttempts,
-    lastError: socketState.current.lastError,
+    isConnected: socketState.isConnected,
+    reconnectAttempts: socketState.reconnectAttempts,
+    lastError: socketState.lastError,
   };
 };

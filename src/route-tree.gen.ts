@@ -18,6 +18,7 @@ import { Route as AppPrioritiesRouteImport } from './routes/app/priorities'
 import { Route as AppPartnersRouteImport } from './routes/app/partners'
 import { Route as AppOrderRouteImport } from './routes/app/order'
 import { Route as AppCompaniesRouteImport } from './routes/app/companies'
+import { Route as AppChatRouteImport } from './routes/app/chat'
 import { Route as authLoginRouteImport } from './routes/(auth)/login'
 import { Route as AppProductsIndexRouteImport } from './routes/app/products/index'
 import { Route as AppOrderIndexRouteImport } from './routes/app/order/index'
@@ -73,6 +74,11 @@ const AppOrderRoute = AppOrderRouteImport.update({
 const AppCompaniesRoute = AppCompaniesRouteImport.update({
   id: '/companies',
   path: '/companies',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppChatRoute = AppChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const authLoginRoute = authLoginRouteImport.update({
@@ -137,6 +143,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteRouteWithChildren
   '/login': typeof authLoginRoute
+  '/app/chat': typeof AppChatRoute
   '/app/companies': typeof AppCompaniesRoute
   '/app/order': typeof AppOrderRouteWithChildren
   '/app/partners': typeof AppPartnersRoute
@@ -158,6 +165,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof authLoginRoute
+  '/app/chat': typeof AppChatRoute
   '/app/companies': typeof AppCompaniesRoute
   '/app/partners': typeof AppPartnersRoute
   '/app/priorities': typeof AppPrioritiesRoute
@@ -179,6 +187,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/app': typeof AppRouteRouteWithChildren
   '/(auth)/login': typeof authLoginRoute
+  '/app/chat': typeof AppChatRoute
   '/app/companies': typeof AppCompaniesRoute
   '/app/order': typeof AppOrderRouteWithChildren
   '/app/partners': typeof AppPartnersRoute
@@ -203,6 +212,7 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/login'
+    | '/app/chat'
     | '/app/companies'
     | '/app/order'
     | '/app/partners'
@@ -224,6 +234,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/login'
+    | '/app/chat'
     | '/app/companies'
     | '/app/partners'
     | '/app/priorities'
@@ -244,6 +255,7 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/(auth)/login'
+    | '/app/chat'
     | '/app/companies'
     | '/app/order'
     | '/app/partners'
@@ -332,6 +344,13 @@ declare module '@tanstack/react-router' {
       path: '/companies'
       fullPath: '/app/companies'
       preLoaderRoute: typeof AppCompaniesRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/chat': {
+      id: '/app/chat'
+      path: '/chat'
+      fullPath: '/app/chat'
+      preLoaderRoute: typeof AppChatRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/(auth)/login': {
@@ -460,6 +479,7 @@ const AppProductsRouteWithChildren = AppProductsRoute._addFileChildren(
 )
 
 interface AppRouteRouteChildren {
+  AppChatRoute: typeof AppChatRoute
   AppCompaniesRoute: typeof AppCompaniesRoute
   AppOrderRoute: typeof AppOrderRouteWithChildren
   AppPartnersRoute: typeof AppPartnersRoute
@@ -473,6 +493,7 @@ interface AppRouteRouteChildren {
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
+  AppChatRoute: AppChatRoute,
   AppCompaniesRoute: AppCompaniesRoute,
   AppOrderRoute: AppOrderRouteWithChildren,
   AppPartnersRoute: AppPartnersRoute,
