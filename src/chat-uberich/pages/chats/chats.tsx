@@ -151,7 +151,7 @@ export function Chats() {
     <>
       <ResizablePanelGroup
         direction="horizontal"
-        className="flex flex-row gap-0.5 mx-auto pb-2 px-2 h-[calc(100vh-165px)]"
+        className="flex flex-row w-full gap-0.5 pb-2 h-[calc(100vh-165px)]"
       >
         <ResizablePanel
           defaultSize={25}
