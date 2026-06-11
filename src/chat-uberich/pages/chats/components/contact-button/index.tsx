@@ -15,7 +15,7 @@ import { Image } from "@/chat-uberich/components/common/image";
 import { FireFromThermometer } from "@/chat-uberich/components/common/fire-from-thermometer";
 import { Visible } from "@/chat-uberich/components/common/visible";
 import { Thermometer } from "@/chat-uberich/components/common/thermometer";
-
+import anonymousAvatar from "@/assets/anonymous_avatar.png";
 
 interface IContactButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
   chat: IChat;
@@ -136,8 +136,8 @@ export function ContactButton({
             <div className="relative">
               <Image
                 className="rounded-full min-w-10 max-w-10"
-                src={avatar ?? "/assets/anonymous_avatar.png"}
-                fallback="/assets/anonymous_avatar.png"
+                src={avatar ?? anonymousAvatar}
+                fallback={anonymousAvatar}
               />
 
               {chat.prospect?.data?.conversa_pausada && (
@@ -157,9 +157,9 @@ export function ContactButton({
 
             <Tooltip info="WhatsApp" className="text-slate-200 bg-[#646464]">
               <WhatsappLogo
-                size={16}
+                size={17}
                 color="#22c55e"
-                className="absolute top-2.5 left-1"
+                className="absolute top-[28px] left-[-5px] bg-[#dddddd] rounded-full"
               />
             </Tooltip>
             {/* 
@@ -173,9 +173,9 @@ export function ContactButton({
               className="text-slate-200 bg-[#646464]"
             >
               <Image
-                className="absolute top-7 left-7.5 w-5 rounded-full border border-slate-300"
-                src={botAvatar || "/assets/anonymous_avatar.png"}
-                fallback="/assets/anonymous_avatar.png"
+                className="absolute top-7 left-7 w-5 rounded-full border border-slate-300"
+                src={botAvatar || anonymousAvatar}
+                fallback={anonymousAvatar}
               />
             </Tooltip>
           </>

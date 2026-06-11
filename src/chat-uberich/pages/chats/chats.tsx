@@ -151,15 +151,15 @@ export function Chats() {
     <>
       <ResizablePanelGroup
         direction="horizontal"
-        className="flex flex-row gap-0.5 mx-auto  px-2 h-[calc(100vh-170px)]"
+        className="flex flex-row gap-0.5 mx-auto pb-2 px-2 h-[calc(100vh-165px)]"
       >
         <ResizablePanel
           defaultSize={25}
           minSize={24}
           maxSize={28}
-          className="flex flex-col items-start gap-2 resize-x w-[27%] h-[calc(100vh-160px)] shadow-md rounded-lg p-2 min-w-64"
+          className="flex flex-col items-start gap-2 resize-x w-[27%] h-[calc(100vh-175px)] shadow-md rounded-lg p-2 min-w-64"
         >
-          <aside className="flex flex-col w-full h-full  overflow-scroll">
+          <aside className="flex flex-col w-full h-full ">
             {/* Componentizar */}
 
             {/* <div className="flex  items-start justify-center div-glow gap-2 w-full pb-1">
@@ -471,7 +471,7 @@ export function Chats() {
               {/* Lista com scroll infinito */}
               <div
                 ref={virtualChatsList.scrollContainerRef}
-                className="flex-1 overflow-y-auto"
+                className="flex-1 overflow-y-auto scrollbar-thin"
               >
                 {virtualChatsList.visibleItems
                   .slice()
@@ -584,7 +584,7 @@ export function Chats() {
         </ResizablePanel>
 
         {isClienteMaxTemperatureDefined && (
-          <section className="flex w-24 flex-col h-full mt-2 overflow-scroll">
+          <section className="flex w-24  flex-col h-full mt-2 overflow-y-scroll scrollbar-thin">
             {allChatsList.map((chat) => {
               if (
                 chat.prospect.data?.temperatura_lead === clientMaxTemperature
