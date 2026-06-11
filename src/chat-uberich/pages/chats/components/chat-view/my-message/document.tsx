@@ -31,7 +31,7 @@ export const DocumentMessage = memo(
             className="p-1 cursor-pointer"
             onClick={() => setIsModalOpen(true)}
           >
-            <p className="text-sm text-neutral-500 font-semibold  break-words flex items-center gap-2">
+            <p className="text-sm text-neutral-500 font-semibold  wrap-break-words flex items-center gap-2">
               <File size={14} /> Abrir documento
             </p>
           </button>

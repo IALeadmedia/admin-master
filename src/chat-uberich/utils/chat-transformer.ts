@@ -1,17 +1,17 @@
-import {
+import type {
   IChat,
   IResponseChatQuery,
   IResponseChatSocket,
   IResponseMessage,
-} from "@/interfaces/chat/chat";
-import { IMessage } from "@/interfaces/chat/message";
+} from "../interfaces/chat";
+import type { IMessage } from "../interfaces/message";
 
 type ChatType = Record<string, IChat>;
 
 export class ChatTransformer {
   // Cache para evitar transformações desnecessárias
   private static transformCache = new Map<string, any>();
-  
+
   // TTL do cache (2 minutos)
   private static cacheTTL = 2 * 60 * 1000;
 
@@ -29,10 +29,10 @@ export class ChatTransformer {
   private static normalizeDate(date: string): string {
     try {
       // Se já termina com Z, retorna como está
-      if (date.endsWith('Z')) return date;
-      
+      if (date.endsWith("Z")) return date;
+
       // Se não tem timezone info, adiciona Z
-      return new Date(date + 'Z').toISOString();
+      return new Date(date + "Z").toISOString();
     } catch {
       // Fallback para data atual se inválida
       return new Date().toISOString();
@@ -41,13 +41,16 @@ export class ChatTransformer {
 
   static transformChats(
     responseChats: IResponseChatQuery[],
-    existingChats: ChatType
+    existingChats: ChatType,
   ): ChatType {
     // Gera chave para cache baseada nos IDs dos chats
-    const cacheKey = `transform-chats-${responseChats.map(c => c.prospect.id).sort().join('-')}`;
+    const cacheKey = `transform-chats-${responseChats
+      .map((c) => c.prospect.id)
+      .sort()
+      .join("-")}`;
     const cached = this.transformCache.get(cacheKey);
-    
-    if (cached && (Date.now() - cached.timestamp) < this.cacheTTL) {
+
+    if (cached && Date.now() - cached.timestamp < this.cacheTTL) {
       return { ...existingChats, ...cached.value };
     }
 
@@ -56,10 +59,10 @@ export class ChatTransformer {
 
     // Agrupa mensagens por prospect primeiro
     const messagesByProspect = new Map<string, IResponseChatQuery[]>();
-    
+
     for (const responseChat of responseChats) {
       const prospectId = responseChat.prospectId;
-      
+
       if (!messagesByProspect.has(prospectId)) {
         messagesByProspect.set(prospectId, []);
       }
@@ -75,7 +78,7 @@ export class ChatTransformer {
 
       // Ordena mensagens por data
       const sortedMessages = messages.sort(
-        (a, b) => new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime()
+        (a, b) => new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime(),
       );
 
       // Pega a primeira mensagem para extrair dados do prospect
@@ -83,7 +86,7 @@ export class ChatTransformer {
       const { prospect } = firstMessage;
 
       // Transforma mensagens
-      const transformedMessages: IMessage[] = sortedMessages.map(msg => ({
+      const transformedMessages: IMessage[] = sortedMessages.map((msg) => ({
         id: msg.id,
         prospectId: msg.prospectId,
         conversationNumber: msg.conversationNumber,
@@ -114,7 +117,7 @@ export class ChatTransformer {
     // Armazena no cache
     this.transformCache.set(cacheKey, {
       value: newChats,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
 
     // Limpa cache se necessário
@@ -129,8 +132,8 @@ export class ChatTransformer {
     const prospectId = responseChat.prospect.id;
     const cacheKey = `prepare-chat-${prospectId}-${responseChat.message.id}`;
     const cached = this.transformCache.get(cacheKey);
-    
-    if (cached && (Date.now() - cached.timestamp) < this.cacheTTL) {
+
+    if (cached && Date.now() - cached.timestamp < this.cacheTTL) {
       return cached.value;
     }
 
@@ -143,7 +146,9 @@ export class ChatTransformer {
       id: prospectId,
       prospect: {
         ...responseChat.prospect,
-        lastInteraction: this.normalizeDate(responseChat.prospect.lastInteraction),
+        lastInteraction: this.normalizeDate(
+          responseChat.prospect.lastInteraction,
+        ),
       },
       messages: [message],
       wasFetch: false,
@@ -153,21 +158,21 @@ export class ChatTransformer {
     // Cache do resultado
     this.transformCache.set(cacheKey, {
       value: chat,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
 
     return chat;
   }
 
   static transformMessagesFromProspect(
-    responseMessages: IResponseMessage[]
+    responseMessages: IResponseMessage[],
   ): IMessage[] {
     if (!responseMessages.length) return [];
 
     const cacheKey = `transform-messages-${responseMessages[0].prospectId}-${responseMessages.length}`;
     const cached = this.transformCache.get(cacheKey);
-    
-    if (cached && (Date.now() - cached.timestamp) < this.cacheTTL) {
+
+    if (cached && Date.now() - cached.timestamp < this.cacheTTL) {
       return cached.value;
     }
 
@@ -181,16 +186,18 @@ export class ChatTransformer {
 
     // Transforma e ordena mensagens
     const transformedMessages = Array.from(uniqueMessages.values())
-      .map(msg => ({
+      .map((msg) => ({
         ...msg,
         sentAt: this.normalizeDate(msg.sentAt),
       }))
-      .sort((a, b) => new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime());
+      .sort(
+        (a, b) => new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime(),
+      );
 
     // Cache do resultado
     this.transformCache.set(cacheKey, {
       value: transformedMessages,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
 
     return transformedMessages;
@@ -213,11 +220,11 @@ export class ChatTransformer {
   static isValidMessage(message: any): message is IResponseMessage {
     return (
       message &&
-      typeof message.id === 'string' &&
-      typeof message.prospectId === 'string' &&
-      typeof message.sentAt === 'string' &&
+      typeof message.id === "string" &&
+      typeof message.prospectId === "string" &&
+      typeof message.sentAt === "string" &&
       message.data &&
-      typeof message.data.content === 'string'
+      typeof message.data.content === "string"
     );
   }
 
@@ -226,7 +233,7 @@ export class ChatTransformer {
     return (
       chat &&
       chat.prospect &&
-      typeof chat.prospect.id === 'string' &&
+      typeof chat.prospect.id === "string" &&
       chat.message &&
       this.isValidMessage(chat.message)
     );

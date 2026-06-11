@@ -1,4 +1,4 @@
-import { apiUberich } from "@/configs/api";
+import { apiUberich } from "../configs/api";
 
 export interface IBaseProperty {
   type: string;

@@ -3,7 +3,6 @@ import { WhatsappLogo } from "@phosphor-icons/react";
 import { Flame, Hand } from "lucide-react";
 
 // Hooks
-import { useMessageSocket } from "@/hooks/use-message-socket";
 
 // Components - UI
 
@@ -18,26 +17,17 @@ import { useChatSearchWordController } from "./searchController";
 // Interfaces
 
 import { HotLead } from "./components/hot-lead";
-import { formatPhoneNumber } from "@/utils/format_number";
-import { Loader } from "@/components/chat/common/loader";
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@/components/chat/ui/resizable";
-import { Button } from "@/components/chat/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/chat/ui/select";
-import { IBot } from "@/services/bots";
-import { Input } from "@/components/chat/ui/input";
-import { Tooltip } from "@/components/chat/common/tooltip";
-import { Visible } from "@/components/chat/common/visible";
+import { useMessageSocket } from "@/chat-uberich/hooks/use-message-socket";
+import { Loader } from "@/chat-uberich/components/common/loader";
+import { ResizablePanel, ResizablePanelGroup } from "@/chat-uberich/components/ui/resizable";
+import { Button } from "@/chat-uberich/components/ui/button";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/chat-uberich/components/ui/select";
+import type { IBot } from "@/chat-uberich/service/bots";
+import { Input } from "@/chat-uberich/components/ui/input";
+import { Tooltip } from "@/chat-uberich/components/common/tooltip";
+import { Visible } from "@/chat-uberich/components/common/visible";
+import { formatPhoneNumber } from "@/chat-uberich/utils/format_number";
+
 
 export function Chats() {
   // Conecta o socket para a página de chats
@@ -228,7 +218,7 @@ export function Chats() {
                                   -{" "}
                                   {formatPhoneNumber(
                                     bot?.evolutionData?.phoneNumber ||
-                                      bot?.phone,
+                                    bot?.phone,
                                   )}
                                 </SelectItem>
                               ))}

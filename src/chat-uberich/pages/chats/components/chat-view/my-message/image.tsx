@@ -33,7 +33,7 @@ export const ImageMessage = memo(({ imageUrl, messageTime }: IImageMessage) => {
             alt="Imagem"
             width={300}
             height={500}
-            className="w-[250px] h-[300px] object-cover rounded-md"
+            className="w-62.5 h-75 object-cover rounded-md"
           />
         </Button>
       </div>

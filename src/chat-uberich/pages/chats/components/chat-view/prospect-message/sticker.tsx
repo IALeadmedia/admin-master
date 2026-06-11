@@ -35,7 +35,7 @@ export const StickerMessage = memo(
               alt="Imagem"
               width={300}
               height={500}
-              className="w-[100px] h-[130px] object-cover rounded-md"
+              className="w-25 h-32.5 object-cover rounded-md"
             />
           </Button>
         </div>

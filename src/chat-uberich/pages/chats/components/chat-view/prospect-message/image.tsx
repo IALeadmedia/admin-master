@@ -28,14 +28,14 @@ export const ImageMessage = memo(
               alt="Imagem"
               width={300}
               height={500}
-              className="w-[250px] h-[300px] object-cover rounded-md"
+              className="w-62.5 h-75 object-cover rounded-md"
             />
           </Button>
           {/* Texto da legenda com quebra de linha */}
           <Visible when={!!caption}>
             <div
               style={{ border: "none" }}
-              className="bg-primary shadow-md p-2 rounded-md border border-b-gray-300 max-w-[250px] break-words mx-auto mb-1"
+              className="bg-primary shadow-md p-2 rounded-md border border-b-gray-300 max-w-62.5 wrap-break-words mx-auto mb-1"
             >
               <p
                 className="text-sm text-slate-300 "

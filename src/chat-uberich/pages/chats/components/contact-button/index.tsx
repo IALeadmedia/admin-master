@@ -82,8 +82,8 @@ export function ContactButton({
 
   const botInfoTooltip = botPhoneNumber
     ? `${chat?.prospect?.bot?.platformId} - ${formatPhoneNumber(
-        botPhoneNumber,
-      )}`
+      botPhoneNumber,
+    )}`
     : chat?.prospect?.bot?.platformId;
 
   const min = 0;
@@ -156,7 +156,7 @@ export function ContactButton({
               <WhatsappLogo
                 size={16}
                 color="#22c55e"
-                className="absolute top-[-10px] left-[-4px]"
+                className="absolute top-2.5 left-1"
               />
             </Tooltip>
             {/* 
@@ -170,7 +170,7 @@ export function ContactButton({
               className="text-slate-200 bg-[#646464]"
             >
               <Image
-                className="absolute top-[28px] left-[30px] w-5 rounded-full border border-slate-300"
+                className="absolute top-7 left-7.5 w-5 rounded-full border border-slate-300"
                 src={botAvatar || "/assets/anonymous_avatar.png"}
                 fallback="/assets/anonymous_avatar.png"
               />

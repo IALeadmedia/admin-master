@@ -1,15 +1,15 @@
 import { useMemo, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { MessagesService } from "@/services/messages";
-import { useChatContext } from "@/hooks/use-chat";
-import { useVirtualList } from "@/hooks/use-virtual-list";
 
 import { useForm } from "react-hook-form";
-import { IChat } from "@/interfaces/chat/chat";
-import { AlertMessage } from "@/components/chat/common/alert-message";
+import { MessagesService } from "@/chat-uberich/service/messages";
+import { BotsService } from "@/chat-uberich/service/bots";
+import { ClientsService } from "@/chat-uberich/service/clients";
+import { useChatContext } from "@/chat-uberich/hooks/use-chat";
+import { AlertMessage } from "@/chat-uberich/components/common/alert-message";
+import type { IChat } from "@/chat-uberich/interfaces/chat";
+import { useVirtualList } from "@/chat-uberich/hooks/use-virtual-list";
 
-import { BotsService } from "@/services/bots";
-import { ClientsService } from "@/services/chats/clients";
 // import { IMessage } from "@/interfaces/chat/message";
 
 const messagesService = new MessagesService();

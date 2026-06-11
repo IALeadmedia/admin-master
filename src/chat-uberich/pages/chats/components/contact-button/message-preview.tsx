@@ -74,7 +74,7 @@ export const MessagePreview = memo(
         <div className="flex flex-row items-center justify-start gap-1 w-full">
           <p className="flex">
             {isDeleted ? (
-              <span className="text-neutral-400  break-words flex items-center gap-1 italic">
+              <span className="text-neutral-400  wrap-break-words flex items-center gap-1 italic">
                 <Ban size={12} /> Mensagem apagada
               </span>
             ) : (

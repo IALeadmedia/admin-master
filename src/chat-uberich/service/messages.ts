@@ -1,11 +1,9 @@
-//
-
-import { apiUberich } from "@/configs/api";
-import { IResponseChatQuery, IResponseMessage } from "@/interfaces/chat/chat";
-
 // interface ISendMessageText {
 //   text: string;
 // }
+
+import { apiUberich } from "../configs/api";
+import type { IResponseChatQuery, IResponseMessage } from "../interfaces/chat";
 
 // interface ISendMessageText {
 //   botPlatformId: string;

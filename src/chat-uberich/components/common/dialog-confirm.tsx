@@ -26,7 +26,7 @@ export const DialogConfirm = ({
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-150">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>

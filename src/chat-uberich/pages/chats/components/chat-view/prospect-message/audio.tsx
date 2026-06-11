@@ -86,10 +86,10 @@ export const AudioMessage = memo(
                 setTime(value[0]);
               }}
             >
-              <SliderPrimitive.Track className="SliderTrack bg-zinc-200 relative grow rounded-full h-[5px] cursor-pointer">
+              <SliderPrimitive.Track className="SliderTrack bg-zinc-200 relative grow rounded-full h-1.25 cursor-pointer">
                 <SliderPrimitive.Range className="SliderRange absolute bg-blue-500 rounded-full h-full cursor-pointer" />
               </SliderPrimitive.Track>
-              <SliderPrimitive.Thumb className="SliderThumb cursor-pointer block w-[15px] h-[15px] bg-blue-500 rounded-full shadow-[0_0_0_5px_rgba(0,0,0,.12)] focus:outline-none focus:shadow-[0_0_0_5px_rgba(0,0,0,.12),0_0_2px_2px_rgba(0,0,0,.3)]" />
+              <SliderPrimitive.Thumb className="SliderThumb cursor-pointer block w-3.75 h-3.75 bg-blue-500 rounded-full shadow-[0_0_0_5px_rgba(0,0,0,.12)] focus:outline-none focus:shadow-[0_0_0_5px_rgba(0,0,0,.12),0_0_2px_2px_rgba(0,0,0,.3)]" />
             </SliderPrimitive.Root>
 
             {isPlaying ? (

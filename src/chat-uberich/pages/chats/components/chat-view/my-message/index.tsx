@@ -74,7 +74,7 @@ export const MyMessage = memo(
       return (
         <div className="flex flex-col gap-2 max-w-[60%] w-max ml-auto">
           <div className="bg-white shadow-md p-2 rounded-md w-full flex gap-1 justify-between">
-            <p className="text-sm text-neutral-400  break-words flex items-center gap-1 italic">
+            <p className="text-sm text-neutral-400  wrap-break-words flex items-center gap-1 italic">
               <Ban size={12} /> Mensagem apagada
             </p>
           </div>

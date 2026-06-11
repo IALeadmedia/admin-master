@@ -13,7 +13,7 @@ export const FavoriteButton = memo(
     return (
       <Tooltip info="Favoritar" className="text-slate-200 bg-[#646464]">
         <div
-          className="absolute bottom-[-5px] left-[-5px]"
+          className="absolute bottom-1.25 left-1.25"
           onClick={onFavoriteChange}
         >
           {isFavorited ? (

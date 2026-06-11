@@ -241,7 +241,7 @@ export const ChatHeader = ({
           </div>
 
           {isClienteMaxTemperatureDefined && (
-            <div className="flex w-[200px] h-2 items-center gap-1 mr-4">
+            <div className="flex w-50 h-2 items-center gap-1 mr-4">
               <Thermometer
                 min={0}
                 max={clientMaxTemperature}
@@ -273,13 +273,13 @@ export const ChatHeader = ({
               >
                 <X size={12} />
               </Button>
-              <div className="relative w-[150px]">
+              <div className="relative w-37.5">
                 <Input
                   style={{ fontSize: "12px", color: "#8b8e8f" }}
                   type="text"
                   value={searchedTerm}
                   placeholder="Buscar mensagem..."
-                  className="w-[150px] text-xs"
+                  className="w-37.5 text-xs"
                   onChange={(e) => changeSearchedTerm(e.target.value)}
                 />
                 {searchedTerm && (
@@ -288,7 +288,7 @@ export const ChatHeader = ({
                     variant="ghost"
                     onClick={() => changeSearchedTerm("")}
                     className="absolute right-1 top-1/2 -translate-y-1/2 rounded-full h-1/2 py-3 
-                      px-[5px] bg-transparent text-muted-foreground "
+                      px-1.25 bg-transparent text-muted-foreground "
                   >
                     <X size={12} />
                   </Button>
@@ -332,7 +332,7 @@ export const ChatHeader = ({
               </Button>
 
               <p
-                className="text-muted-foreground text-xs w-[50px]"
+                className="text-muted-foreground text-xs w-12.5"
                 style={{ fontSize: "12px", color: "#8b8e8f" }}
               >
                 {searchedTerm === ""

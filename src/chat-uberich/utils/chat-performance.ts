@@ -1,11 +1,11 @@
-import { IChat } from "@/interfaces/chat/chat";
-import { IMessage } from "@/interfaces/chat/message";
+import type { IChat } from "../interfaces/chat";
+import type { IMessage } from "../interfaces/message";
 
 // Utilitários para otimização de performance do chat
 export class ChatPerformanceUtils {
   // Cache para memoização de operações custosas
   private static cache = new Map<string, any>();
-  
+
   // TTL do cache (5 minutos)
   private static cacheTTL = 5 * 60 * 1000;
 
@@ -23,14 +23,14 @@ export class ChatPerformanceUtils {
   static getCachedOrCompute<T>(key: string, computeFn: () => T): T {
     const cached = this.cache.get(key);
     const now = Date.now();
-    
-    if (cached && (now - cached.timestamp) < this.cacheTTL) {
+
+    if (cached && now - cached.timestamp < this.cacheTTL) {
       return cached.value;
     }
 
     const result = computeFn();
     this.cache.set(key, { value: result, timestamp: now });
-    
+
     // Limpa cache periodicamente
     if (this.cache.size > 100) {
       this.cleanCache();
@@ -53,37 +53,40 @@ export class ChatPerformanceUtils {
   static areChatsEqual(chat1: IChat, chat2: IChat): boolean {
     if (chat1.id !== chat2.id) return false;
     if (chat1.messages.length !== chat2.messages.length) return false;
-    if (chat1.prospect.lastInteraction !== chat2.prospect.lastInteraction) return false;
-    
+    if (chat1.prospect.lastInteraction !== chat2.prospect.lastInteraction)
+      return false;
+
     // Verifica apenas as últimas 5 mensagens (otimização)
     const recentMessages1 = chat1.messages.slice(-5);
     const recentMessages2 = chat2.messages.slice(-5);
-    
+
     for (let i = 0; i < recentMessages1.length; i++) {
       if (!this.areMessagesEqual(recentMessages1[i], recentMessages2[i])) {
         return false;
       }
     }
-    
+
     return true;
   }
 
   // Filtra mensagens não deletadas com cache
   static getActiveMessages(chat: IChat): IMessage[] {
     const cacheKey = `active-messages-${chat.id}-${chat.messages.length}`;
-    
-    return this.getCachedOrCompute(cacheKey, () => 
-      chat.messages.filter(msg => !msg.deletedAt)
+
+    return this.getCachedOrCompute(cacheKey, () =>
+      chat.messages.filter((msg) => !msg.deletedAt),
     );
   }
 
   // Conta mensagens não lidas com cache
   static getUnreadCount(chat: IChat, lastReadMessageId?: string): number {
-    const cacheKey = `unread-count-${chat.id}-${lastReadMessageId || 'none'}-${chat.messages.length}`;
-    
+    const cacheKey = `unread-count-${chat.id}-${lastReadMessageId || "none"}-${chat.messages.length}`;
+
     return this.getCachedOrCompute(cacheKey, () => {
       if (!lastReadMessageId) {
-        return chat.messages.filter(msg => msg.sender !== 'user' && !msg.deletedAt).length;
+        return chat.messages.filter(
+          (msg) => msg.sender !== "user" && !msg.deletedAt,
+        ).length;
       }
 
       let foundLastRead = false;
@@ -92,13 +95,13 @@ export class ChatPerformanceUtils {
       // Conta mensagens após a última lida
       for (let i = chat.messages.length - 1; i >= 0; i--) {
         const msg = chat.messages[i];
-        
+
         if (msg.id === lastReadMessageId) {
           foundLastRead = true;
           break;
         }
-        
-        if (msg.sender !== 'user' && !msg.deletedAt) {
+
+        if (msg.sender !== "user" && !msg.deletedAt) {
           unreadCount++;
         }
       }
@@ -109,21 +112,21 @@ export class ChatPerformanceUtils {
 
   // Agrupa mensagens por data com cache
   static groupMessagesByDate(messages: IMessage[]): Record<string, IMessage[]> {
-    const cacheKey = `grouped-messages-${messages.length}-${messages[messages.length - 1]?.id || 'empty'}`;
-    
+    const cacheKey = `grouped-messages-${messages.length}-${messages[messages.length - 1]?.id || "empty"}`;
+
     return this.getCachedOrCompute(cacheKey, () => {
       const groups: Record<string, IMessage[]> = {};
-      
+
       for (const message of messages) {
         if (message.deletedAt) continue;
-        
+
         const date = new Date(message.sentAt).toDateString();
         if (!groups[date]) {
           groups[date] = [];
         }
         groups[date].push(message);
       }
-      
+
       return groups;
     });
   }
@@ -131,14 +134,15 @@ export class ChatPerformanceUtils {
   // Busca mensagens por texto com cache e debounce
   static searchMessages(chat: IChat, searchTerm: string): IMessage[] {
     if (!searchTerm.trim()) return [];
-    
+
     const cacheKey = `search-${chat.id}-${searchTerm.toLowerCase()}-${chat.messages.length}`;
-    
-    return this.getCachedOrCompute(cacheKey, () => 
-      chat.messages.filter(msg => 
-        !msg.deletedAt && 
-        msg.data.content.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+
+    return this.getCachedOrCompute(cacheKey, () =>
+      chat.messages.filter(
+        (msg) =>
+          !msg.deletedAt &&
+          msg.data.content.toLowerCase().includes(searchTerm.toLowerCase()),
+      ),
     );
   }
 
@@ -150,32 +154,36 @@ export class ChatPerformanceUtils {
     averageResponseTime: number;
   } {
     const cacheKey = `chat-stats-${chat.id}-${chat.messages.length}`;
-    
+
     return this.getCachedOrCompute(cacheKey, () => {
       const activeMessages = this.getActiveMessages(chat);
-      const userMessages = activeMessages.filter(msg => msg.sender === 'user');
-      const botMessages = activeMessages.filter(msg => msg.sender !== 'user');
-      
+      const userMessages = activeMessages.filter(
+        (msg) => msg.sender === "user",
+      );
+      const botMessages = activeMessages.filter((msg) => msg.sender !== "user");
+
       // Calcula tempo médio de resposta (simplificado)
       let totalResponseTime = 0;
       let responseCount = 0;
-      
+
       for (let i = 1; i < activeMessages.length; i++) {
         const prev = activeMessages[i - 1];
         const curr = activeMessages[i];
-        
-        if (prev.sender === 'user' && curr.sender !== 'user') {
-          const responseTime = new Date(curr.sentAt).getTime() - new Date(prev.sentAt).getTime();
+
+        if (prev.sender === "user" && curr.sender !== "user") {
+          const responseTime =
+            new Date(curr.sentAt).getTime() - new Date(prev.sentAt).getTime();
           totalResponseTime += responseTime;
           responseCount++;
         }
       }
-      
+
       return {
         totalMessages: activeMessages.length,
         userMessages: userMessages.length,
         botMessages: botMessages.length,
-        averageResponseTime: responseCount > 0 ? totalResponseTime / responseCount : 0,
+        averageResponseTime:
+          responseCount > 0 ? totalResponseTime / responseCount : 0,
       };
     });
   }

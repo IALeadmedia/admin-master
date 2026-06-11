@@ -95,7 +95,7 @@ export const ChatView = ({
             <Loader />
           </div>
         )}
-        <div className="h-[470px] overflow-y-auto p-2">
+        <div className="h-117.5 overflow-y-auto p-2">
           <ChatMessagesList
             messages={messages}
             matchedMessages={matchedMessages}
