@@ -202,4 +202,11 @@ export type TelecomFormValues = {
   single_zip_code?: boolean;
   state?: string;
   zip_code?: string;
+  consultant_notes?: {
+    id: string;
+    obs: string;
+    user: string;
+    role: string;
+    created_at: string;
+  }[];
 };
