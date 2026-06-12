@@ -11,6 +11,7 @@ import { usePartnerQuery } from "../../hooks/partners/usePartnerQuery";
 import { useCompanyQuery } from "../../hooks/companies/useCompanyQuery";
 import { useAdminScope } from "../../context/admin-scope-provider";
 import { useMemo } from "react";
+// import { useLocation } from "@tanstack/react-router";
 
 const segmentOptions = [
   { label: "Financeiro", value: "finances" },
@@ -21,6 +22,7 @@ const segmentOptions = [
 export function LayoutMain() {
 
   const navigate = useNavigate();
+  // const { pathname } = useLocation();
   const { user, logout, isGlobalAdmin } = useAuth();
   const { toggleDarkMode, isDarkMode } = useTheme();
   const {
@@ -63,6 +65,7 @@ export function LayoutMain() {
     });
   };
   const color = appSetting?.primaryColor
+  // const isChatRoute = pathname === "/app/chat";
 
   return (
     <Layout>
@@ -167,7 +170,9 @@ export function LayoutMain() {
         </div>
       </div>
 
+      {/* <Content className={isChatRoute ? "px-0" : "px-6 md:px-10 lg:px-14"}> */}
       <Content className="px-6 md:px-10 lg:px-14">
+
         <div
           style={{
             minHeight: 280,

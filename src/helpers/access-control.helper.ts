@@ -8,7 +8,9 @@ export type PermissionResource =
   | "users"
   | "priorities"
   | "products"
-  | "orders";
+  | "orders"
+  | "chat"
+  | "evolution";
 
 export type PermissionAction = "view" | "create" | "edit" | "delete";
 
@@ -19,7 +21,9 @@ type RestrictedRoute =
   | "/app/priorities"
   | "/app/products"
   | "/app/order"
-  | "/app/orders";
+  | "/app/orders"
+  | "/app/chat"
+  | "/app/evolution";
 
 const allCrudActions: PermissionAction[] = ["view", "create", "edit", "delete"];
 
@@ -34,16 +38,40 @@ const permissionsByRole: Record<
     products: allCrudActions,
     priorities: allCrudActions,
     orders: allCrudActions,
+    chat: allCrudActions,
+    evolution: allCrudActions,
   },
   GESTOR: {
     users: allCrudActions,
     products: allCrudActions,
     orders: allCrudActions,
+    chat: allCrudActions,
+    evolution: allCrudActions,
   },
-  DIRETOR: { products: allCrudActions, orders: allCrudActions },
-  GERENTE: { products: allCrudActions, orders: ["view", "edit"] },
-  LIDER: { products: ["view"], orders: ["view", "edit"] },
-  CONSULTOR: { products: ["view"], orders: ["view", "edit"] },
+  DIRETOR: {
+    products: allCrudActions,
+    orders: allCrudActions,
+    chat: allCrudActions,
+    evolution: allCrudActions,
+  },
+  GERENTE: {
+    products: allCrudActions,
+    orders: ["view", "edit"],
+    chat: allCrudActions,
+    evolution: allCrudActions,
+  },
+  LIDER: {
+    products: ["view"],
+    orders: ["view", "edit"],
+    chat: allCrudActions,
+    evolution: allCrudActions,
+  },
+  CONSULTOR: {
+    products: ["view"],
+    orders: ["view", "edit"],
+    chat: allCrudActions,
+    evolution: allCrudActions,
+  },
 };
 
 const routeResourceMap: Record<RestrictedRoute, PermissionResource> = {
@@ -54,6 +82,8 @@ const routeResourceMap: Record<RestrictedRoute, PermissionResource> = {
   "/app/products": "products",
   "/app/order": "orders",
   "/app/orders": "orders",
+  "/app/chat": "chat",
+  "/app/evolution": "evolution",
 };
 
 function resolveRestrictedRoute(path: string): RestrictedRoute | null {
@@ -67,6 +97,8 @@ function resolveRestrictedRoute(path: string): RestrictedRoute | null {
   if (path.startsWith("/app/partners")) return "/app/partners";
   if (path.startsWith("/app/companies")) return "/app/companies";
   if (path.startsWith("/app/priorities")) return "/app/priorities";
+  if (path.startsWith("/app/chat")) return "/app/chat";
+  if (path.startsWith("/app/evolution")) return "/app/evolution";
 
   return null;
 }

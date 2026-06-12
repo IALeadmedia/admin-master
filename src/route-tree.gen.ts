@@ -17,7 +17,9 @@ import { Route as AppProductsRouteImport } from './routes/app/products'
 import { Route as AppPrioritiesRouteImport } from './routes/app/priorities'
 import { Route as AppPartnersRouteImport } from './routes/app/partners'
 import { Route as AppOrderRouteImport } from './routes/app/order'
+import { Route as AppEvolutionRouteImport } from './routes/app/evolution'
 import { Route as AppCompaniesRouteImport } from './routes/app/companies'
+import { Route as AppChatRouteImport } from './routes/app/chat'
 import { Route as authLoginRouteImport } from './routes/(auth)/login'
 import { Route as AppProductsIndexRouteImport } from './routes/app/products/index'
 import { Route as AppOrderIndexRouteImport } from './routes/app/order/index'
@@ -70,9 +72,19 @@ const AppOrderRoute = AppOrderRouteImport.update({
   path: '/order',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppEvolutionRoute = AppEvolutionRouteImport.update({
+  id: '/evolution',
+  path: '/evolution',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppCompaniesRoute = AppCompaniesRouteImport.update({
   id: '/companies',
   path: '/companies',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppChatRoute = AppChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const authLoginRoute = authLoginRouteImport.update({
@@ -137,7 +149,9 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteRouteWithChildren
   '/login': typeof authLoginRoute
+  '/app/chat': typeof AppChatRoute
   '/app/companies': typeof AppCompaniesRoute
+  '/app/evolution': typeof AppEvolutionRoute
   '/app/order': typeof AppOrderRouteWithChildren
   '/app/partners': typeof AppPartnersRoute
   '/app/priorities': typeof AppPrioritiesRoute
@@ -158,7 +172,9 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof authLoginRoute
+  '/app/chat': typeof AppChatRoute
   '/app/companies': typeof AppCompaniesRoute
+  '/app/evolution': typeof AppEvolutionRoute
   '/app/partners': typeof AppPartnersRoute
   '/app/priorities': typeof AppPrioritiesRoute
   '/app/users': typeof AppUsersRoute
@@ -179,7 +195,9 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/app': typeof AppRouteRouteWithChildren
   '/(auth)/login': typeof authLoginRoute
+  '/app/chat': typeof AppChatRoute
   '/app/companies': typeof AppCompaniesRoute
+  '/app/evolution': typeof AppEvolutionRoute
   '/app/order': typeof AppOrderRouteWithChildren
   '/app/partners': typeof AppPartnersRoute
   '/app/priorities': typeof AppPrioritiesRoute
@@ -203,7 +221,9 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/login'
+    | '/app/chat'
     | '/app/companies'
+    | '/app/evolution'
     | '/app/order'
     | '/app/partners'
     | '/app/priorities'
@@ -224,7 +244,9 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/login'
+    | '/app/chat'
     | '/app/companies'
+    | '/app/evolution'
     | '/app/partners'
     | '/app/priorities'
     | '/app/users'
@@ -244,7 +266,9 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/(auth)/login'
+    | '/app/chat'
     | '/app/companies'
+    | '/app/evolution'
     | '/app/order'
     | '/app/partners'
     | '/app/priorities'
@@ -327,11 +351,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppOrderRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/app/evolution': {
+      id: '/app/evolution'
+      path: '/evolution'
+      fullPath: '/app/evolution'
+      preLoaderRoute: typeof AppEvolutionRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/app/companies': {
       id: '/app/companies'
       path: '/companies'
       fullPath: '/app/companies'
       preLoaderRoute: typeof AppCompaniesRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/chat': {
+      id: '/app/chat'
+      path: '/chat'
+      fullPath: '/app/chat'
+      preLoaderRoute: typeof AppChatRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/(auth)/login': {
@@ -460,7 +498,9 @@ const AppProductsRouteWithChildren = AppProductsRoute._addFileChildren(
 )
 
 interface AppRouteRouteChildren {
+  AppChatRoute: typeof AppChatRoute
   AppCompaniesRoute: typeof AppCompaniesRoute
+  AppEvolutionRoute: typeof AppEvolutionRoute
   AppOrderRoute: typeof AppOrderRouteWithChildren
   AppPartnersRoute: typeof AppPartnersRoute
   AppPrioritiesRoute: typeof AppPrioritiesRoute
@@ -473,7 +513,9 @@ interface AppRouteRouteChildren {
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
+  AppChatRoute: AppChatRoute,
   AppCompaniesRoute: AppCompaniesRoute,
+  AppEvolutionRoute: AppEvolutionRoute,
   AppOrderRoute: AppOrderRouteWithChildren,
   AppPartnersRoute: AppPartnersRoute,
   AppPrioritiesRoute: AppPrioritiesRoute,

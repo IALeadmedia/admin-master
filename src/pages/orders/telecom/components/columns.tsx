@@ -65,6 +65,8 @@ const OPERATOR_ASSETS: Record<string, { src: string; className: string }> = {
     algar: { src: "/algar.png", className: "h-5" },
     brisanet: { src: "/brisanet.png", className: "h-4" },
     vero: { src: "/vero.svg", className: "h-4" },
+    vivo: { src: "/vivo.png", className: "h-4" },
+
 
 };
 function resolveOperatorKey(companyName?: string | null) {
@@ -72,18 +74,18 @@ function resolveOperatorKey(companyName?: string | null) {
 }
 
 function getAvailabilityColumns(companies: ICompany[] = []): TableColumnsType<TelecomOrder> {
-    const vivoColumn: TableColumnsType<TelecomOrder>[number] = {
-        title: (
-            <div className="flex items-center justify-center">
-                <img src="/vivo.png" alt="Vivo" />
-            </div>
-        ),
-        width: 80,
-        render: (_, record) => renderAvailability(record.availability, record.found_via_range),
-    };
+    // const vivoColumn: TableColumnsType<TelecomOrder>[number] = {
+    //     title: (
+    //         <div className="flex items-center justify-center">
+    //             <img src="/vivo.png" alt="Vivo" />
+    //         </div>
+    //     ),
+    //     width: 80,
+    //     render: (_, record) => renderAvailability(record.availability, record.found_via_range),
+    // };
 
     const otherColumns: TableColumnsType<TelecomOrder> = companies
-        .filter((company) => company.company_name !== "Vivo")
+        // .filter((company) => company.company_name !== "Vivo")
         .map((company) => {
             const operatorKey = resolveOperatorKey(company.company_name);
             const asset = operatorKey ? OPERATOR_ASSETS[operatorKey] : undefined;
@@ -112,7 +114,7 @@ function getAvailabilityColumns(companies: ICompany[] = []): TableColumnsType<Te
             };
         });
 
-    return [...otherColumns, vivoColumn];
+    return [...otherColumns];
 }
 
 type UseAllTableColumnsProps = {
@@ -269,7 +271,7 @@ export function getAvailabilityExportColumns(
     companies: ICompany[],
 ): Array<{ title: string; getValue: (record: unknown) => string }> {
     const otherCols = companies
-        .filter((c) => c.company_name !== "Vivo")
+        // .filter((c) => c.company_name !== "Vivo")
         .map((company) => {
             const operatorKey = resolveOperatorKey(company.company_name);
             return {
@@ -289,13 +291,13 @@ export function getAvailabilityExportColumns(
             };
         });
 
-    const vivoCol = {
-        title: "Vivo",
-        getValue: (record: unknown) => {
-            const r = record as TelecomOrder;
-            return resolveAvailabilityLabel(r.availability, r.found_via_range);
-        },
-    };
+    // const vivoCol = {
+    //     title: "Vivo",
+    //     getValue: (record: unknown) => {
+    //         const r = record as TelecomOrder;
+    //         return resolveAvailabilityLabel(r.availability, r.found_via_range);
+    //     },
+    // };
 
-    return [...otherCols, vivoCol];
+    return [...otherCols];
 }

@@ -101,8 +101,7 @@ export function MenuOptions(): JSX.Element {
                 color: ${color} !important;
                 font-weight: 500;
               }
-         
-    }
+                 }
               `}
         </style>
       </ConfigProvider>
