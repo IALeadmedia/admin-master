@@ -44,10 +44,22 @@ const permissionsByRole: Record<
     orders: allCrudActions,
     chat: allCrudActions,
   },
-  DIRETOR: { products: allCrudActions, orders: allCrudActions },
-  GERENTE: { products: allCrudActions, orders: ["view", "edit"] },
-  LIDER: { products: ["view"], orders: ["view", "edit"] },
-  CONSULTOR: { products: ["view"], orders: ["view", "edit"] },
+  DIRETOR: {
+    products: allCrudActions,
+    orders: allCrudActions,
+    chat: allCrudActions,
+  },
+  GERENTE: {
+    products: allCrudActions,
+    orders: ["view", "edit"],
+    chat: allCrudActions,
+  },
+  LIDER: { products: ["view"], orders: ["view", "edit"], chat: allCrudActions },
+  CONSULTOR: {
+    products: ["view"],
+    orders: ["view", "edit"],
+    chat: allCrudActions,
+  },
 };
 
 const routeResourceMap: Record<RestrictedRoute, PermissionResource> = {
