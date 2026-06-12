@@ -220,8 +220,9 @@ export const useChatContext = () => {
   );
 
   // Estados derivados memoizados
-  const sortedChats = useMemo(() => getSortedChats(), [getSortedChats]);
+  // const sortedChats = useMemo(() => getSortedChats(), [getSortedChats]);
 
+  const sortedChats = getSortedChats();
   const isLoadingChats = loading.fetchingChats || chatsQuery.isLoading;
   const isLoadingMessages = selectedChatId
     ? loading.fetchingMessages[selectedChatId] || messagesQuery.isLoading
