@@ -32,29 +32,37 @@ export const AvailabilityStatus = ({
     companyName?: string | null;
 }) => {
     const operatorKey = resolveOperatorKey(companyName);
-    const isVivo = operatorKey === "vivo";
+    // const isVivo = operatorKey === "vivo";
 
-    const available: boolean | number | null | undefined = isVivo
-        ? localData.availability
-        : (() => {
+    const available: boolean | number | null | undefined =
+        // isVivo
+        //     ? localData.availability
+        //     : 
+        (() => {
             const avail = operatorKey ? localData.operators_availability?.[operatorKey] : undefined;
             return avail?.availability ?? avail?.available ?? null;
         })();
 
-    const foundViaRange: boolean | null | undefined = isVivo
-        ? localData.found_via_range
-        : (() => {
+    const foundViaRange: boolean | null | undefined =
+        // isVivo
+        //     ? localData.found_via_range
+        //     : 
+        (() => {
             const avail = operatorKey ? localData.operators_availability?.[operatorKey] : undefined;
             return avail?.encontrado_via_range ?? avail?.found_via_range ?? null;
         })();
 
-    const rangeMin = isVivo
-        ? null
-        : (operatorKey ? localData.operators_availability?.[operatorKey]?.range_min : null) ?? null;
+    const rangeMin =
+        //  isVivo
+        //     ? null
+        //     : 
+        (operatorKey ? localData.operators_availability?.[operatorKey]?.range_min : null) ?? null;
 
-    const rangeMax = isVivo
-        ? null
-        : (operatorKey ? localData.operators_availability?.[operatorKey]?.range_max : null) ?? null;
+    const rangeMax =
+        // isVivo
+        //     ? null
+        //     : 
+        (operatorKey ? localData.operators_availability?.[operatorKey]?.range_max : null) ?? null;
 
     if (available === null || available === undefined) {
         return (
