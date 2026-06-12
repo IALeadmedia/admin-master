@@ -9,7 +9,8 @@ export type PermissionResource =
   | "priorities"
   | "products"
   | "orders"
-  | "chat";
+  | "chat"
+  | "evolution";
 
 export type PermissionAction = "view" | "create" | "edit" | "delete";
 
@@ -21,7 +22,8 @@ type RestrictedRoute =
   | "/app/products"
   | "/app/order"
   | "/app/orders"
-  | "/app/chat";
+  | "/app/chat"
+  | "/app/evolution";
 
 const allCrudActions: PermissionAction[] = ["view", "create", "edit", "delete"];
 
@@ -37,28 +39,38 @@ const permissionsByRole: Record<
     priorities: allCrudActions,
     orders: allCrudActions,
     chat: allCrudActions,
+    evolution: allCrudActions,
   },
   GESTOR: {
     users: allCrudActions,
     products: allCrudActions,
     orders: allCrudActions,
     chat: allCrudActions,
+    evolution: allCrudActions,
   },
   DIRETOR: {
     products: allCrudActions,
     orders: allCrudActions,
     chat: allCrudActions,
+    evolution: allCrudActions,
   },
   GERENTE: {
     products: allCrudActions,
     orders: ["view", "edit"],
     chat: allCrudActions,
+    evolution: allCrudActions,
   },
-  LIDER: { products: ["view"], orders: ["view", "edit"], chat: allCrudActions },
+  LIDER: {
+    products: ["view"],
+    orders: ["view", "edit"],
+    chat: allCrudActions,
+    evolution: allCrudActions,
+  },
   CONSULTOR: {
     products: ["view"],
     orders: ["view", "edit"],
     chat: allCrudActions,
+    evolution: allCrudActions,
   },
 };
 
@@ -71,6 +83,7 @@ const routeResourceMap: Record<RestrictedRoute, PermissionResource> = {
   "/app/order": "orders",
   "/app/orders": "orders",
   "/app/chat": "chat",
+  "/app/evolution": "evolution",
 };
 
 function resolveRestrictedRoute(path: string): RestrictedRoute | null {
@@ -85,6 +98,7 @@ function resolveRestrictedRoute(path: string): RestrictedRoute | null {
   if (path.startsWith("/app/companies")) return "/app/companies";
   if (path.startsWith("/app/priorities")) return "/app/priorities";
   if (path.startsWith("/app/chat")) return "/app/chat";
+  if (path.startsWith("/app/evolution")) return "/app/evolution";
 
   return null;
 }

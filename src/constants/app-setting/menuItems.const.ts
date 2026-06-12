@@ -35,6 +35,10 @@ export const menuOptionsCommon: MenuItem[] = [
         label: "Chat",
         to: "/app/chat",
       },
+      {
+        label: "Conectar conta",
+        to: "/app/evolution",
+      },
     ],
   },
 ];
