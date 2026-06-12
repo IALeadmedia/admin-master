@@ -14,7 +14,7 @@ import { Tooltip } from "@/chat-uberich/components/common/tooltip";
 import { Input } from "@/chat-uberich/components/ui/input";
 import { formatPhoneNumber } from "@/chat-uberich/utils/format_number";
 import { Button } from "@/chat-uberich/components/ui/button";
-
+import anonymousAvatar from "@/assets/anonymous_avatar.png";
 const messagesService = new MessagesService();
 
 const ChatHeaderActions = () => {
@@ -205,7 +205,7 @@ export const ChatHeader = ({
             <img
               className="w-10 rounded-full"
               src={
-                prospect.platformData?.picture ?? "/assets/anonymous_avatar.png"
+                prospect.platformData?.picture ?? anonymousAvatar
               }
               alt="Avatar"
             />
@@ -353,7 +353,7 @@ export const ChatHeader = ({
       >
         <img
           className="rounded-md max-h-[70vh] max-w-[70vw] items-center flex"
-          src={prospect.platformData?.picture ?? "/assets/anonymous_avatar.png"}
+          src={prospect.platformData?.picture ?? anonymousAvatar}
           alt="Avatar"
         />
       </Modal>
